@@ -30,7 +30,7 @@ public class Distributor
     public int CurrentInstrument { get; set; } = 0;
 
     //Each Bit Represents an Enabled Channel/Instrument (limits max number of instruments to 32)
-    public int Channels { get; set; } = 0; //Represents Enabled MIDI Channels
+    public int Channels {get; set; } = 0; //Represents Enabled MIDI Channels
     public int Instruments { get; set; } = 0; //Represents Enabled Instruments
 
     //Settings

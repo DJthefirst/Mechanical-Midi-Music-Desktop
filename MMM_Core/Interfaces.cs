@@ -16,6 +16,7 @@ public class MMM
 	private MidiOutputSystem midiOutputSystem = new MidiOutputSystem();
 	public MidiSerialManager serialManager = new MidiSerialManager();
 	public MidiPortInManager midiPortInManager = new MidiPortInManager();
+	public MidiPortOutManager midiPortOutManager = new MidiPortOutManager();
 	MidiCore midiCore = new MidiCore();
 
 	static MMM() { }
@@ -31,6 +32,7 @@ public class MMM
 		//Connect MIDI Outputs
 		//midiCore.Connect((IOutputDevice)midiOutputSystem);
 		midiCore.Connect((IOutputDevice)serialManager);
+		midiCore.Connect((IOutputDevice)midiPortOutManager);
 	}
 	public static MMM Instance => instance;
 }

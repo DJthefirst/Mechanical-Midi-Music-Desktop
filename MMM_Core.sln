@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing Example", "Testing 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMM_Device", "MMM_Device\MMM_Device.csproj", "{12CAC53F-FB2E-46DC-9476-B6D7F269C981}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGUI", "AvaloniaGUI\AvaloniaGUI.csproj", "{0C31B08E-E64D-40BB-A0C6-E4AC984E2FF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGUI.Desktop", "AvaloniaGUI.Desktop\AvaloniaGUI.Desktop.csproj", "{5C801176-C141-47B9-A823-01CCF946E61D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{12CAC53F-FB2E-46DC-9476-B6D7F269C981}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12CAC53F-FB2E-46DC-9476-B6D7F269C981}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12CAC53F-FB2E-46DC-9476-B6D7F269C981}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C31B08E-E64D-40BB-A0C6-E4AC984E2FF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C31B08E-E64D-40BB-A0C6-E4AC984E2FF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C31B08E-E64D-40BB-A0C6-E4AC984E2FF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C31B08E-E64D-40BB-A0C6-E4AC984E2FF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C801176-C141-47B9-A823-01CCF946E61D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C801176-C141-47B9-A823-01CCF946E61D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C801176-C141-47B9-A823-01CCF946E61D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C801176-C141-47B9-A823-01CCF946E61D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

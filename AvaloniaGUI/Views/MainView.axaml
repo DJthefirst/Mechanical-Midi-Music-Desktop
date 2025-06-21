@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaGUI.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+	<Grid RowDefinitions="Auto, *, Auto" >
+        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+		
+		<Grid
+		    RowDefinitions="Auto"
+			Background="Black">
+			<Image Source="/Assets/Images/MMM_Icon.png"
+				   Height="50"
+				   HorizontalAlignment="Left">
+				
+			</Image>
+			<!--
+			<Image Source="{SvgImage /Assets/Images/MMM_Logo_White_Simple.svg}"
+				   HorizontalAlignment="Left"
+				   Width="100">
+			</Image>
+			-->
+		</Grid>
+
+	</Grid>
+</UserControl>

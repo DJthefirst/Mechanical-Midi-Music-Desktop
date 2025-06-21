@@ -184,44 +184,48 @@ public class ConsoleGUI()
 	}
     void Cmd_MIDIOUTAVAILABLE()
     {
-        //var ports = MMM_CoreDesktop.GetAvailableMidiOut();
-        //if (ports.Count == 0) { Console.WriteLine("No available MIDI Out ports"); return; }
-        //Console.WriteLine("---------- Available MIDI Out Ports ----------\n");
-        //foreach (var port in ports)
-        //{
-        //    Console.WriteLine("ID: " + port.Item1);
-        //    Console.WriteLine("Name: " + port.Item2);
-        //    Console.WriteLine("Manufacturer: " + port.Item3);
-        //    Console.WriteLine("Version: " + port.Item4);
-        //    Console.WriteLine();
-        //}
-    }
+		var ports = MMM.Instance.midiPortOutManager.AvailableConnections();
+        if (ports.Count == 0) { Console.WriteLine("No available MIDI Out ports"); return; }
+        Console.WriteLine("---------- Available MIDI Out Ports ----------\n");
+        foreach (var port in ports)
+			Console.WriteLine("ID: " + port);
+
+		//{
+		//    Console.WriteLine("ID: " + port.Item1);
+		//    Console.WriteLine("Name: " + port.Item2);
+		//    Console.WriteLine("Manufacturer: " + port.Item3);
+		//    Console.WriteLine("Version: " + port.Item4);
+		//    Console.WriteLine();
+		//}
+	}
     void Cmd_MIDIOUTLIST()
     {
-        //var ports = MMM_CoreDesktop.ListConnectedOutputs();
-        //if (ports.Count == 0) { Console.WriteLine("No connected MIDI Out ports"); return; }
-        //Console.WriteLine("---------- Connected MIDI Out Ports ----------\n");
-        //foreach (var port in ports)
-        //{
-        //    Console.WriteLine("ID: " + port.Item1);
-        //    Console.WriteLine("Name: " + port.Item2);
-        //    Console.WriteLine("Manufacturer: " + port.Item3);
-        //    Console.WriteLine("Version: " + port.Item4);
-        //    Console.WriteLine();
-        //}
-    }
+		var ports = MMM.Instance.midiPortInManager.ListConnections();
+        if (ports.Count == 0) { Console.WriteLine("No connected MIDI Out ports"); return; }
+        Console.WriteLine("---------- Connected MIDI Out Ports ----------\n");
+        foreach (var port in ports)
+			Console.WriteLine("ID: " + port);
+
+		//{
+		//    Console.WriteLine("ID: " + port.Item1);
+		//    Console.WriteLine("Name: " + port.Item2);
+		//    Console.WriteLine("Manufacturer: " + port.Item3);
+		//    Console.WriteLine("Version: " + port.Item4);
+		//    Console.WriteLine();
+		//}
+	}
     void Cmd_MIDIOUTCONNECT(string? cmd)
     {
-        //MMM_CoreDesktop.AddMidiOutput(cmd);
-    }
+		MMM.Instance.midiPortOutManager.AddConnection(cmd);
+	}
     void Cmd_MIDIOUTDISCONNECT(string? cmd)
     {
-        //MMM_CoreDesktop.RemoveMidiOutput(cmd);
-    }
+		MMM.Instance.midiPortOutManager.RemoveConnection(cmd);
+	}
     void Cmd_MIDIOUTRESET()
     {
-        //MMM_CoreDesktop.ClearMidiOutputs();
-    }
+		MMM.Instance.midiPortOutManager.ClearConnections();
+	}
     void Cmd_SONGADD(string? cmd)
     {
 		try
