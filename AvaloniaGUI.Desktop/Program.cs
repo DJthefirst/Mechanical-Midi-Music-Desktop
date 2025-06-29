@@ -1,7 +1,6 @@
 ﻿using System;
 
 using Avalonia;
-using Avalonia.Svg.Skia;
 
 namespace AvaloniaGUI.Desktop;
 
@@ -14,13 +13,11 @@ class Program
     public static void Main(string[] args) => BuildAvaloniaApp()
         .StartWithClassicDesktopLifetime(args);
 
-	public static AppBuilder BuildAvaloniaApp()
-	{
-		GC.KeepAlive(typeof(SvgImageExtension).Assembly);
-		return AppBuilder.Configure<App>()
-			.UsePlatformDetect()
-			.WithInterFont()
-			.LogToTrace();
-	}
+    // Avalonia configuration, don't remove; also used by visual designer.
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
 
 }

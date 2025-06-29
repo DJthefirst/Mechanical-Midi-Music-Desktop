@@ -1,10 +1,123 @@
-<Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaGUI.App"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+<Application
+    x:Class="AvaloniaGUI.App"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:AvaloniaGUI"
+    xmlns:vc="clr-namespace:AvaloniaGUI.ValueConverters"
+    RequestedThemeVariant="Default">
+    <!--  "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options.  -->
+
+    <Application.DataTemplates>
+        <local:ViewLocator />
+    </Application.DataTemplates>
 
     <Application.Styles>
         <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="Styles/Buttons.axaml" />
+        <StyleInclude Source="Styles/General.axaml" />
+        <StyleInclude Source="Styles/Labels.axaml" />
+        <StyleInclude Source="Styles/ListBox.axaml" />
+        <StyleInclude Source="Styles/TextBlock.axaml" />
+        <StyleInclude Source="Styles/TextBox.axaml" />
     </Application.Styles>
+
+    <Application.Resources>
+
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <MergeResourceInclude Source="/Controls/ButtonSpinner.axaml" />
+                <MergeResourceInclude Source="/Controls/IconButton.axaml" />
+                <MergeResourceInclude Source="/Controls/CheckBox.axaml" />
+                <MergeResourceInclude Source="/Controls/ToggleButton.axaml" />
+                <MergeResourceInclude Source="/Controls/ComboBox.axaml" />
+                <MergeResourceInclude Source="/Controls/ComboBoxItem.axaml" />
+                <MergeResourceInclude Source="/Controls/ListBoxItem.axaml" />
+                <MergeResourceInclude Source="/Controls/NumericUpDown.axaml" />
+                <MergeResourceInclude Source="/Controls/TabControl.axaml" />
+                <MergeResourceInclude Source="/Controls/TabItem.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+
+        <vc:BooleanToBoldFontConverter x:Key="BooleanToBoldFontConverter" />
+
+        <Thickness x:Key="PrimaryBorderThickness">2</Thickness>
+
+        <SolidColorBrush x:Key="PrimaryForeground">#CFCFCF</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryForegroundSubtle">#aaa</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryBackground">#14172D</SolidColorBrush>
+
+        <Color x:Key="PrimaryBackgroundColor1">#111214</Color>
+        <Color x:Key="PrimaryBackgroundColor2">#151E3E</Color>
+
+        <LinearGradientBrush x:Key="PrimaryBackgroundGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="{DynamicResource PrimaryBackgroundColor1}" />
+            <GradientStop Offset="1" Color="{DynamicResource PrimaryBackgroundColor2}" />
+        </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="PrimaryHoverBackground">#333B5A</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryHoverForeground">White</SolidColorBrush>
+
+        <LinearGradientBrush x:Key="DefaultGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#333B5A" />
+            <GradientStop Offset="1" Color="#333B5A" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="ActiveGradientText" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#7C59CD" />
+            <GradientStop Offset="1" Color="#7C59CD" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="ActiveGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#6633DD" />
+            <GradientStop Offset="1" Color="#431B9F" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="ActiveHoverGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#6633DD" />
+            <GradientStop Offset="1" Color="#6633DD" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="HoverGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#00ffff" />
+            <GradientStop Offset="1" Color="#ff00ff" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="SuccessGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#00ff00" />
+            <GradientStop Offset="1" Color="#009900" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="SuccessHoverGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#44ff44" />
+            <GradientStop Offset="1" Color="#55cc55" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="AlertGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#ffff00" />
+            <GradientStop Offset="1" Color="#ff8800" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="AlertHoverGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#ffff00" />
+            <GradientStop Offset="1" Color="#ffff00" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="DangerGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#ff0000" />
+            <GradientStop Offset="1" Color="#aa0000" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="DangerHoverGradient" StartPoint="0%, 0%" EndPoint="100%, 0%">
+            <GradientStop Offset="0" Color="#ff4444" />
+            <GradientStop Offset="1" Color="#bb1111" />
+        </LinearGradientBrush>
+
+
+        <FontFamily x:Key="Phosphor">/Assets/Fonts/Phosphor.ttf#Phosphor</FontFamily>
+        <FontFamily x:Key="PhosphorFill">/Assets/Fonts/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>
+
+        <FontFamily x:Key="DefaultFontFamily">/Assets/Fonts/NotoSansJP.ttf</FontFamily>
+
+    </Application.Resources>
 </Application>

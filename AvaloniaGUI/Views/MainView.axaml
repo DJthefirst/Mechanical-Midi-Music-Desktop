@@ -11,24 +11,6 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
-	<Grid RowDefinitions="Auto, *, Auto" >
-        <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-		
-		<Grid
-		    RowDefinitions="Auto"
-			Background="Black">
-			<Image Source="/Assets/Images/MMM_Icon.png"
-				   Height="50"
-				   HorizontalAlignment="Left">
-				
-			</Image>
-			<!--
-			<Image Source="{SvgImage /Assets/Images/MMM_Logo_White_Simple.svg}"
-				   HorizontalAlignment="Left"
-				   Width="100">
-			</Image>
-			-->
-		</Grid>
 
-	</Grid>
+  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 </UserControl>
