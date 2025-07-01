@@ -9,9 +9,12 @@
     Title="AvaloniaGUI"
     Width="1400"
     Height="800"
-    MinWidth="1400"
-    MinHeight="800"
+    MinWidth="100"
+    MinHeight="100"
+    d:DesignHeight="800"
+    d:DesignWidth="1400"
     Icon="/Assets/Images/avalonia-logo.ico"
+    WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
 
     <Design.DataContext>

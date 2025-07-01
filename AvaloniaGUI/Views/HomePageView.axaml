@@ -1,0 +1,544 @@
+﻿<UserControl
+    x:Class="AvaloniaGUI.Views.HomePageView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    MinHeight="100"
+    d:DesignHeight="800"
+    d:DesignWidth="1400"
+    mc:Ignorable="d">
+
+
+    <Grid Background="#112" ColumnDefinitions="*,*,*">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Grid.Column="0">
+                <!--  MIDI Player  -->
+                <Border
+                    Margin="5,5,5,5"
+                    Padding="5,5,5,10"
+                    Background="#383840"
+                    CornerRadius="20">
+                    <StackPanel>
+                        <Label
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Foreground="White">
+                            MIDI Player
+                        </Label>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Border
+                                Grid.Column="0"
+                                Margin="5,0,5,10"
+                                Padding="5"
+                                Background="#333"
+                                CornerRadius="10">
+                                <Grid RowDefinitions="*,Auto,Auto ">
+
+                                    <ListBox
+                                        MinHeight="100"
+                                        MaxHeight="150"
+                                        VerticalAlignment="Stretch"
+                                        CornerRadius="10"
+                                        ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                        <ListBoxItem Height="40" FontSize="10">
+                                            1. KirbysTheme
+                                        </ListBoxItem>
+                                        <ListBoxItem Height="40" FontSize="10">2. NyanCat</ListBoxItem>
+                                        <ListBoxItem Height="40" FontSize="10">
+                                            3. Pirates of the Caribbean
+                                        </ListBoxItem>
+                                        <ListBoxItem Height="40" FontSize="10">4. Smash Mouth - All Star</ListBoxItem>
+                                        <ListBoxItem Height="40" FontSize="10">
+                                            5. Tetris
+                                        </ListBoxItem>
+                                    </ListBox>
+
+                                    <Slider
+                                        Grid.Row="1"
+                                        Margin="0"
+                                        Padding="0" />
+                                    <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*,*,*,*">
+
+                                        <Label Grid.Column="0" Foreground="white">-0:00</Label>
+                                        <Button Grid.Column="1" />
+                                        <Button Grid.Column="2" />
+                                        <Button Grid.Column="3" />
+                                        <Button Grid.Column="4" />
+                                        <Button Grid.Column="5" />
+                                        <Button Grid.Column="6" />
+                                        <Label Grid.Column="7" Foreground="white">0:00</Label>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,*">
+                                <Button
+                                    Grid.Row="0"
+                                    HorizontalAlignment="Stretch"
+                                    Content="Add Song" />
+                                <Button
+                                    Grid.Row="1"
+                                    HorizontalAlignment="Stretch"
+                                    Content="Remove Song" />
+                                <Button
+                                    Grid.Row="2"
+                                    HorizontalAlignment="Stretch"
+                                    Content="Clear Playlist" />
+                                <StackPanel Grid.Row="3">
+                                    <Label HorizontalContentAlignment="Center" Foreground="White">MIDI IN</Label>
+                                    <ListBox>
+                                        <ListBoxItem>
+                                            loopMIDI Port
+                                        </ListBoxItem>
+                                    </ListBox>
+                                </StackPanel>
+                                <StackPanel Grid.Row="4">
+                                    <Label HorizontalContentAlignment="Center" Foreground="White">MIDI OUT</Label>
+                                    <ListBox>
+                                        <ListBoxItem>
+                                            loopMIDI Port
+                                        </ListBoxItem>
+                                    </ListBox>
+                                </StackPanel>
+
+                            </Grid>
+                        </Grid>
+
+                    </StackPanel>
+                </Border>
+                <!--  Device Manager  -->
+                <Border
+                    Margin="5,5,5,5"
+                    Padding="5,5,5,10"
+                    Background="#383840"
+                    CornerRadius="20">
+                    <StackPanel>
+                        <Label
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Foreground="White">
+                            Device Manager
+                        </Label>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <StackPanel
+                                Grid.Column="0"
+                                Margin="5"
+                                Orientation="Horizontal">
+                                <Label VerticalAlignment="Center" Foreground="White">
+                                    Device ID
+                                </Label>
+                                <TextBox Text="1" />
+                            </StackPanel>
+                            <StackPanel
+                                Grid.Column="1"
+                                Margin="5"
+                                Orientation="Horizontal">
+                                <Label VerticalAlignment="Center" Foreground="White">
+                                    Device Name
+                                </Label>
+                                <TextBox Text="" />
+                            </StackPanel>
+                        </Grid>
+                        <StackPanel Margin="5" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Omni Mode Enable
+                            </Label>
+                            <CheckBox />
+                        </StackPanel>
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <Button
+                                Grid.Column="0"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Update
+                            </Button>
+                            <Button
+                                Grid.Column="1"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Reset
+                            </Button>
+                            <Button
+                                Grid.Column="2"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Remove
+                            </Button>
+                            <Button
+                                Grid.Column="3"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Clear
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+                <!--  Distributor Manager  -->
+                <Border
+                    Margin="5,5,5,5"
+                    Padding="5,5,5,10"
+                    Background="#383840"
+                    CornerRadius="20">
+                    <StackPanel>
+                        <Label
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="18"
+                            Foreground="White">
+                            Distruibutor Manager
+                        </Label>
+                        <StackPanel Margin="0" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Channels
+                            </Label>
+                            <TextBox Text="1-4" />
+                        </StackPanel>
+                        <StackPanel Margin="0" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Instruments
+                            </Label>
+                            <ComboBox>
+                                <ComboBoxItem>RoundRobinBalance</ComboBoxItem>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="5" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Damper Enable
+                            </Label>
+                            <CheckBox />
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Polyphonic Enable
+                            </Label>
+                            <CheckBox />
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Note Overwrite
+                            </Label>
+                            <CheckBox />
+                        </StackPanel>
+                        <StackPanel Margin="5" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Note Min/Max
+                            </Label>
+                            <TextBox Text="0" />
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                -
+                            </Label>
+                            <TextBox Text="127" />
+                        </StackPanel>
+                        <StackPanel Margin="5" Orientation="Horizontal">
+                            <Label VerticalAlignment="Center" Foreground="White">
+                                Number of Polyphonic Notes
+                            </Label>
+                            <TextBox Text="1" />
+                        </StackPanel>
+
+                        <Grid ColumnDefinitions="*,*,*,*">
+                            <Button
+                                Grid.Column="0"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Update
+                            </Button>
+                            <Button
+                                Grid.Column="1"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Reset
+                            </Button>
+                            <Button
+                                Grid.Column="2"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Remove
+                            </Button>
+                            <Button
+                                Grid.Column="3"
+                                Margin="5"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center">
+                                Clear
+                            </Button>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+        <!--  Distributor List  -->
+        <Border
+            Grid.Column="1"
+            Margin="5,5,5,5"
+            Padding="5,5,5,10"
+            Background="#383840"
+            CornerRadius="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Label
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        Foreground="White">
+                        Distributors
+                    </Label>
+                    <ListBox Background="#383840">
+
+                        <ListBoxItem
+                            Margin="5,5,5,5"
+                            Background="#112"
+                            CornerRadius="15">
+                            <Grid ColumnDefinitions="*,0.8*">
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Distributor ID:</Label>
+                                        <Label>0</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Channels:</Label>
+                                        <Label>0x0001</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Instrument:</Label>
+                                        <Label>0x0000000F</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Label>Distribution Method:</Label>
+                                        <Label>RoundRobinBalance</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Note Min/Max:</Label>
+                                        <Label>1-127</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Damper:</Label>
+                                        <CheckBox IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Polyphonic:</Label>
+                                        <CheckBox IsChecked="True" IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Note Overwrite:</Label>
+                                        <CheckBox IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>NumPolyphonic Notes:</Label>
+                                        <Label>1</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </ListBoxItem>
+
+                        <ListBoxItem
+                            Margin="5,5,5,5"
+                            Background="#112"
+                            CornerRadius="15">
+                            <Grid ColumnDefinitions="*,0.8*">
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Distributor ID:</Label>
+                                        <Label>0</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Channels:</Label>
+                                        <Label>0x0001</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Instrument:</Label>
+                                        <Label>0x0000000F</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical">
+                                        <Label>Distribution Method:</Label>
+                                        <Label>RoundRobinBalance</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Note Min/Max:</Label>
+                                        <Label>1-127</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Damper:</Label>
+                                        <CheckBox IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Polyphonic:</Label>
+                                        <CheckBox IsChecked="True" IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Note Overwrite:</Label>
+                                        <CheckBox IsEnabled="False" />
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>NumPolyphonic Notes:</Label>
+                                        <Label>1</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        <!--  Device List  -->
+        <Border
+            Grid.Column="3"
+            Margin="5,5,5,5"
+            Padding="5,5,5,10"
+            Background="#383840"
+            CornerRadius="20">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Label
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontSize="18"
+                        Foreground="White">
+                        Devices
+                    </Label>
+                    <Grid ColumnDefinitions="*,*,*">
+                        <ComboBox Grid.Column="0" HorizontalAlignment="Stretch">
+                            <ComboBoxItem>115200</ComboBoxItem>
+                        </ComboBox>
+                        <Button
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                            Add Device
+                        </Button>
+                        <Button
+                            Grid.Column="2"
+                            HorizontalAlignment="Stretch"
+                            HorizontalContentAlignment="Center">
+                            Remove Device
+                        </Button>
+                    </Grid>
+
+                    <ListBox Background="#383840">
+
+                        <ListBoxItem
+                            Margin="5,5,5,5"
+                            Background="#112"
+                            CornerRadius="15">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                        <Label>ID:</Label>
+                                        <Label>001</Label>
+                                    </StackPanel>
+                                    <Label HorizontalAlignment="Center">Devcie 1</Label>
+                                    <Label HorizontalAlignment="Right">COM 3</Label>
+                                </Grid>
+                                <Grid>
+                                    <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Platform:</Label>
+                                            <Label>0</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Device Type:</Label>
+                                            <Label>0x0001</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Number of Instruments:</Label>
+                                            <Label>0x0000000F</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Notes:</Label>
+                                            <Label>RoundRobinBalance</Label>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem
+                            Margin="5,5,5,5"
+                            Background="#112"
+                            CornerRadius="15">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                        <Label>ID:</Label>
+                                        <Label>001</Label>
+                                    </StackPanel>
+                                    <Label HorizontalAlignment="Center">Devcie 2</Label>
+                                    <Label HorizontalAlignment="Right">UDP 192.168.1.15</Label>
+                                </Grid>
+                                <Grid>
+                                    <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Platform:</Label>
+                                            <Label>0</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Device Type:</Label>
+                                            <Label>0x0001</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Number of Instruments:</Label>
+                                            <Label>0x0000000F</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Notes:</Label>
+                                            <Label>RoundRobinBalance</Label>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </ListBoxItem>
+
+                        <ListBoxItem
+                            Margin="5,5,5,5"
+                            Background="#112"
+                            CornerRadius="15">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                        <Label>ID:</Label>
+                                        <Label>001</Label>
+                                    </StackPanel>
+                                    <Label HorizontalAlignment="Center">Devcie 3</Label>
+                                    <Label HorizontalAlignment="Right">COM 5</Label>
+                                </Grid>
+                                <Grid>
+                                    <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                    <StackPanel Grid.Column="0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Platform:</Label>
+                                            <Label>0</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Device Type:</Label>
+                                            <Label>0x0001</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Number of Instruments:</Label>
+                                            <Label>0x0000000F</Label>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Label>Notes:</Label>
+                                            <Label>RoundRobinBalance</Label>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </ListBoxItem>
+                    </ListBox>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+    </Grid>
+</UserControl>
