@@ -10,14 +10,14 @@
     mc:Ignorable="d">
 
 
-    <Grid Background="#112" ColumnDefinitions="*,*,*">
+    <Grid Background="{DynamicResource PrimaryBackground}" ColumnDefinitions="*,*,*">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.Column="0">
                 <!--  MIDI Player  -->
                 <Border
                     Margin="5,5,5,5"
                     Padding="5,5,5,10"
-                    Background="#383840"
+                    Background="{DynamicResource SecondaryBackground}"
                     CornerRadius="20">
                     <StackPanel>
                         <Label
@@ -111,7 +111,7 @@
                 <Border
                     Margin="5,5,5,5"
                     Padding="5,5,5,10"
-                    Background="#383840"
+                    Background="{DynamicResource SecondaryBackground}"
                     CornerRadius="20">
                     <StackPanel>
                         <Label
@@ -183,7 +183,7 @@
                 <Border
                     Margin="5,5,5,5"
                     Padding="5,5,5,10"
-                    Background="#383840"
+                    Background="{DynamicResource SecondaryBackground}"
                     CornerRadius="20">
                     <StackPanel>
                         <Label
@@ -277,7 +277,7 @@
             Grid.Column="1"
             Margin="5,5,5,5"
             Padding="5,5,5,10"
-            Background="#383840"
+            Background="{DynamicResource SecondaryBackground}"
             CornerRadius="20">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
@@ -288,11 +288,11 @@
                         Foreground="White">
                         Distributors
                     </Label>
-                    <ListBox Background="#383840">
+                    <ListBox Background="{DynamicResource SecondaryBackground}">
 
                         <ListBoxItem
                             Margin="5,5,5,5"
-                            Background="#112"
+                            Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="15">
                             <Grid ColumnDefinitions="*,0.8*">
                                 <StackPanel Grid.Column="0">
@@ -340,7 +340,7 @@
 
                         <ListBoxItem
                             Margin="5,5,5,5"
-                            Background="#112"
+                            Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="15">
                             <Grid ColumnDefinitions="*,0.8*">
                                 <StackPanel Grid.Column="0">
@@ -394,7 +394,7 @@
             Grid.Column="3"
             Margin="5,5,5,5"
             Padding="5,5,5,10"
-            Background="#383840"
+            Background="{DynamicResource SecondaryBackground}"
             CornerRadius="20">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
@@ -423,11 +423,11 @@
                         </Button>
                     </Grid>
 
-                    <ListBox Background="#383840">
+                    <ListBox Background="{DynamicResource SecondaryBackground}">
 
                         <ListBoxItem
                             Margin="5,5,5,5"
-                            Background="#112"
+                            Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="15">
                             <StackPanel>
                                 <Grid>
@@ -464,7 +464,7 @@
 
                         <ListBoxItem
                             Margin="5,5,5,5"
-                            Background="#112"
+                            Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="15">
                             <StackPanel>
                                 <Grid>
@@ -501,7 +501,7 @@
 
                         <ListBoxItem
                             Margin="5,5,5,5"
-                            Background="#112"
+                            Background="{DynamicResource PrimaryBackground}"
                             CornerRadius="15">
                             <StackPanel>
                                 <Grid>

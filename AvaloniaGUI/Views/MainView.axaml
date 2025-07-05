@@ -14,25 +14,13 @@
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <Grid Background="{DynamicResource PrimaryBackground}" ColumnDefinitions="Auto, *">
-
-        <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
-
-        <Border Padding="20" Background="{DynamicResource PrimaryBackgroundGradient}">
-            <Grid RowDefinitions="*, Auto">
-                <StackPanel Spacing="12">
-                    <Image Width="22" Source="{SvgImage /Assets/Images/icon.svg}" />
-
-                    <Button HorizontalAlignment="Stretch">
-                        <Label Content="Home" IsVisible="{Binding SideMenuExpanded}" />
-                    </Button>
-                </StackPanel>
-
-                <Button Grid.Row="1" Classes="transparent subtle">
-                    <Label Classes="icon-only" Content="&#xe272;" />
-                </Button>
-            </Grid>
-        </Border>
-    </Grid>
+    <TabControl Background="{DynamicResource PrimaryBackground}" Foreground="White">
+        <TabItem Foreground="White" Header="Home">
+            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
+        </TabItem>
+        <TabItem Foreground="{DynamicResource PrimaryForeground}" Header="MIDI">
+            <TextBlock Margin="5">This is tab 3 content</TextBlock>
+        </TabItem>
+    </TabControl>
 
 </UserControl>
