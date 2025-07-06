@@ -32,5 +32,11 @@
     <Compile Update="Controls\IconButton2.axaml.cs">
       <DependentUpon>IconButton2.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\MidiPageView.axaml.cs">
+      <DependentUpon>MidiPageView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MidiPlayerView.axaml.cs">
+      <DependentUpon>MidiPlayerView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

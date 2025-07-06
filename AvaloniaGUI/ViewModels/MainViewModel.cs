@@ -12,10 +12,6 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	private readonly PageFactory _pageFactory;
 	//private readonly DatabaseFactory _databaseFactory;
 
-	[ObservableProperty]
-	private bool _sideMenuExpanded = true;
-
-
 	//[NotifyPropertyChangedFor(nameof(ProcessPageIsActive))]
 	//[NotifyPropertyChangedFor(nameof(ActionsPageIsActive))]
 	//[NotifyPropertyChangedFor(nameof(MacrosPageIsActive))]
@@ -24,6 +20,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	//[NotifyPropertyChangedFor(nameof(SettingsPageIsActive))]
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(MidiPageIsActive))]
 	[NotifyPropertyChangedFor(nameof(HomePageIsActive))]
 	private PageViewModel _currentPage;
 
@@ -31,6 +28,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	//private DialogViewModel _dialog;
 
 	public bool HomePageIsActive => CurrentPage.PageName == ApplicationPageNames.Home;
+	public bool MidiPageIsActive => CurrentPage.PageName == ApplicationPageNames.Midi;
 	//public bool ProcessPageIsActive => CurrentPage.PageName == ApplicationPageNames.Process;
 	//public bool ActionsPageIsActive => CurrentPage.PageName == ApplicationPageNames.Actions;
 	//public bool MacrosPageIsActive => CurrentPage.PageName == ApplicationPageNames.Macros;
@@ -50,9 +48,16 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	}
 #pragma warning restore CS8618, CS9264
 
-	[RelayCommand]
-	private void SideMenuResize() => SideMenuExpanded = !SideMenuExpanded;
+	public MainViewModel(PageFactory pageFactory)
+	{
+		_pageFactory = pageFactory ?? throw new ArgumentNullException(nameof(pageFactory));
+		CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>();
+	}
 
 	[RelayCommand]
 	private void GoToHome() => CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>();
+
+
+	[RelayCommand]
+	private void GoToMidi() => CurrentPage = _pageFactory.GetPageViewModel<MidiPageViewModel>();
 }

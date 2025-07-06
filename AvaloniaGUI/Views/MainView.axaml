@@ -10,17 +10,34 @@
     MinHeight="100"
     x:DataType="vm:MainViewModel"
     mc:Ignorable="d">
+
     <Design.DataContext>
         <vm:MainViewModel />
     </Design.DataContext>
 
-    <TabControl Background="{DynamicResource PrimaryBackground}" Foreground="White">
-        <TabItem Foreground="White" Header="Home">
-            <ContentControl Grid.Column="1" Content="{Binding CurrentPage}" />
-        </TabItem>
-        <TabItem Foreground="{DynamicResource PrimaryForeground}" Header="MIDI">
-            <TextBlock Margin="5">This is tab 3 content</TextBlock>
-        </TabItem>
-    </TabControl>
+    <Grid Background="{DynamicResource PrimaryBackground}" RowDefinitions="auto,*">
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <Image
+                Width="50"
+                VerticalAlignment="Center"
+                Source="{SvgImage /Assets/Images/MMM_Icon_Blue_BG.svg}" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToHomeCommand}"
+                Content="Home"
+                FontSize="25"
+                FontWeight="Bold" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToMidiCommand}"
+                Content="MIDI View"
+                FontSize="25"
+                FontWeight="Bold" />
+        </StackPanel>
+
+        <ContentControl Grid.Row="1" Content="{Binding CurrentPage}" />
+    </Grid>
 
 </UserControl>

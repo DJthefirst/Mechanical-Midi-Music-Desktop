@@ -14,14 +14,15 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
-        <StyleInclude Source="Styles/Buttons.axaml" />
+        <StyleInclude Source="Styles/AppDefaultStyles.axaml" />
+        <!-- <StyleInclude Source="Styles/Buttons.axaml" /> -->
     </Application.Styles>
 
     <Application.Resources>
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <MergeResourceInclude Source="/Controls/IconButton.axaml" />
+                <!-- <MergeResourceInclude Source="/Controls/IconButton.axaml" /> -->
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
@@ -29,12 +30,15 @@
 
         <Thickness x:Key="PrimaryBorderThickness">2</Thickness>
 
-        <SolidColorBrush x:Key="PrimaryForeground">#FFF</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryForegroundSubtle">#aaa</SolidColorBrush>
         <SolidColorBrush x:Key="PrimaryBackground">#1E2124</SolidColorBrush>
         <SolidColorBrush x:Key="SecondaryBackground">#36393E</SolidColorBrush>
-        <SolidColorBrush x:Key="SelectedBackground">#205080</SolidColorBrush>
-        <SolidColorBrush x:Key="HoverBackground">#374151</SolidColorBrush>
+
+        <SolidColorBrush x:Key="PrimaryForeground">#CFCFCF</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimarySelectedBackground">#205080</SolidColorBrush>
+
+        <SolidColorBrush x:Key="PrimaryHoverForeground">White</SolidColorBrush>
+        <SolidColorBrush x:Key="PrimaryHoverBackground">#374151</SolidColorBrush>
 
         <Color x:Key="PrimaryBackgroundColor1">#1E2124</Color>
         <Color x:Key="PrimaryBackgroundColor2">#36393E</Color>

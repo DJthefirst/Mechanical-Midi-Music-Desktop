@@ -4,9 +4,9 @@ using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 
 using Avalonia.Metadata;
-//using AvaloniaGUI.Data;
+using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
-// using AvaloniaGUI.Services;
+//using AvaloniaGUI.Services;
 using AvaloniaGUI.ViewModels;
 using AvaloniaGUI.Views;
 using Microsoft.EntityFrameworkCore;
@@ -26,27 +26,17 @@ public partial class App : Application
 	{
 		var collection = new ServiceCollection();
 		collection.AddSingleton<MainViewModel>();
-		//collection.AddTransient<ActionsPageViewModel>();
-		//collection.AddTransient<HistoryPageViewModel>();
-		//collection.AddTransient<HomePageViewModel>();
-		//collection.AddTransient<MacrosPageViewModel>();
-		//collection.AddTransient<ProcessPageViewModel>();
-		//collection.AddTransient<ReporterPageViewModel>();
-		//collection.AddTransient<SettingsPageViewModel>();
+		collection.AddTransient<HomePageViewModel>();
+		collection.AddTransient<MidiPageViewModel>();
 
-		//collection.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
-		//{
-		//	_ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
-		//	_ when type == typeof(ProcessPageViewModel) => x.GetRequiredService<ProcessPageViewModel>(),
-		//	_ when type == typeof(MacrosPageViewModel) => x.GetRequiredService<MacrosPageViewModel>(),
-		//	_ when type == typeof(ActionsPageViewModel) => x.GetRequiredService<ActionsPageViewModel>(),
-		//	_ when type == typeof(ReporterPageViewModel) => x.GetRequiredService<ReporterPageViewModel>(),
-		//	_ when type == typeof(HistoryPageViewModel) => x.GetRequiredService<HistoryPageViewModel>(),
-		//	_ when type == typeof(SettingsPageViewModel) => x.GetRequiredService<SettingsPageViewModel>(),
-		//	_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
-		//});
+		collection.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
+		{
+			_ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
+			_ when type == typeof(MidiPageViewModel) => x.GetRequiredService<MidiPageViewModel>(),
+			_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
+		});
 
-		//collection.AddSingleton<PageFactory>();
+		collection.AddSingleton<PageFactory>();
 		//collection.AddSingleton<DialogService>();
 
 		//collection.AddTransient<PrinterService>();

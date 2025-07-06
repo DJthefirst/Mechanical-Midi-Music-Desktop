@@ -1,0 +1,105 @@
+<UserControl
+    x:Class="AvaloniaGUI.Views.MidiPlayerView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    MinHeight="100"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    mc:Ignorable="d">
+
+<Grid>
+    <Border
+        Margin="5,5,5,5"
+        Padding="5,5,5,10"
+        Background="{DynamicResource SecondaryBackground}"
+        CornerRadius="20">
+        <StackPanel>
+            <Label
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="18"
+                Foreground="White">
+                MIDI Player
+            </Label>
+            <Grid ColumnDefinitions="*,Auto">
+                <Border
+                    Grid.Column="0"
+                    Margin="5,0,5,10"
+                    Padding="5"
+                    Background="{DynamicResource PrimaryBackground}"
+                    CornerRadius="10">
+                    <Grid RowDefinitions="*,Auto,Auto ">
+
+                        <ListBox
+                            MinHeight="100"
+                            MaxHeight="150"
+                            VerticalAlignment="Stretch"
+                            CornerRadius="10"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBoxItem Height="40" FontSize="10">
+                                1. KirbysTheme
+                            </ListBoxItem>
+                            <ListBoxItem Height="40" FontSize="10">2. NyanCat</ListBoxItem>
+                            <ListBoxItem Height="40" FontSize="10">
+                                3. Pirates of the Caribbean
+                            </ListBoxItem>
+                            <ListBoxItem Height="40" FontSize="10">4. Smash Mouth - All Star</ListBoxItem>
+                            <ListBoxItem Height="40" FontSize="10">
+                                5. Tetris
+                            </ListBoxItem>
+                        </ListBox>
+
+                        <Slider
+                            Grid.Row="1"
+                            Margin="0"
+                            Padding="0" />
+                        <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*,*,*,*">
+
+                            <Label Grid.Column="0" Foreground="white">-0:00</Label>
+                            <Button Grid.Column="1" />
+                            <Button Grid.Column="2" />
+                            <Button Grid.Column="3" />
+                            <Button Grid.Column="4" />
+                            <Button Grid.Column="5" />
+                            <Button Grid.Column="6" />
+                            <Label Grid.Column="7" Foreground="white">0:00</Label>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,*">
+                    <Button
+                        Grid.Row="0"
+                        HorizontalAlignment="Stretch"
+                        Content="Add Song" />
+                    <Button
+                        Grid.Row="1"
+                        HorizontalAlignment="Stretch"
+                        Content="Remove Song" />
+                    <Button
+                        Grid.Row="2"
+                        HorizontalAlignment="Stretch"
+                        Content="Clear Playlist" />
+                    <StackPanel Grid.Row="3">
+                        <Label HorizontalContentAlignment="Center" Foreground="White">MIDI IN</Label>
+                        <ListBox>
+                            <ListBoxItem>
+                                loopMIDI Port
+                            </ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                    <StackPanel Grid.Row="4">
+                        <Label HorizontalContentAlignment="Center" Foreground="White">MIDI OUT</Label>
+                        <ListBox>
+                            <ListBoxItem>
+                                loopMIDI Port
+                            </ListBoxItem>
+                        </ListBox>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Grid>
+</UserControl>
