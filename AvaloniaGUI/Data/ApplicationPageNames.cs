@@ -5,4 +5,8 @@ public enum ApplicationPageNames
     Unknown = 0,
     Home = 1,
     Midi = 2,
+    Moppy = 3,
+    GettingStarted = 4,
+    Documentation = 5,
+    About = 6,
 }

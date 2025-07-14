@@ -35,6 +35,34 @@
                 Content="MIDI View"
                 FontSize="25"
                 FontWeight="Bold" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToMoppyCommand}"
+                Content="Moppy"
+                FontSize="25"
+                FontWeight="Bold" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToGettingStartedCommand}"
+                Content="Guide"
+                FontSize="25"
+                FontWeight="Bold" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToDocumentationCommand}"
+                Content="Docs"
+                FontSize="25"
+                FontWeight="Bold" />
+            <Button
+                Margin="10,0,10,0"
+                VerticalAlignment="Bottom"
+                Command="{Binding GoToAboutCommand}"
+                Content="About"
+                FontSize="25"
+                FontWeight="Bold" />
         </StackPanel>
 
         <ContentControl Grid.Row="1" Content="{Binding CurrentPage}" />

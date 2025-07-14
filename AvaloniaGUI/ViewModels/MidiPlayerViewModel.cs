@@ -1,13 +1,17 @@
-﻿using AvaloniaGUI.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace AvaloniaGUI.ViewModels;
 
-public partial class MidiPlayerViewModel() : ViewModelBase
+public partial class MidiPlayerViewModel : ViewModelBase
 {
+	[ObservableProperty]
+	private string? _name;
+
+	[ObservableProperty]
+	private int _duration;
+
+	[ObservableProperty]
+	private bool _isSelected;
 
 }
+

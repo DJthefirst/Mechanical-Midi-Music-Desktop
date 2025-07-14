@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
+using MMM_Core;
+
 namespace AvaloniaGUI;
 
 public partial class App : Application
@@ -28,15 +30,24 @@ public partial class App : Application
 		collection.AddSingleton<MainViewModel>();
 		collection.AddTransient<HomePageViewModel>();
 		collection.AddTransient<MidiPageViewModel>();
+		collection.AddTransient<MoppyPageViewModel>();
+		collection.AddTransient<GettingStartedPageViewModel>();
+		collection.AddTransient<DocumentationPageViewModel>();
+		collection.AddTransient<AboutPageViewModel>();
 
 		collection.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
 		{
 			_ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
 			_ when type == typeof(MidiPageViewModel) => x.GetRequiredService<MidiPageViewModel>(),
+			_ when type == typeof(MoppyPageViewModel) => x.GetRequiredService<MoppyPageViewModel>(),
+			_ when type == typeof(GettingStartedPageViewModel) => x.GetRequiredService<GettingStartedPageViewModel>(),
+			_ when type == typeof(DocumentationPageViewModel) => x.GetRequiredService<DocumentationPageViewModel>(),
+			_ when type == typeof(AboutPageViewModel) => x.GetRequiredService<AboutPageViewModel>(),
 			_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
 		});
 
 		collection.AddSingleton<PageFactory>();
+		collection.AddSingleton<MMM>();
 		//collection.AddSingleton<DialogService>();
 
 		//collection.AddTransient<PrinterService>();

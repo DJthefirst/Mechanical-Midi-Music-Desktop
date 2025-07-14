@@ -10,6 +10,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\AllStar.mid" />
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\Flight Of The Bumblebee.mid" />
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\KirbysTheme.mid" />
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\NyanCat.mid" />
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\Pirates of the Caribbean - He's a Pirate.mid" />
+    <AvaloniaResource Remove="Assets\DefaultMidiSongs\Tetris.mid" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.2" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.3.2" />
     <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.1.5" />
@@ -29,6 +38,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MMM_Core\MMM_Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Controls\IconButton2.axaml.cs">
       <DependentUpon>IconButton2.axaml</DependentUpon>
     </Compile>
@@ -37,6 +50,18 @@
     </Compile>
     <Compile Update="Views\MidiPlayerView.axaml.cs">
       <DependentUpon>MidiPlayerView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AboutPageView.axaml.cs">
+      <DependentUpon>AboutPageView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DocumentationPageView.axaml.cs">
+      <DependentUpon>DocumentationPageView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MoppyPageView.axaml.cs">
+      <DependentUpon>MoppyPageView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\GettingStartedPageView.axaml.cs">
+      <DependentUpon>GettingStartedPageView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

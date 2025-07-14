@@ -22,7 +22,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.Column="0">
                 <!--  MIDI Player  -->
-                <view:MidiPlayerView />
+                <view:MidiPlayerView Name="MidiPlayerComponent"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
