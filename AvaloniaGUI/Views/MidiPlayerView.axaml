@@ -64,10 +64,16 @@
                             <Slider
                                 Grid.Row="1"
                                 Margin="0"
-                                Padding="0" />
+                                Padding="0"
+                                Maximum="{Binding SongDuration}"
+                                Value="{Binding SongPosition}" />
+
                             <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*,*,*,*">
 
-                                <Label Grid.Column="0" Foreground="white">-0:00</Label>
+                                <Label
+                                    Grid.Column="0"
+                                    Content="{Binding TimePosition}"
+                                    Foreground="white" />
                                 <Button Grid.Column="1">
                                     <Label
                                         Classes="icon"
@@ -104,7 +110,10 @@
                                         Content="&#xE026;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Label Grid.Column="7" Foreground="white">0:00</Label>
+                                <Label
+                                    Grid.Column="7"
+                                    Content="{Binding TimeDuration}"
+                                    Foreground="white" />
                             </Grid>
                         </Grid>
                     </Border>

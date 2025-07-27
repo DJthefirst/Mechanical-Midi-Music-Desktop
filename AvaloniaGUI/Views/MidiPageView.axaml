@@ -13,7 +13,7 @@
     mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:MidiPlayerViewModel />
+        <vm:MidiPageViewModel />
     </Design.DataContext>
 
 
@@ -22,7 +22,7 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Grid.Column="0">
                 <!--  MIDI Player  -->
-                <view:MidiPlayerView Name="MidiPlayerComponent"/>
+                <ContentControl Content="{Binding MidiPlayerPage}" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

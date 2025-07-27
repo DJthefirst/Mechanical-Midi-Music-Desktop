@@ -12,13 +12,6 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	private readonly PageFactory _pageFactory;
 	//private readonly DatabaseFactory _databaseFactory;
 
-	//[NotifyPropertyChangedFor(nameof(ProcessPageIsActive))]
-	//[NotifyPropertyChangedFor(nameof(ActionsPageIsActive))]
-	//[NotifyPropertyChangedFor(nameof(MacrosPageIsActive))]
-	//[NotifyPropertyChangedFor(nameof(ReporterPageIsActive))]
-	//[NotifyPropertyChangedFor(nameof(HistoryPageIsActive))]
-	//[NotifyPropertyChangedFor(nameof(SettingsPageIsActive))]
-
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(MidiPageIsActive))]
 	[NotifyPropertyChangedFor(nameof(HomePageIsActive))]
@@ -29,12 +22,6 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 
 	public bool HomePageIsActive => CurrentPage.PageName == ApplicationPageNames.Home;
 	public bool MidiPageIsActive => CurrentPage.PageName == ApplicationPageNames.Midi;
-	//public bool ProcessPageIsActive => CurrentPage.PageName == ApplicationPageNames.Process;
-	//public bool ActionsPageIsActive => CurrentPage.PageName == ApplicationPageNames.Actions;
-	//public bool MacrosPageIsActive => CurrentPage.PageName == ApplicationPageNames.Macros;
-	//public bool ReporterPageIsActive => CurrentPage.PageName == ApplicationPageNames.Reporter;
-	//public bool HistoryPageIsActive => CurrentPage.PageName == ApplicationPageNames.History;
-	//public bool SettingsPageIsActive => CurrentPage.PageName == ApplicationPageNames.Settings;
 
 	/// <summary>
 	/// Design-time only constructor
@@ -44,7 +31,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	public MainViewModel()
 	{
 		//CurrentPage = new SettingsPageViewModel(new DatabaseFactory(() => new DatabaseService(new ApplicationDbContext())));
-		CurrentPage = new HomePageViewModel();
+		//CurrentPage = new MoppyPageViewModel();
 	}
 #pragma warning restore CS8618, CS9264
 
@@ -58,7 +45,7 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	private void GoToHome() => CurrentPage = _pageFactory.GetPageViewModel<HomePageViewModel>();
 
 	[RelayCommand]
-	private void GoToMidi() => CurrentPage = _pageFactory.GetPageViewModel<MidiPageViewModel>();
+	private void GoToMidi() => CurrentPage = _pageFactory.GetPageViewModel<MidiPageViewModel>(afterCreation => afterCreation.TestName = "TestName");
 
 	[RelayCommand]
 	private void GoToMoppy() => CurrentPage = _pageFactory.GetPageViewModel<MoppyPageViewModel>();

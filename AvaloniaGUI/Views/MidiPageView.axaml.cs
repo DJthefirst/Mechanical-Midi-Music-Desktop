@@ -16,7 +16,7 @@ public partial class MidiPageView : UserControl
     private void OnPlayerUpdated()
     {
         // Get View Model
-        var viewModel = MidiPlayerComponent.DataContext as MidiPageViewModel;
+        //var viewModel = MidiPlayerComponent.DataContext as MidiPageViewModel;
 
         // Type Check
         //viewModel?.RefreshComponents();

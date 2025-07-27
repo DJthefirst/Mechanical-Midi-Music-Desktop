@@ -27,9 +27,11 @@ public partial class App : Application
 	public override void OnFrameworkInitializationCompleted()
 	{
 		var collection = new ServiceCollection();
+
+		// GUI Page Services
 		collection.AddSingleton<MainViewModel>();
-		collection.AddTransient<HomePageViewModel>();
 		collection.AddTransient<MidiPageViewModel>();
+		collection.AddTransient<HomePageViewModel>();
 		collection.AddTransient<MoppyPageViewModel>();
 		collection.AddTransient<GettingStartedPageViewModel>();
 		collection.AddTransient<DocumentationPageViewModel>();
@@ -45,6 +47,16 @@ public partial class App : Application
 			_ when type == typeof(AboutPageViewModel) => x.GetRequiredService<AboutPageViewModel>(),
 			_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
 		});
+
+		//GUI Component Services
+		collection.AddScoped<MidiPlayerViewModel>();
+
+		//collection.AddSingleton<Func<Type, ComponentViewModel>>(x => type => type switch
+		//{
+		//	_ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
+
+		//	_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
+		//});
 
 		collection.AddSingleton<PageFactory>();
 		collection.AddSingleton<MMM>();
