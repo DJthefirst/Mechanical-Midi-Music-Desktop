@@ -6,7 +6,7 @@ public enum ApplicationPageNames
     Home = 1,
     Midi = 2,
     Moppy = 3,
-    GettingStarted = 4,
-    Documentation = 5,
+    Guide = 4,
+    Docs = 5,
     About = 6,
 }

@@ -1,5 +1,5 @@
 <UserControl
-    x:Class="AvaloniaGUI.Views.DocumentationPageView"
+    x:Class="AvaloniaGUI.Views.GuidePageView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -8,18 +8,18 @@
     MinHeight="100"
     d:DesignHeight="400"
     d:DesignWidth="600"
-    x:DataType="vm:DocumentationPageViewModel"
+    x:DataType="vm:GuidePageViewModel"
     mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:DocumentationPageViewModel />
+        <vm:GuidePageViewModel />
     </Design.DataContext>
-   
+
     <Label
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         FontSize="18"
         Foreground="White">
-        Documentation
+        GettingStarted
     </Label>
 </UserControl>

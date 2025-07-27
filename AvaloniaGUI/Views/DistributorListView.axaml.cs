@@ -5,9 +5,9 @@ using AvaloniaGUI.ViewModels;
 
 namespace AvaloniaGUI.Views;
 
-public partial class GettingStartedPageView : UserControl
+public partial class DistributorListView : UserControl
 {
-	public GettingStartedPageView()
+	public DistributorListView()
 	{
 		InitializeComponent();
 	}

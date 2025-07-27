@@ -50,9 +50,9 @@ public partial class MainViewModel : ViewModelBase, IDialogProvider
 	[RelayCommand]
 	private void GoToMoppy() => CurrentPage = _pageFactory.GetPageViewModel<MoppyPageViewModel>();
 	[RelayCommand]
-	private void GoToGettingStarted() => CurrentPage = _pageFactory.GetPageViewModel<GettingStartedPageViewModel>();
+	private void GoToGettingStarted() => CurrentPage = _pageFactory.GetPageViewModel<GuidePageViewModel>();
 	[RelayCommand]
-	private void GoToDocumentation() => CurrentPage = _pageFactory.GetPageViewModel<DocumentationPageViewModel>();
+	private void GoToDocumentation() => CurrentPage = _pageFactory.GetPageViewModel<DocsPageViewModel>();
 	[RelayCommand]
 	private void GoToAbout() => CurrentPage = _pageFactory.GetPageViewModel<AboutPageViewModel>();
 }

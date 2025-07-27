@@ -1,0 +1,167 @@
+<UserControl
+    x:Class="AvaloniaGUI.Views.DeviceListView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
+    MinHeight="100"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    x:DataType="vm:DeviceListViewModel"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:DeviceListViewModel />
+    </Design.DataContext>
+
+    <!--  Device List  -->
+    <Border
+        Margin="5,5,5,5"
+        Padding="5,5,5,10"
+        Background="{DynamicResource SecondaryBackground}"
+        CornerRadius="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="18"
+                    Foreground="White">
+                    Devices
+                </Label>
+                <Grid ColumnDefinitions="*,*,*">
+                    <ComboBox Grid.Column="0" HorizontalAlignment="Stretch">
+                        <ComboBoxItem>115200</ComboBoxItem>
+                    </ComboBox>
+                    <Button
+                        Grid.Column="1"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">
+                        Add Device
+                    </Button>
+                    <Button
+                        Grid.Column="2"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center">
+                        Remove Device
+                    </Button>
+                </Grid>
+
+                <ListBox Background="{DynamicResource SecondaryBackground}">
+
+                    <ListBoxItem
+                        Margin="5,5,5,5"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="15">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <Label>ID:</Label>
+                                    <Label>001</Label>
+                                </StackPanel>
+                                <Label HorizontalAlignment="Center">Devcie 1</Label>
+                                <Label HorizontalAlignment="Right">COM 3</Label>
+                            </Grid>
+                            <Grid>
+                                <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Platform:</Label>
+                                        <Label>0</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Device Type:</Label>
+                                        <Label>0x0001</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Number of Instruments:</Label>
+                                        <Label>0x0000000F</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Notes:</Label>
+                                        <Label>RoundRobinBalance</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ListBoxItem>
+
+                    <ListBoxItem
+                        Margin="5,5,5,5"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="15">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <Label>ID:</Label>
+                                    <Label>001</Label>
+                                </StackPanel>
+                                <Label HorizontalAlignment="Center">Devcie 2</Label>
+                                <Label HorizontalAlignment="Right">UDP 192.168.1.15</Label>
+                            </Grid>
+                            <Grid>
+                                <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Platform:</Label>
+                                        <Label>0</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Device Type:</Label>
+                                        <Label>0x0001</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Number of Instruments:</Label>
+                                        <Label>0x0000000F</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Notes:</Label>
+                                        <Label>RoundRobinBalance</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ListBoxItem>
+
+                    <ListBoxItem
+                        Margin="5,5,5,5"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="15">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                    <Label>ID:</Label>
+                                    <Label>001</Label>
+                                </StackPanel>
+                                <Label HorizontalAlignment="Center">Devcie 3</Label>
+                                <Label HorizontalAlignment="Right">COM 5</Label>
+                            </Grid>
+                            <Grid>
+                                <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                <StackPanel Grid.Column="0">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Platform:</Label>
+                                        <Label>0</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Device Type:</Label>
+                                        <Label>0x0001</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Number of Instruments:</Label>
+                                        <Label>0x0000000F</Label>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Label>Notes:</Label>
+                                        <Label>RoundRobinBalance</Label>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </ListBoxItem>
+                </ListBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>

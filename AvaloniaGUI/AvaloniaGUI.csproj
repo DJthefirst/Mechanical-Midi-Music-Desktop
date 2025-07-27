@@ -45,6 +45,15 @@
     <Compile Update="Controls\IconButton2.axaml.cs">
       <DependentUpon>IconButton2.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\DistributorManagerView.axaml.cs">
+      <DependentUpon>DistributorManagerView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DistributorListView.axaml.cs">
+      <DependentUpon>DistributorListView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DeviceListView.axaml.cs">
+      <DependentUpon>DeviceListView.axaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\MidiPageView.axaml.cs">
       <DependentUpon>MidiPageView.axaml</DependentUpon>
     </Compile>
@@ -54,14 +63,17 @@
     <Compile Update="Views\AboutPageView.axaml.cs">
       <DependentUpon>AboutPageView.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\DocumentationPageView.axaml.cs">
-      <DependentUpon>DocumentationPageView.axaml</DependentUpon>
+    <Compile Update="Views\DocsPageView.axaml.cs">
+      <DependentUpon>DocsPageView.axaml</DependentUpon>
     </Compile>
     <Compile Update="Views\MoppyPageView.axaml.cs">
       <DependentUpon>MoppyPageView.axaml</DependentUpon>
     </Compile>
-    <Compile Update="Views\GettingStartedPageView.axaml.cs">
-      <DependentUpon>GettingStartedPageView.axaml</DependentUpon>
+    <Compile Update="Views\GuidePageView.axaml.cs">
+      <DependentUpon>GuidePageView.axaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\DeviceManagerView.axaml.cs">
+      <DependentUpon>DeviceManagerView.axaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

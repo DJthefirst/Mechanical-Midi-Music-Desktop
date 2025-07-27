@@ -33,8 +33,8 @@ public partial class App : Application
 		collection.AddTransient<MidiPageViewModel>();
 		collection.AddTransient<HomePageViewModel>();
 		collection.AddTransient<MoppyPageViewModel>();
-		collection.AddTransient<GettingStartedPageViewModel>();
-		collection.AddTransient<DocumentationPageViewModel>();
+		collection.AddTransient<GuidePageViewModel>();
+		collection.AddTransient<DocsPageViewModel>();
 		collection.AddTransient<AboutPageViewModel>();
 
 		collection.AddSingleton<Func<Type, PageViewModel>>(x => type => type switch
@@ -42,13 +42,17 @@ public partial class App : Application
 			_ when type == typeof(HomePageViewModel) => x.GetRequiredService<HomePageViewModel>(),
 			_ when type == typeof(MidiPageViewModel) => x.GetRequiredService<MidiPageViewModel>(),
 			_ when type == typeof(MoppyPageViewModel) => x.GetRequiredService<MoppyPageViewModel>(),
-			_ when type == typeof(GettingStartedPageViewModel) => x.GetRequiredService<GettingStartedPageViewModel>(),
-			_ when type == typeof(DocumentationPageViewModel) => x.GetRequiredService<DocumentationPageViewModel>(),
+			_ when type == typeof(GuidePageViewModel) => x.GetRequiredService<GuidePageViewModel>(),
+			_ when type == typeof(DocsPageViewModel) => x.GetRequiredService<DocsPageViewModel>(),
 			_ when type == typeof(AboutPageViewModel) => x.GetRequiredService<AboutPageViewModel>(),
 			_ => throw new InvalidOperationException($"Page of type {type?.FullName} has no view model"),
 		});
 
 		//GUI Component Services
+		collection.AddTransient<DeviceListViewModel>();
+		collection.AddTransient<DeviceManagerViewModel>();
+		collection.AddTransient<DistributorListViewModel>();
+		collection.AddTransient<DistributorManagerViewModel>();
 		collection.AddScoped<MidiPlayerViewModel>();
 
 		//collection.AddSingleton<Func<Type, ComponentViewModel>>(x => type => type switch

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AvaloniaGUI.Data;
+using AvaloniaGUI.Factories;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
-namespace AvaloniaGUI.ViewModels
+namespace AvaloniaGUI.ViewModels;
+
+public partial class DistributorListViewModel() : ComponentViewModel(PageComponentNames.DistributorList)
 {
-	internal class DistributorListViewModel : ViewModelBase
-	{
-	}
 }
+
+

@@ -5,9 +5,9 @@ using AvaloniaGUI.ViewModels;
 
 namespace AvaloniaGUI.Views;
 
-public partial class DocumentationPageView : UserControl
+public partial class GuidePageView : UserControl
 {
-	public DocumentationPageView()
+	public GuidePageView()
 	{
 		InitializeComponent();
 	}

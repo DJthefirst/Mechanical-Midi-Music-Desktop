@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace AvaloniaGUI.ViewModels;
 
-public partial class GettingStartedPageViewModel() : PageViewModel(ApplicationPageNames.GettingStarted)
+public partial class GuidePageViewModel() : PageViewModel(ApplicationPageNames.Guide)
 {
 
 }

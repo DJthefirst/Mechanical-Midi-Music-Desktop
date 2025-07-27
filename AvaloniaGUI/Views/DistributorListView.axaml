@@ -1,0 +1,134 @@
+<UserControl
+    x:Class="AvaloniaGUI.Views.DistributorListView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
+    MinHeight="100"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    x:DataType="vm:DistributorListViewModel"
+    mc:Ignorable="d">
+
+    <Design.DataContext>
+        <vm:DistributorListViewModel />
+    </Design.DataContext>
+
+    <!--  Distributor List  -->
+    <Border
+        Margin="5,5,5,5"
+        Padding="5,5,5,10"
+        Background="{DynamicResource SecondaryBackground}"
+        CornerRadius="20">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <Label
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    FontSize="18"
+                    Foreground="White">
+                    Distributors
+                </Label>
+                <ListBox Background="{DynamicResource SecondaryBackground}">
+
+                    <ListBoxItem
+                        Margin="5,5,5,5"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="15">
+                        <Grid ColumnDefinitions="*,0.8*">
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Distributor ID:</Label>
+                                    <Label>0</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Channels:</Label>
+                                    <Label>0x0001</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Instrument:</Label>
+                                    <Label>0x0000000F</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical">
+                                    <Label>Distribution Method:</Label>
+                                    <Label>RoundRobinBalance</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Note Min/Max:</Label>
+                                    <Label>1-127</Label>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Damper:</Label>
+                                    <CheckBox IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Polyphonic:</Label>
+                                    <CheckBox IsChecked="True" IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Note Overwrite:</Label>
+                                    <CheckBox IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>NumPolyphonic Notes:</Label>
+                                    <Label>1</Label>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </ListBoxItem>
+
+                    <ListBoxItem
+                        Margin="5,5,5,5"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="15">
+                        <Grid ColumnDefinitions="*,0.8*">
+                            <StackPanel Grid.Column="0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Distributor ID:</Label>
+                                    <Label>0</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Channels:</Label>
+                                    <Label>0x0001</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Instrument:</Label>
+                                    <Label>0x0000000F</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical">
+                                    <Label>Distribution Method:</Label>
+                                    <Label>RoundRobinBalance</Label>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Note Min/Max:</Label>
+                                    <Label>1-127</Label>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Damper:</Label>
+                                    <CheckBox IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Polyphonic:</Label>
+                                    <CheckBox IsChecked="True" IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>Note Overwrite:</Label>
+                                    <CheckBox IsEnabled="False" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <Label>NumPolyphonic Notes:</Label>
+                                    <Label>1</Label>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+                    </ListBoxItem>
+                </ListBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Border>
+</UserControl>
