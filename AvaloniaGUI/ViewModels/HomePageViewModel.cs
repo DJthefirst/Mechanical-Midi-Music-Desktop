@@ -1,8 +1,11 @@
 ﻿using AvaloniaGUI.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -22,17 +25,23 @@ public partial class HomePageViewModel : PageViewModel
 	private ComponentViewModel _distributorManagerComponent;
 
 	[ObservableProperty]
-	string _testName = "";
+	public bool _isFullWidth = true;
 
+	[ObservableProperty]
+	public bool _isMinWidth = false;
 
-	/// <summary>
-	/// Design-time only constructor
-	/// </summary>
+	[RelayCommand]
+	public void UpdateWidth(double width)
+	{
+		IsFullWidth = (width > 1250);
+		IsMinWidth = (width < 950);
+	}
+
 	// Allow nullable PageFactory for now in designer... ideally get it working
 #pragma warning disable CS8618, CS9264
 	public HomePageViewModel(
 		MidiPlayerViewModel midiPlayerViewModel,
-		DeviceListViewModel deviceListViewModel, 
+		DeviceListViewModel deviceListViewModel,
 		DeviceManagerViewModel deviceManagerViewModel,
 		DistributorListViewModel distributorListViewModel,
 		DistributorManagerViewModel distributorManagerViewModel)
@@ -45,6 +54,4 @@ public partial class HomePageViewModel : PageViewModel
 		DistributorManagerComponent = distributorManagerViewModel;
 	}
 #pragma warning restore CS8618, CS9264
-
-
 }

@@ -18,28 +18,60 @@
 
 
 
-    <Grid Background="{DynamicResource PrimaryBackground}" ColumnDefinitions="*,*,*">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Grid Grid.Column="0" RowDefinitions="Auto, *, *">
+    <Grid
+        Name="HomeBaseGrid"
+        Background="{DynamicResource PrimaryBackground}"
+        ColumnDefinitions="*,*">
+        <ScrollViewer
+            Grid.Column="0"
+            IsVisible="{Binding !IsMinWidth}"
+            VerticalScrollBarVisibility="Auto">
+            <Grid MinWidth="450" RowDefinitions="*, Auto, Auto">
                 <!--  MIDI Player  -->
-                <!-- <view:MidiPlayerView /> -->
-                <Border
-                    Grid.Row="0"
-                    VerticalAlignment="Stretch"
-                    BorderBrush="Red"
-                    BorderThickness="5">
-                    <ContentControl Content="{Binding MidiPlayerComponent}" />
-                </Border>
-                <!--  Device Manager
+                <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
+                <!--  Device Manager  -->
                 <ContentControl Grid.Row="1" Content="{Binding DeviceManagerComponent}" />
-                  Distributor Manager
-                <ContentControl Grid.Row="2" Content="{Binding DistributorManagerComponent}" />-->
+                <!--  Distributor Manager  -->
+                <ContentControl Grid.Row="2" Content="{Binding DistributorManagerComponent}" />
             </Grid>
         </ScrollViewer>
-        <!--  Distributor List  -->
-        <ContentControl Grid.Column="1" Content="{Binding DistributorListComponent}" />
-        <!--  Device List  -->
-        <ContentControl Grid.Column="2" Content="{Binding DeviceListComponent}" />
-
+        <ScrollViewer
+            Grid.Column="0"
+            Grid.ColumnSpan="2"
+            IsVisible="{Binding IsMinWidth}"
+            VerticalScrollBarVisibility="Auto">
+            <Grid MinWidth="450" RowDefinitions="*, Auto, Auto, Auto, Auto">
+                <!--  MIDI Player  -->
+                <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
+                <!--  Device Manager  -->
+                <ContentControl Grid.Row="1" Content="{Binding DeviceManagerComponent}" />
+                <!--  Device List  -->
+                <ContentControl Grid.Row="2" Content="{Binding DeviceListComponent}" />
+                <!--  Distributor Manager  -->
+                <ContentControl Grid.Row="3" Content="{Binding DistributorManagerComponent}" />
+                <!--  Distributor List  -->
+                <ContentControl Grid.Row="4" Content="{Binding DistributorListComponent}" />
+            </Grid>
+        </ScrollViewer>
+        <Grid Grid.Column="1" IsVisible="{Binding !IsMinWidth}">
+            <Grid
+                Name="HomePageUnStackedLists"
+                ColumnDefinitions="*,*"
+                IsVisible="{Binding IsFullWidth}">
+                <!--  Distributor List  -->
+                <ContentControl Grid.Column="0" Content="{Binding DistributorListComponent}" />
+                <!--  Device List  -->
+                <ContentControl Grid.Column="1" Content="{Binding DeviceListComponent}" />
+            </Grid>
+            <Grid
+                Name="HomePageStackedLists"
+                IsVisible="{Binding !IsFullWidth}"
+                RowDefinitions="*,*">
+                <!--  Distributor List  -->
+                <ContentControl Grid.Row="0" Content="{Binding DistributorListComponent}" />
+                <!--  Device List  -->
+                <ContentControl Grid.Row="1" Content="{Binding DeviceListComponent}" />
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

@@ -25,7 +25,6 @@ public partial class MidiPlayerViewModel() : ComponentViewModel(PageComponentNam
 	[ObservableProperty]
 	private bool _isSelected;
 
-
 	private string GenerateTimestamp(int seconds)
 	{
 		var minutes = seconds / 60;

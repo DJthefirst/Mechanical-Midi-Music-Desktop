@@ -6,8 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:view="clr-namespace:AvaloniaGUI.Views"
     xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
-    MinWidth="800"
-    MinHeight="100"
+    MinWidth="200"
+    MinHeight="200"
     x:DataType="vm:MainViewModel"
     mc:Ignorable="d">
 
