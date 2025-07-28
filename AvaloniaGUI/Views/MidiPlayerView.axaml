@@ -8,11 +8,11 @@
     MinHeight="100"
     d:DesignHeight="400"
     d:DesignWidth="600"
-    x:DataType="vm:MidiPageViewModel"
+    x:DataType="vm:MidiPlayerViewModel"
     mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:MidiPageViewModel />
+        <vm:MidiPlayerViewModel />
     </Design.DataContext>
 
     <Grid>
@@ -21,28 +21,29 @@
             Padding="5,5,5,10"
             Background="{DynamicResource SecondaryBackground}"
             CornerRadius="20">
-            <StackPanel>
+            <Grid RowDefinitions="Auto,*">
                 <Label
+                    Grid.Row="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     FontSize="18"
                     Foreground="White">
                     MIDI Player
                 </Label>
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
                     <Border
                         Grid.Column="0"
                         Margin="5,0,5,10"
                         Padding="5"
                         Background="{DynamicResource PrimaryBackground}"
                         CornerRadius="10">
-                        <Grid RowDefinitions="*,Auto,Auto ">
+                        <Grid RowDefinitions="*,Auto,Auto">
                             <StackPanel>
                                 <ListBox ItemsSource="{Binding SongNames}" />
                                 <!-- <ListBox ItemsSource="{Binding SongList}" /> -->
                             </StackPanel>
 
-                            <!--        <ListBox
+                            <!--       <ListBox
                             MinHeight="100"
                             MaxHeight="150"
                             VerticalAlignment="Stretch"
@@ -148,7 +149,7 @@
                         </StackPanel>
                     </Grid>
                 </Grid>
-            </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </UserControl>

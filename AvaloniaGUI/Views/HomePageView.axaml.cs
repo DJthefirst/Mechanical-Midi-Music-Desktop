@@ -18,7 +18,6 @@ public partial class HomePageView : UserControl
 	private void OnSizeChanged(object? sender, SizeChangedEventArgs args)
 	{
 		var width = args.NewSize.Width;
-		Debug.WriteLine($"Width: {width}");
 		(DataContext as HomePageViewModel)?.UpdateWidthCommand?.Execute(width);
 	}
 }

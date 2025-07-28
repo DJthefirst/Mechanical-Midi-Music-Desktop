@@ -46,7 +46,7 @@
                     <Label VerticalAlignment="Center" Foreground="White">
                         Device Name
                     </Label>
-                    <TextBox Text="" />
+                    <TextBox Text="{Binding Name}" />
                 </StackPanel>
             </Grid>
             <StackPanel Margin="5" Orientation="Horizontal">
@@ -60,7 +60,8 @@
                     Grid.Column="0"
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center">
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding SaveNameCommand}">
                     Update
                 </Button>
                 <Button

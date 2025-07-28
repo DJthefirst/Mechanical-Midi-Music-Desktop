@@ -49,10 +49,10 @@ public partial class App : Application
 		});
 
 		//GUI Component Services
-		collection.AddTransient<DeviceListViewModel>();
-		collection.AddTransient<DeviceManagerViewModel>();
-		collection.AddTransient<DistributorListViewModel>();
-		collection.AddTransient<DistributorManagerViewModel>();
+		collection.AddScoped<DeviceListViewModel>();
+		collection.AddScoped<DeviceManagerViewModel>();
+		collection.AddScoped<DistributorListViewModel>();
+		collection.AddScoped<DistributorManagerViewModel>();
 		collection.AddScoped<MidiPlayerViewModel>();
 
 		//collection.AddSingleton<Func<Type, ComponentViewModel>>(x => type => type switch

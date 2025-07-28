@@ -97,7 +97,7 @@
                                     <Label>ID:</Label>
                                     <Label>001</Label>
                                 </StackPanel>
-                                <Label HorizontalAlignment="Center">Devcie 2</Label>
+                                <Label HorizontalAlignment="Center" Content="{Binding Name}" />
                                 <Label HorizontalAlignment="Right">UDP 192.168.1.15</Label>
                             </Grid>
                             <Grid>
