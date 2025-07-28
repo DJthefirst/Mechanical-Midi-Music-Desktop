@@ -55,3 +55,16 @@ public partial class HomePageViewModel : PageViewModel
 	}
 #pragma warning restore CS8618, CS9264
 }
+
+public partial class DesignHomePageViewModel : HomePageViewModel
+{
+	public DesignHomePageViewModel()
+		: base(
+			new MidiPlayerViewModel(),
+			new DeviceListViewModel(),
+			new DeviceManagerViewModel(new DeviceListViewModel()),
+			new DistributorListViewModel(),
+			new DistributorManagerViewModel())
+	{
+	}
+}

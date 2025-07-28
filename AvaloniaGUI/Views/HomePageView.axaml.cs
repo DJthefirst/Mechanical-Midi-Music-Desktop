@@ -12,6 +12,7 @@ public partial class HomePageView : UserControl
 	public HomePageView()
 	{
 		InitializeComponent();
+		//DataContext = App.Current.Services.GetRequiredService<HomePageViewModel>();
 		this.SizeChanged += OnSizeChanged;
 	}
 
