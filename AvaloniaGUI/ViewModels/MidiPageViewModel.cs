@@ -31,3 +31,11 @@ public partial class MidiPageViewModel : PageViewModel{
 
 }
 
+public partial class DesignMidiPageViewModel : MidiPageViewModel
+{
+	public DesignMidiPageViewModel()
+		: base(
+			new MidiPlayerViewModel())
+	{
+	}
+}

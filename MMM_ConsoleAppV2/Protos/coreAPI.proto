@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+option csharp_namespace = "MMM_Server_Grpc";
+
+package CoreAPI;
+
+// The System service definition.
+service SystemCMDs {
+  // Requests help information
+  rpc Help (Empty) returns (MessageReply);
+  // Resets the service
+  rpc Reset (Empty) returns (Empty);
+  // Quits the application
+  rpc Quit (Empty) returns (Empty);
+  // Loads the configuration
+  rpc LoadConfiguration (Empty) returns (Empty);
+}
+
+//// The Player service definition.
+//service PlayerCMDs {
+//  rpc SongAdd () returns ();
+//  rpc SongRemove () returns ();
+//  rpc SongList () returns ();
+//  rpc Repeat () returns ();
+//  rpc PlaylistClear () returns ();
+//  rpc Loop () returns ();
+//  rpc Autoplay () returns ();
+//  rpc Play () returns ();
+//  rpc Pause () returns ();
+//  rpc Stop () returns ();
+//  rpc Start () returns ();
+//  rpc Next () returns ();
+//  rpc Prev () returns ();
+//}
+//
+//// The DeviceConnection service definition.
+//service DeviceConnectionCMDs {
+//  rpc Available () returns ();
+//  rpc List () returns ();
+//  rpc Connect () returns (); 
+//  rpc Disconnect () returns ();
+//  rpc Reset () returns ();
+//}
+//
+//// The MidiConnection service definition.
+//service MidiConnectionCMDs {
+//  rpc Available () returns ();
+//  rpc List () returns ();
+//  rpc Connect () returns (); 
+//  rpc Disconnect () returns ();
+//  rpc Reset () returns ();
+//
+//}
+//
+//// The Device service definition.
+//service DeviceCMDs {
+//  rpc Available () returns ();
+//  rpc List () returns ();
+//  rpc Add (DeviceConstruct) returns ();
+//  rpc Update (DeviceConstruct) returns ();
+//  rpc Remove () returns ();
+//  rpc Reset () returns ();
+//
+//}
+//
+//// The Device service definition.
+//service DistributorCMDs {
+//  rpc Available () returns ();
+//  rpc List () returns ();
+//  rpc Add (DeviceConstruct) returns ();
+//  rpc Update (DeviceConstruct) returns ();
+//  rpc Remove (IdRequest) returns ();
+//  rpc Reset (IdRequest) returns ();
+//}
+
+
+// The request message containing an Objects ID.
+message IdRequest {
+  uint32 id = 1;
+}
+
+// The request message containing a Device Construct.
+message DeviceConstruct {
+  string name = 1;
+}
+
+message MessageReply {
+  string message = 1;
+}
+
+message Empty {}
+
+
+           
+         

@@ -13,9 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMM_Device", "MMM_Device\MM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGUI", "AvaloniaGUI\AvaloniaGUI.csproj", "{CBE04044-2A82-A5C1-3BBE-FF37CD72CCD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGUI.Browser", "AvaloniaGUI.Browser\AvaloniaGUI.Browser.csproj", "{D48D762A-BD8B-A765-E44D-6F20A220DEDA}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGUI.Desktop", "AvaloniaGUI.Desktop\AvaloniaGUI.Desktop.csproj", "{35725ECD-6C10-733C-8E4C-242B8ACD8825}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MMM_Server_Grpc", "MMM_Server_Grpc\MMM_Server_Grpc.csproj", "{872841BC-1EC7-432F-9511-ADEA9C7C8C57}"
+	ProjectSection(ProjectDependencies) = postProject
+		{12CAC53F-FB2E-46DC-9476-B6D7F269C981} = {12CAC53F-FB2E-46DC-9476-B6D7F269C981}
+		{F3ACEED7-9A27-4D31-A21C-5A55C4D3E061} = {F3ACEED7-9A27-4D31-A21C-5A55C4D3E061}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,16 +47,19 @@ Global
 		{CBE04044-2A82-A5C1-3BBE-FF37CD72CCD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBE04044-2A82-A5C1-3BBE-FF37CD72CCD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBE04044-2A82-A5C1-3BBE-FF37CD72CCD4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D48D762A-BD8B-A765-E44D-6F20A220DEDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D48D762A-BD8B-A765-E44D-6F20A220DEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D48D762A-BD8B-A765-E44D-6F20A220DEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D48D762A-BD8B-A765-E44D-6F20A220DEDA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{35725ECD-6C10-733C-8E4C-242B8ACD8825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{35725ECD-6C10-733C-8E4C-242B8ACD8825}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35725ECD-6C10-733C-8E4C-242B8ACD8825}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35725ECD-6C10-733C-8E4C-242B8ACD8825}.Release|Any CPU.Build.0 = Release|Any CPU
+		{872841BC-1EC7-432F-9511-ADEA9C7C8C57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{872841BC-1EC7-432F-9511-ADEA9C7C8C57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{872841BC-1EC7-432F-9511-ADEA9C7C8C57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{872841BC-1EC7-432F-9511-ADEA9C7C8C57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1E6320A2-DB25-44D7-9D00-519DBF57F32A}
 	EndGlobalSection
 EndGlobal
