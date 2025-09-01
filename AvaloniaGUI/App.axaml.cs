@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-using MMM_Core;
+[assembly: XmlnsDefinition("https://github.com/avaloniaui", "AvaloniaGUI.Controls")]
 
 namespace AvaloniaGUI;
 
@@ -63,7 +63,7 @@ public partial class App : Application
 		//});
 
 		collection.AddSingleton<PageFactory>();
-		collection.AddSingleton<MMM>();
+		//collection.AddSingleton<MMM>();
 		//collection.AddSingleton<DialogService>();
 
 		//collection.AddTransient<PrinterService>();

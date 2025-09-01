@@ -1,95 +1,147 @@
 syntax = "proto3";
 
-option csharp_namespace = "MMM_Server_Grpc";
+option csharp_namespace = "MMM_Server";
 
 package CoreAPI;
 
 // The System service definition.
 service SystemCMDs {
   // Requests help information
-  rpc Help (Empty) returns (MessageReply);
+  rpc Help (Cmd) returns (StringMsg);
   // Resets the service
-  rpc Reset (Empty) returns (Empty);
+  rpc Reset (Cmd) returns (NullMsg);
   // Quits the application
-  rpc Quit (Empty) returns (Empty);
+  rpc Quit (Cmd) returns (NullMsg);
   // Loads the configuration
-  rpc LoadConfiguration (Empty) returns (Empty);
+  rpc LoadConfiguration (IdCmd) returns (Struct);
 }
 
-//// The Player service definition.
-//service PlayerCMDs {
-//  rpc SongAdd () returns ();
-//  rpc SongRemove () returns ();
-//  rpc SongList () returns ();
-//  rpc Repeat () returns ();
-//  rpc PlaylistClear () returns ();
-//  rpc Loop () returns ();
-//  rpc Autoplay () returns ();
-//  rpc Play () returns ();
-//  rpc Pause () returns ();
-//  rpc Stop () returns ();
-//  rpc Start () returns ();
-//  rpc Next () returns ();
-//  rpc Prev () returns ();
-//}
-//
-//// The DeviceConnection service definition.
-//service DeviceConnectionCMDs {
-//  rpc Available () returns ();
-//  rpc List () returns ();
-//  rpc Connect () returns (); 
-//  rpc Disconnect () returns ();
-//  rpc Reset () returns ();
-//}
-//
-//// The MidiConnection service definition.
-//service MidiConnectionCMDs {
-//  rpc Available () returns ();
-//  rpc List () returns ();
-//  rpc Connect () returns (); 
-//  rpc Disconnect () returns ();
-//  rpc Reset () returns ();
-//
-//}
-//
-//// The Device service definition.
-//service DeviceCMDs {
-//  rpc Available () returns ();
-//  rpc List () returns ();
-//  rpc Add (DeviceConstruct) returns ();
-//  rpc Update (DeviceConstruct) returns ();
-//  rpc Remove () returns ();
-//  rpc Reset () returns ();
-//
-//}
-//
-//// The Device service definition.
-//service DistributorCMDs {
-//  rpc Available () returns ();
-//  rpc List () returns ();
-//  rpc Add (DeviceConstruct) returns ();
-//  rpc Update (DeviceConstruct) returns ();
-//  rpc Remove (IdRequest) returns ();
-//  rpc Reset (IdRequest) returns ();
-//}
+// The Player service definition.
+service PlayerCMDs {
+  rpc Request (Cmd) returns (Struct);
+  rpc Status (ModeCmd) returns (ModeMsg);
+  rpc Position (PositionCmd) returns (PositionMsg);
+  rpc Navigate (PositionCmd) returns (PositionMsg);
+  rpc Repeat (ModeCmd) returns (ModeMsg);
+  rpc AutoPlay (BoolCmd) returns (BoolMsg);
+  rpc Loop (BoolCmd) returns (BoolMsg);
+}
 
+// The Playlist service definition.
+service PlaylistCMDs {
+  rpc Request (Cmd) returns (PlaylistStruct);
+  rpc Clear (Cmd) returns (PlaylistStruct);
+  rpc Swap (SwapCmd) returns (PlaylistStruct);
+  rpc Add (Struct) returns (PlaylistStruct);                              
+  rpc Remove (IdCmd) returns (PlaylistStruct);
+  rpc Index (ModeCmd) returns (ModeMsg);
+  rpc Navigate (ModeCmd) returns (ModeMsg);
+}
+
+// The MidiInConnection service definition.
+service ConnectionCMDs {
+  rpc Request (ConnectionCmd) returns (ConnectionListStruct);
+  rpc Available (ConnectionCmd) returns (ConnectionListStruct);
+  rpc List (ConnectionCmd) returns (ConnectionListStruct);
+  rpc Connect (ConnectionStructCmd) returns (ConnectionListStruct); 
+  rpc Disconnect (ConnectionIdCmd) returns (ConnectionListStruct);
+  rpc Clear (ConnectionCmd) returns (ConnectionListStruct);
+}
+
+
+message Cmd {
+}
+
+message BoolCmd {
+    bool isSetter = 1;
+    bool value = 2;
+}
+
+message BoolMsg {
+    bool value = 1;
+}
 
 // The request message containing an Objects ID.
-message IdRequest {
-  uint32 id = 1;
+message IdCmd {
+    bool isSetter = 1;
+    uint32 id = 2;
 }
 
-// The request message containing a Device Construct.
-message DeviceConstruct {
-  string name = 1;
+message SwapCmd {
+    bool isSetter = 1;
+    uint32 src = 2;
+    uint32 dest = 3;
 }
 
-message MessageReply {
-  string message = 1;
+message ConnectionCmd {
+    bool isSetter = 1;
+    uint32 typeEnum = 2;
 }
 
-message Empty {}
+message ConnectionIdCmd {
+    bool isSetter = 1;
+    uint32 typeEnum = 2;
+    uint32 id = 3;
+}
 
+message ConnectionStructCmd {
+    bool isSetter = 1;
+    uint32 typeEnum = 2;
+    uint32 id = 3;
+    Struct struct = 4;
+}
 
+message ModeCmd {
+    bool isSetter = 1;
+    uint32 mode = 2;
+}
+
+message ModeMsg {
+    uint32 mode = 1;
+}
+
+message PositionCmd {
+    bool isSetter = 1;
+    double position = 2;
+}
+
+message PositionMsg {
+    double position = 1;
+    double maxPosition = 2;
+}
+
+message NullMsg {
+
+}
+
+message StringMsg {
+    string message = 2;
+}
+
+message SongStruct {
+    int32 index = 1;
+    string name = 2;
+    string path = 3;
+}
+
+message PlaylistStruct {
+    uint32 curIndex = 1;
+    repeated SongStruct list = 2;
+}
+
+message ConnectionStruct {
+    uint32 index = 1;
+    string name = 2;
+    Struct struct = 3;
+}
+
+message ConnectionListStruct {
+    uint32 curIndex = 1;
+    repeated ConnectionStruct list = 2;
+}
+
+message Struct {
+  bytes struct = 1;
+}
            
          

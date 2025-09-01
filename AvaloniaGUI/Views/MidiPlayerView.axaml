@@ -7,7 +7,7 @@
     xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
     MinHeight="100"
     d:DesignHeight="400"
-    d:DesignWidth="600"
+    d:DesignWidth="600  "
     x:DataType="vm:MidiPlayerViewModel"
     mc:Ignorable="d">
 
@@ -17,11 +17,12 @@
 
     <Grid>
         <Border
+            MaxHeight="300"
             Margin="5,5,5,5"
-            Padding="5,5,5,10"
+            Padding="10,0,10,10"
             Background="{DynamicResource SecondaryBackground}"
             CornerRadius="20">
-            <Grid RowDefinitions="Auto,*">
+            <Grid ColumnDefinitions="*,150" RowDefinitions="Auto,*">
                 <Label
                     Grid.Row="0"
                     HorizontalAlignment="Center"
@@ -30,124 +31,222 @@
                     Foreground="White">
                     MIDI Player
                 </Label>
-                <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
-                    <Border
+                <Grid
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    ColumnDefinitions="*,*,*,*">
+                    <Button
                         Grid.Column="0"
-                        Margin="5,0,5,10"
-                        Padding="5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="10">
-                        <Grid RowDefinitions="*,Auto,Auto">
-                            <StackPanel>
-                                <ListBox ItemsSource="{Binding SongNames}" />
-                                <!-- <ListBox ItemsSource="{Binding SongList}" /> -->
-                            </StackPanel>
+                        Padding="0,5,0,5"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource SecondaryBackground}"
+                        Command="{Binding AddSongCommand}">
+                        <Label
+                            HorizontalAlignment="Center"
+                            Classes="icon"
+                            Content="&#xE25E;"
+                            FontFamily="{DynamicResource PhosphorFill}" />
+                    </Button>
+                    <Button
+                        Grid.Column="1"
+                        Padding="0,5,0,5"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource SecondaryBackground}"
+                        Command="{Binding AddSongCommand}">
+                        <Label
+                            HorizontalAlignment="Center"
+                            Classes="icon"
+                            Content="&#xE236;"
+                            FontFamily="{DynamicResource PhosphorFill}" />
+                    </Button>
+                    <Button
+                        Grid.Column="2"
+                        Padding="0,5,0,5"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource SecondaryBackground}"
+                        Command="{Binding AddSongCommand}">
+                        <Label
+                            HorizontalAlignment="Center"
+                            Classes="icon"
+                            Content="&#xE234;"
+                            FontFamily="{DynamicResource PhosphorFill}" />
+                    </Button>
+                    <Button
+                        Grid.Column="3"
+                        Padding="0,5,0,5"
+                        HorizontalAlignment="Stretch"
+                        Background="{DynamicResource SecondaryBackground}"
+                        Command="{Binding AddSongCommand}">
+                        <Label
+                            HorizontalAlignment="Center"
+                            Classes="icon"
+                            Content="&#xE25C;"
+                            FontFamily="{DynamicResource PhosphorFill}" />
+                    </Button>
+                </Grid>
+                <Border
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,0,10,0"
+                    Background="{DynamicResource PrimaryBackground}"
+                    CornerRadius="10">
+                    <Grid RowDefinitions="*,Auto,Auto">
+                        <StackPanel>
+                            <ListBox
+                                Name="SongSelector"
+                                MinHeight="190"
+                                MaxHeight="190"
+                                Margin="0,15,0,0"
+                                VerticalAlignment="Stretch"
+                                ItemsSource="{Binding SongNames}"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </StackPanel>
 
-                            <!--       <ListBox
-                            MinHeight="100"
-                            MaxHeight="150"
-                            VerticalAlignment="Stretch"
-                            CornerRadius="10"
-                            ScrollViewer.VerticalScrollBarVisibility="Auto">
-                            <ListBoxItem Height="40" FontSize="10">
-                                1. KirbysTheme
-                            </ListBoxItem>
-                            <ListBoxItem Height="40" FontSize="10">2. NyanCat</ListBoxItem>
-                            <ListBoxItem Height="40" FontSize="10">
-                                3. Pirates of the Caribbean
-                            </ListBoxItem>
-                            <ListBoxItem Height="40" FontSize="10">4. Smash Mouth - All Star</ListBoxItem>
-                            <ListBoxItem Height="40" FontSize="10">
-                                5. Tetris
-                            </ListBoxItem>
-                        </ListBox>-->
+                        <NavBarSlider
+                            Name="PlayerNavBar"
+                            Grid.Row="1"
+                            Margin="0"
+                            Padding="0"
+                            Maximum="{Binding SongDuration}"
+                            PointerReleased=""
+                            Value="{Binding SongPosition}" />
 
-                            <Slider
-                                Grid.Row="1"
-                                Margin="0"
-                                Padding="0"
-                                Maximum="{Binding SongDuration}"
-                                Value="{Binding SongPosition}" />
+                        <Grid
+                            Grid.Row="2"
+                            Margin="0,5,0,5"
+                            ColumnDefinitions="Auto,*,Auto">
 
-                            <Grid Grid.Row="2" ColumnDefinitions="*,*,*,*,*,*,*,*">
-
-                                <Label
+                            <Label
+                                Grid.Column="0"
+                                Content="{Binding TimePosition}"
+                                Foreground="white" />
+                            <Label
+                                Grid.Column="2"
+                                Content="{Binding TimeDuration}"
+                                Foreground="white" />
+                            <Grid Grid.Column="1" ColumnDefinitions="*,*,*,*,*,*">
+                                <Button
                                     Grid.Column="0"
-                                    Content="{Binding TimePosition}"
-                                    Foreground="white" />
-                                <Button Grid.Column="1">
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding RepeatCommand}">
                                     <Label
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE3F6;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Button Grid.Column="2">
+                                <Button
+                                    Grid.Column="1"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding PrevCommand}">
                                     <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE6A8;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Button Grid.Column="3">
+                                <Button
+                                    Grid.Column="2"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding PlayCommand}">
                                     <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE3D0;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Button Grid.Column="4">
+                                <Button
+                                    Grid.Column="3"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding StopCommand}">
                                     <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE46C;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Button Grid.Column="5">
+                                <Button
+                                    Grid.Column="4"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding NextCommand}">
                                     <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE6A6;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Button Grid.Column="6">
+                                <Button
+                                    Grid.Column="5"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding SkipCommand}">
                                     <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE026;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
-                                <Label
-                                    Grid.Column="7"
-                                    Content="{Binding TimeDuration}"
-                                    Foreground="white" />
                             </Grid>
                         </Grid>
-                    </Border>
-                    <Grid Grid.Column="1" RowDefinitions="Auto,Auto,Auto,*,*">
-                        <Button
-                            Grid.Row="0"
-                            HorizontalAlignment="Stretch"
-                            Content="Add Song" />
-                        <Button
-                            Grid.Row="1"
-                            HorizontalAlignment="Stretch"
-                            Content="Remove Song" />
-                        <Button
-                            Grid.Row="2"
-                            HorizontalAlignment="Stretch"
-                            Content="Clear Playlist" />
-                        <StackPanel Grid.Row="3">
-                            <Label HorizontalContentAlignment="Center" Foreground="White">MIDI IN</Label>
-                            <ListBox>
-                                <ListBoxItem>
-                                    loopMIDI Port
-                                </ListBoxItem>
-                            </ListBox>
-                        </StackPanel>
-                        <StackPanel Grid.Row="4">
-                            <Label HorizontalContentAlignment="Center" Foreground="White">MIDI OUT</Label>
-                            <ListBox>
-                                <ListBoxItem>
-                                    loopMIDI Port
-                                </ListBoxItem>
-                            </ListBox>
-                        </StackPanel>
                     </Grid>
+
+                </Border>
+                <Grid
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    VerticalAlignment="Stretch"
+                    RowDefinitions="*,*">
+
+                    <Border
+                        Grid.Row="0"
+                        VerticalAlignment="Stretch"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="8">
+                        <StackPanel VerticalAlignment="Stretch">
+                            <Label HorizontalContentAlignment="Center" Foreground="White">MIDI IN</Label>
+                            <ListBox
+                                Name="MidiInSelector"
+                                MaxHeight="80"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ItemsSource="{Binding SongNames}"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </StackPanel>
+                    </Border>
+                    <Border
+                        Grid.Row="1"
+                        VerticalAlignment="Stretch"
+                        Background="{DynamicResource PrimaryBackground}"
+                        CornerRadius="8">
+                        <StackPanel VerticalAlignment="Stretch">
+                            <Label HorizontalContentAlignment="Center" Foreground="White">MIDI OUT</Label>
+                            <ListBox
+                                Name="MidiOutSelector"
+                                MaxHeight="80"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                ItemsSource="{Binding SongNames}"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                SelectionMode="Multiple" />
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Grid>
         </Border>

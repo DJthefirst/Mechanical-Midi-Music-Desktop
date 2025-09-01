@@ -2,6 +2,7 @@
     x:Class="AvaloniaGUI.App"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:AvaloniaGUI.Controls"
     xmlns:local="clr-namespace:AvaloniaGUI"
     xmlns:vc="clr-namespace:AvaloniaGUI.ValueConverters"
     RequestedThemeVariant="Default">
@@ -23,6 +24,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <!-- <MergeResourceInclude Source="/Controls/IconButton.axaml" /> -->
+                <MergeResourceInclude Source="/Controls/NavBarSlider.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
@@ -47,6 +49,17 @@
             <GradientStop Offset="0" Color="{DynamicResource PrimaryBackgroundColor1}" />
             <GradientStop Offset="1" Color="{DynamicResource PrimaryBackgroundColor2}" />
         </LinearGradientBrush>
+
+        <SolidColorBrush x:Key="ControlAddForeground">#CFCFCF</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlAddBackground">#0e5e34</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlAddHoverForeground">White</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlAddHoverBackground">##0d4f2c</SolidColorBrush>
+
+        <SolidColorBrush x:Key="ControlRemoveForeground">#CFCFCF</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlRemoveBackground">#8a0000</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlRemoveHoverForeground">White</SolidColorBrush>
+        <SolidColorBrush x:Key="ControlRemoveHoverBackground">#902020</SolidColorBrush>
+
 
         <FontFamily x:Key="Phosphor">/Assets/Fonts/Phosphor.ttf#Phosphor</FontFamily>
         <FontFamily x:Key="PhosphorFill">/Assets/Fonts/Phosphor-Fill.ttf#Phosphor-Fill</FontFamily>

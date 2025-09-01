@@ -6,7 +6,7 @@
 //using static System.Net.Mime.MediaTypeNames;
 
 using Grpc.Net.Client;
-using MMM_Server_Grpc;
+using MMM_Server;
 
 //var player = MMM.Instance.player;
 //var playlist = MMM.Instance.playlist;
@@ -36,13 +36,14 @@ using MMM_Server_Grpc;
 
 class Test
 {
-	private readonly SystemCMDs.SystemCMDsClient client;
-	private readonly Cmd inputs;
+	private readonly SystemCMDs.SystemCMDsClient clientSystemCMDs;
+	private readonly PlayerCMDs.PlayerCMDsClient clientPlayerCMDs;
+	private readonly Cmd cmd;
 
-	public Test(SystemCMDs.SystemCMDsClient client, Cmd inputs)
+	public Test(SystemCMDs.SystemCMDsClient clientSystemCMDs, PlayerCMDs.PlayerCMDsClient clientPlayerCMDs)
 	{
-		this.client = client;
-		this.inputs = inputs;
+		this.clientSystemCMDs = clientSystemCMDs;
+		this.clientPlayerCMDs = clientPlayerCMDs;
 	}
 
 	static async Task Main(string[] args)
@@ -51,11 +52,11 @@ class Test
 		Console.WriteLine("To quit type 'q' or 'quit'.");
 		Console.WriteLine("For help type 'h' or 'help'.");
 
-		var channel = Grpc.Net.Client.GrpcChannel.ForAddress("https://localhost:7219");
-		var client = new SystemCMDs.SystemCMDsClient(channel);
-		var inputs = new Cmd();
+		using var channel = GrpcChannel.ForAddress("https://localhost:7219");
+		var clientSystemCMDs = new SystemCMDs.SystemCMDsClient(channel);
+		var clientPlayerCMDs = new PlayerCMDs.PlayerCMDsClient(channel);
 
-		var testInstance = new Test(client, inputs);
+		var testInstance = new Test(clientSystemCMDs, clientPlayerCMDs);
 
 		while (true)
 		{
@@ -85,18 +86,22 @@ class Test
 				break;
 
 			case ConsoleKey.H:
-				var reply = await client.HelpAsync(inputs);
-				Console.WriteLine(reply.Message);
+				Console.WriteLine((await clientSystemCMDs.HelpAsync(new Cmd {})).Message);
 				break;
 
 			case ConsoleKey.P:
-				//player.Pause();
+				await clientPlayerCMDs.StatusAsync(new ModeCmd { IsSetter = true, Mode = 3 });
 				Console.WriteLine($"Paused");
 				break;
 
 			case ConsoleKey.G:
-				//player.Play();
+				await clientPlayerCMDs.StatusAsync(new ModeCmd { IsSetter = true, Mode = 1 });
 				Console.WriteLine($"Play");
+				break;
+
+			case ConsoleKey.S:
+				await clientPlayerCMDs.StatusAsync(new ModeCmd { IsSetter = true, Mode = 0 });
+				Console.WriteLine($"Stop");
 				break;
 
 			case ConsoleKey.C:

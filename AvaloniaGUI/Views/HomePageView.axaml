@@ -23,7 +23,7 @@
             Grid.Column="0"
             IsVisible="{Binding !IsMinWidth}"
             VerticalScrollBarVisibility="Auto">
-            <Grid MinWidth="450" RowDefinitions="*, Auto, Auto">
+            <Grid MinWidth="500" RowDefinitions="*, Auto, Auto">
                 <!--  MIDI Player  -->
                 <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
                 <!--  Device Manager  -->

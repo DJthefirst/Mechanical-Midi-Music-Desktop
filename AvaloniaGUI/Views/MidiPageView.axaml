@@ -18,9 +18,12 @@
 
 
 
-    <Grid Background="{DynamicResource PrimaryBackground}" ColumnDefinitions="*,*,*">
+    <Grid Background="{DynamicResource PrimaryBackground}" ColumnDefinitions="Auto,*,*">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Grid.Column="0">
+            <StackPanel
+                Grid.Column="0"
+                MinWidth="500"
+                VerticalAlignment="Top">
                 <!--  MIDI Player  -->
                 <ContentControl Content="{Binding MidiPlayerPage}" />
             </StackPanel>

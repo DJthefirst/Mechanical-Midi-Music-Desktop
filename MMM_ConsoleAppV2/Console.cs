@@ -4,18 +4,19 @@
 using Melanchall.DryWetMidi.Multimedia;
 using MMM_Console;
 using MMM_Core;
+using MMM_Server;
 
 namespace CONSOLE_GUI;
 
 public class ConsoleGUI()
 {
 
-    public void ConsoleInit()
+	public void ConsoleInit()
     {
         Console.WriteLine("---------- Mechanical MIDI Music Terminal ----------");
         Console.WriteLine("To quit type 'q' or 'quit'.");
         Console.WriteLine("For help type 'h' or 'help'.");
-    }
+	}
 
     public void ConsolePeriodic()
     {
@@ -92,12 +93,11 @@ public class ConsoleGUI()
         }
     }
 
-    void Cmd_QUIT()
-    {
-		MMM.Instance.player.Stop();
-        Console.WriteLine("MMM Terminated!");
-        Console.ReadLine();
-    }
+	void Cmd_QUIT()
+	{
+		Console.WriteLine("MMM Terminated!");
+		Program.IsRunning = false;
+	}
     void Cmd_HELP(string? cmd)
     {
         if (cmd == null) { CommandList.display(); return; }
@@ -117,7 +117,7 @@ public class ConsoleGUI()
     void Cmd_SERIALLIST()
     {
         var ports = MMM.Instance.serialManager.ListConnections();
-		if (ports.Count == 0) { Console.WriteLine("No connected Serial ports"); return; }
+        if (ports.Count == 0) { Console.WriteLine("No connected Serial ports"); return; }
         Console.WriteLine("---------- Connected Serial Ports ----------\n");
         foreach (var port in ports)
         {
@@ -131,8 +131,8 @@ public class ConsoleGUI()
     }
     void Cmd_SERIALDISCONNECT(string? cmd)
     {
-		MMM.Instance.serialManager.RemoveConnection(cmd);
-	}
+        MMM.Instance.serialManager.RemoveConnection(cmd);
+    }
     void Cmd_SERIALRESET()
     {
         Console.WriteLine("TODO");
@@ -143,119 +143,118 @@ public class ConsoleGUI()
         if (ports.Count == 0) { Console.WriteLine("No available MIDI In ports"); return; }
         Console.WriteLine("---------- Available MIDI In Ports ----------\n");
         foreach (var port in ports)
-			Console.WriteLine("ID: " + port);
-		    // Console.WriteLine("ID: " + InputDevice.GetByName(port).ToString());
-
-		//{
-		//    Console.WriteLine("ID: " + port.Item1);
-		//    Console.WriteLine("Name: " + port.Item2);
-		//    Console.WriteLine("Manufacturer: " + port.Item3);
-		//    Console.WriteLine("Version: " + port.Item4);
-		//    Console.WriteLine();
-		//}
-	}
+            Console.WriteLine("ID: " + port);
+        //Console.WriteLine("ID: " + InputDevice.GetByName(port).ToString());
+        //{
+        //    Console.WriteLine("ID: " + port.Item1);
+        //    Console.WriteLine("Name: " + port.Item2);
+        //    Console.WriteLine("Manufacturer: " + port.Item3);
+        //    Console.WriteLine("Version: " + port.Item4);
+        //    Console.WriteLine();
+        //}
+    }
     void Cmd_MIDIINLIST()
     {
-		var ports = MMM.Instance.midiPortInManager.ListConnections();
+        var ports = MMM.Instance.midiPortInManager.ListConnections();
         if (ports.Count == 0) { Console.WriteLine("No connected MIDI In ports"); return; }
         Console.WriteLine("---------- Connected MIDI In Ports ----------\n");
         foreach (var port in ports)
-			Console.WriteLine("ID: " + port);
+            Console.WriteLine("ID: " + port);
 
-		//{
-		//    Console.WriteLine("ID: " + port.Item1);
-		//    Console.WriteLine("Name: " + port.Item2);
-		//    Console.WriteLine("Manufacturer: " + port.Item3);
-		//    Console.WriteLine("Version: " + port.Item4);
-		//    Console.WriteLine();
-		//}
-	}
+        //{
+        //    Console.WriteLine("ID: " + port.Item1);
+        //    Console.WriteLine("Name: " + port.Item2);
+        //    Console.WriteLine("Manufacturer: " + port.Item3);
+        //    Console.WriteLine("Version: " + port.Item4);
+        //    Console.WriteLine();
+        //}
+    }
     void Cmd_MIDIINCONNECT(string? cmd)
     {
         MMM.Instance.midiPortInManager.AddConnection(cmd);
-	}
+    }
     void Cmd_MIDIINDISCONNECT(string? cmd)
     {
         MMM.Instance.midiPortInManager.RemoveConnection(cmd);
-	}
+    }
     void Cmd_MIDIINRESET()
     {
         MMM.Instance.midiPortInManager.ClearConnections();
-	}
+    }
     void Cmd_MIDIOUTAVAILABLE()
     {
-		var ports = MMM.Instance.midiPortOutManager.AvailableConnections();
+        var ports = MMM.Instance.midiPortOutManager.AvailableConnections();
         if (ports.Count == 0) { Console.WriteLine("No available MIDI Out ports"); return; }
         Console.WriteLine("---------- Available MIDI Out Ports ----------\n");
         foreach (var port in ports)
-			Console.WriteLine("ID: " + port);
+            Console.WriteLine("ID: " + port);
 
-		//{
-		//    Console.WriteLine("ID: " + port.Item1);
-		//    Console.WriteLine("Name: " + port.Item2);
-		//    Console.WriteLine("Manufacturer: " + port.Item3);
-		//    Console.WriteLine("Version: " + port.Item4);
-		//    Console.WriteLine();
-		//}
-	}
+        //{
+        //    Console.WriteLine("ID: " + port.Item1);
+        //    Console.WriteLine("Name: " + port.Item2);
+        //    Console.WriteLine("Manufacturer: " + port.Item3);
+        //    Console.WriteLine("Version: " + port.Item4);
+        //    Console.WriteLine();
+        //}
+    }
     void Cmd_MIDIOUTLIST()
     {
-		var ports = MMM.Instance.midiPortInManager.ListConnections();
+        var ports = MMM.Instance.midiPortInManager.ListConnections();
         if (ports.Count == 0) { Console.WriteLine("No connected MIDI Out ports"); return; }
         Console.WriteLine("---------- Connected MIDI Out Ports ----------\n");
         foreach (var port in ports)
-			Console.WriteLine("ID: " + port);
+            Console.WriteLine("ID: " + port);
 
-		//{
-		//    Console.WriteLine("ID: " + port.Item1);
-		//    Console.WriteLine("Name: " + port.Item2);
-		//    Console.WriteLine("Manufacturer: " + port.Item3);
-		//    Console.WriteLine("Version: " + port.Item4);
-		//    Console.WriteLine();
-		//}
-	}
+        //{
+        //    Console.WriteLine("ID: " + port.Item1);
+        //    Console.WriteLine("Name: " + port.Item2);
+        //    Console.WriteLine("Manufacturer: " + port.Item3);
+        //    Console.WriteLine("Version: " + port.Item4);
+        //    Console.WriteLine();
+        //}
+    }
     void Cmd_MIDIOUTCONNECT(string? cmd)
     {
-		MMM.Instance.midiPortOutManager.AddConnection(cmd);
-	}
+        MMM.Instance.midiPortOutManager.AddConnection(cmd);
+    }
     void Cmd_MIDIOUTDISCONNECT(string? cmd)
     {
-		MMM.Instance.midiPortOutManager.RemoveConnection(cmd);
-	}
+        MMM.Instance.midiPortOutManager.RemoveConnection(cmd);
+    }
     void Cmd_MIDIOUTRESET()
     {
-		MMM.Instance.midiPortOutManager.ClearConnections();
-	}
+        MMM.Instance.midiPortOutManager.ClearConnections();
+    }
     void Cmd_SONGADD(string? cmd)
     {
-		try
-		{
-			if (Directory.Exists(cmd))
-			{
-				MMM.Instance.playlist.AddDirectory(new DirectoryInfo(cmd));
-			}
-			else if (File.Exists(cmd) && Path.GetExtension(cmd).Equals(".mid", StringComparison.OrdinalIgnoreCase))
-			{
-				MMM.Instance.playlist.AddSong(new FileInfo(cmd));
-			}
-			else
-			{
-				Console.WriteLine("The provided path is invalid or not a MIDI file.");
-			}
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine($"An error occurred: {e.Message}");
-		}
-	}
+        try
+        {
+            if (Directory.Exists(cmd))
+            {
+                MMM.Instance.playlist.AddDirectory(new DirectoryInfo(cmd));
+            }
+            else if (File.Exists(cmd) && Path.GetExtension(cmd).Equals(".mid", StringComparison.OrdinalIgnoreCase))
+            {
+                MMM.Instance.playlist.AddSong(new FileInfo(cmd));
+            }
+            else
+            {
+                Console.WriteLine("The provided path is invalid or not a MIDI file.");
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"An error occurred: {e.Message}");
+        }
+    }
 
     void Cmd_SONGREMOVE(string? cmd)
     {
-		//MMM.Instance.playlist.RemoveSong(cmd);
+        //MMM.Instance.playlist.RemoveSong(cmd);
     }
     void Cmd_SONGLIST()
     {
-        var songNames = MMM.Instance.playlist.List.Select( i=> i.Name).ToList();
+        var songNames = MMM.Instance.playlist.Songs.Select( i=> i.Name).ToList();
         if (songNames.Count == 0) { Console.WriteLine("No songs in playlist.\n"); return; }
         Console.WriteLine("\n---------- " + songNames.Count + " Songs in Playlist ----------");
         foreach (var name in songNames)
@@ -266,7 +265,7 @@ public class ConsoleGUI()
     }
     void Cmd_PLAYLISTCLEAR()
     {
-		MMM.Instance.playlist.List.Clear();
+		MMM.Instance.playlist.Songs.Clear();
     }
     void Cmd_REPEAT(string? cmd)
     {
@@ -278,7 +277,7 @@ public class ConsoleGUI()
     }
     void Cmd_AUTOPLAY(string? cmd)
     {
-        //MMM_CoreDesktop.AutoPlay(cmd.ToLower() == "true");
+        //MMM.Instance.AutoPlay(cmd.ToLower() == "true");
     }
     void Cmd_PLAY(string? cmd)
     {
@@ -290,10 +289,10 @@ public class ConsoleGUI()
         //    MMM_CoreDesktop.Play();
         //}
     }
-    void Cmd_PAUSE()
-    {
+	void Cmd_PAUSE()
+	{
 		MMM.Instance.player.Pause();
-    }
+	}
     void Cmd_STOP()
     {
 		MMM.Instance.player.Stop();

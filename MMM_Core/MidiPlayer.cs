@@ -17,14 +17,28 @@ public enum PLAYER_STATUS
 	PAUSE = 3
 }
 
+public sealed class PlaybackUpdateEventArgs : EventArgs
+{
+	public PlaybackUpdateEventArgs(double curPlaybackTime, double maxDuration)
+	{
+		CurPlaybackTime = curPlaybackTime;
+		MaxDuration = maxDuration;
+	}
+
+	public double CurPlaybackTime { get; }
+	public double MaxDuration { get; }
+}
+
 public class MidiPlayer : IMidiPlayer, IInputDevice
 {
 	private Playback? playback;
+	private PlaybackCurrentTimeWatcher? timeWatcher;
 	private IMidiPlaylist playlist;
 	private uint repeat = 0;
 	private bool autoPlay = true;
 	private bool loop = true;
 
+	public event EventHandler<PlaybackUpdateEventArgs> OnPlaybackTimeUpdated;
 	public event EventHandler<MidiEventReceivedEventArgs> EventReceived;
 
 	public IMidiPlaylist Playlist => playlist;
@@ -63,12 +77,23 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 	{
 		this.loop = loop;
 	}
+	public void Play(string songName)
+	{
+		var song = playlist.GetSongByName(songName);
+		if (song == null) return;
+		playlist.SertCurSong(songName);
+		Reset();
+		Play();
+	}
 
 	public void Play()
 	{
+		if (playback != null && playback.IsRunning)
+			return;
 		if (GetStatus() == PLAYER_STATUS.PAUSE)
 		{
 			playback?.Start();
+			timeWatcher?.Start();
 			return;
 		}
 
@@ -85,16 +110,35 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 		{
 			OnPlayerFinsihed();
 		};
+
+		timeWatcher?.Stop();
+		timeWatcher?.Dispose();
+		timeWatcher = new PlaybackCurrentTimeWatcher(null);
+		timeWatcher.AddPlayback(playback);
+		timeWatcher.PollingInterval = TimeSpan.FromMilliseconds(250); // Update every 100 ms
+		timeWatcher.CurrentTimeChanged += OnCurrentTimeChanged;
+		timeWatcher.Start();
 		playback.Start();
 	}
+
+	// Replace the OnCurrentTimeChanged method with the following
+	private void OnCurrentTimeChanged(object? sender, PlaybackCurrentTimeChangedEventArgs e)
+	{
+		var playbackTime = GetPositionMs();
+		var duration = GetMaxPositionMs();
+		OnPlaybackTimeUpdated?.Invoke(this, new PlaybackUpdateEventArgs(playbackTime, duration));
+	}
+
 	public void Pause()
 	{
 		playback?.Stop();
+		timeWatcher?.Stop();
 	}
 	public void Stop()
 	{
 		playback?.Stop();
 		playback?.MoveToStart();
+		timeWatcher?.Stop();
 	}
 	public void Reset()
 	{
@@ -102,6 +146,9 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 		playback?.MoveToStart();
 		playback?.Dispose();
 		playback = null;
+		timeWatcher?.Stop();
+		timeWatcher?.Dispose();
+		timeWatcher = null;
 	}
 
 	public IMidiSong? Next()
@@ -136,12 +183,15 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 		if (playback == null) return 0;
 		return (double)playback.GetCurrentTime<MetricTimeSpan>().TotalMilliseconds;
 	}
+
+
 	public double SetPositionMs(double pos)
 	{
 		if (playback == null) return 0;
 		playback.MoveToTime(new MetricTimeSpan((long)pos));
 		return (double)playback.GetCurrentTime<MetricTimeSpan>().TotalMilliseconds;
 	}
+
 
 	public double NavigateMs(double increment)
 	{
@@ -195,6 +245,9 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 	}
 	public void Dispose()
 	{
+		timeWatcher?.Stop();
+		timeWatcher?.Dispose();
+		timeWatcher = null;
 	}
 	public byte[] ToByteArray()
 	{
@@ -207,7 +260,7 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 			writer.Write((uint)GetStatus());
 			writer.Write(repeat);
 		}
-		return 
+		return
 			ms.ToArray();
 	}
 	public void FromByteArray(byte[] data)
@@ -236,11 +289,6 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 			}
 		}
 	}
-
-
-
-
-
 	//private void OnEventPlayed(object sender, MidiEventPlayedEventArgs e)
 	//{
 	//	var midiDevice = (MidiDevice)sender;

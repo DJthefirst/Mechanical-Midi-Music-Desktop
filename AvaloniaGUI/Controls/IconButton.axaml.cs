@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using System;
 
-namespace BatchProcess3.Controls;
+namespace AvaloniaGUI.Controls;
 
 public class IconButton : Button
 {

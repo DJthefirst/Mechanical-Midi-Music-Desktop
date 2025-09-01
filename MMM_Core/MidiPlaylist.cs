@@ -34,11 +34,30 @@ public class MidiPlaylist : IMidiPlaylist
 	public int curSongIndex = 0;
 	public List<IMidiSong> Songs { get; private set; } = new List<IMidiSong>();
 
+	public event EventHandler<IMidiSong>? OnSongChanged;
+
 	public IMidiSong? GetCurSong()
 	{
 		if (Songs is null || Songs.Count == 0)
 			return null;
 		return  Songs[curSongIndex];
+	}
+
+	public IMidiSong? GetSongByName(string name)
+	{
+		if (Songs is null) return null;
+		return Songs.Find(song => song.Name == name);
+	}
+	
+	public void SertCurSong(string name)
+	{
+		if (Songs is null) return;
+		var index = Songs.FindIndex(song => song.Name == name);
+		if (index != -1 && curSongIndex != index)
+		{
+			curSongIndex = index;
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
+		}
 	}
 
 	public void AddSong(FileInfo file)
@@ -70,14 +89,24 @@ public class MidiPlaylist : IMidiPlaylist
 	public IMidiSong? Next()
 	{
 		if (Songs is null) return null;
-		curSongIndex = curSongIndex +1 % Songs.Count;
+		int newIndex = (curSongIndex + 1) % Songs.Count;
+		if (newIndex != curSongIndex)
+		{
+			curSongIndex = newIndex;
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
+		}
 		return Songs[curSongIndex];
 	}
 
 	public IMidiSong? Prev()
 	{
 		if (Songs is null) return null;
-		curSongIndex = (curSongIndex - 1) % Songs.Count;
+		int newIndex = (Songs.Count + curSongIndex - 1) % Songs.Count;
+		if (newIndex != curSongIndex)
+		{
+			curSongIndex = newIndex;
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
+		}
 		return Songs[curSongIndex];
 	}
 }

@@ -2,6 +2,7 @@
 using MMM_Core.MidiManagers;
 using MMM_Device;
 using System.IO.Ports;
+using static MMM_Core.MidiPlayer;
 
 namespace MMM_Core;
 
@@ -13,20 +14,27 @@ public interface IMidiSong
 }
 public interface IMidiPlaylist
 {
+	public event EventHandler<IMidiSong>? OnSongChanged;
 	List<IMidiSong> Songs { get; }
 	IMidiSong? GetCurSong();
+	IMidiSong? GetSongByName(string name);
+	void SertCurSong(string name);
 	void AddSong(FileInfo file);
 	void AddSong(IMidiSong song);
 	void AddDirectory(DirectoryInfo path);
 	public IMidiSong? Next();
 	public IMidiSong? Prev();
 }
+
 public interface IMidiPlayer
 {
 
 	IMidiPlaylist Playlist { get; }
+	public event EventHandler<PlaybackUpdateEventArgs> OnPlaybackTimeUpdated;
+	public event EventHandler<MidiEventReceivedEventArgs> EventReceived;
 	PLAYER_STATUS GetStatus();
 	void Play();
+	public void Play(string songName);
 	void Pause();
 	void Stop();
 	void Reset();

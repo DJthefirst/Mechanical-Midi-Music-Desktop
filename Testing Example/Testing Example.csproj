@@ -30,7 +30,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Protobuf Include="Protos\coreAPI.proto" GrpcServices="Client" />
+	  <Protobuf Include="Protos\coreAPI.proto" GrpcServices="Server" />
 	</ItemGroup>
 
 </Project>

@@ -14,14 +14,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MMM_Core\MMM_Core.csproj" />
+    <ProjectReference Include="..\MMM_Device\MMM_Device.csproj" />
+    <ProjectReference Include="..\MMM_Server_Grpc\MMM_Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Protos\coreAPI.proto" GrpcServices="Client" />
+    <Protobuf Include="Protos\coreAPI.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

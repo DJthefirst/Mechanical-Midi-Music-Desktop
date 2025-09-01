@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "MMM_Server_Grpc";
+option csharp_namespace = "MMM_Server";
 
 package CoreAPI;
 
