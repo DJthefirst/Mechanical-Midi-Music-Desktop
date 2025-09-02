@@ -24,21 +24,23 @@ public class MidiPortOutManager : IOutputManager
 		return false;
 	}
 
-	public bool RemoveConnection(string portName)
-	{
-		var outputDevice = OutputDevice.GetByName(portName);
-		return outputDevice != null && RemoveConnection(outputDevice);
-	}
-
 	public bool RemoveConnection(OutputDevice outputDevice)
 	{
-		if (outputDevice != null)
+		if (outputDevice != null && midiPorts.Contains(outputDevice))
 		{
 			outputDevice.SendEvent(new ResetEvent());
 			midiPorts.Remove(outputDevice);
+			outputDevice.Dispose(); // Optionally dispose to release the device
 			return true;
 		}
 		return false;
+	}
+
+	public bool RemoveConnection(string portName)
+	{
+		// Find the OutputDevice instance in midiPorts by name
+		var outputDevice = midiPorts.FirstOrDefault(d => d.Name == portName);
+		return outputDevice != null && RemoveConnection(outputDevice);
 	}
 
 	public void ClearConnections()

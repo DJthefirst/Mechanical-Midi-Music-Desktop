@@ -2,6 +2,7 @@
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 using System.IO.Ports;
+using System.Linq;
 
 namespace MMM_Core.MidiManagers;
 
@@ -38,20 +39,22 @@ public class MidiPortInManager : IInputManager
 		return true;
 	}
 
-	public bool RemoveConnection(string portName)
+	public bool RemoveConnection(InputDevice inputDevice)
 	{
-		InputDevice inputDevice = InputDevice.GetByName(portName);
-		return RemoveConnection(inputDevice);
-	}
-
-	public bool RemoveConnection(InputDevice portName)
-	{
-		if (midiPorts.Contains(portName))
+		if (inputDevice != null && midiPorts.Contains(inputDevice))
 		{
-			midiPorts.Remove(portName);
+			midiPorts.Remove(inputDevice);
+			inputDevice.Dispose(); // Optionally dispose to release the device
 			return true;
 		}
 		return false;
+	}
+
+	public bool RemoveConnection(string portName)
+	{
+		// Find the OutputDevice instance in midiPorts by name
+		var inputDevice = midiPorts.FirstOrDefault(d => d.Name == portName);
+		return inputDevice != null && RemoveConnection(inputDevice);
 	}
 
 	public void ClearConnections()

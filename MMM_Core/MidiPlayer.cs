@@ -81,7 +81,7 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 	{
 		var song = playlist.GetSongByName(songName);
 		if (song == null) return;
-		playlist.SertCurSong(songName);
+		playlist.SetCurSong(songName);
 		Reset();
 		Play();
 	}
@@ -139,6 +139,10 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 		playback?.Stop();
 		playback?.MoveToStart();
 		timeWatcher?.Stop();
+		var currentSong = playlist.GetCurSong();
+		if (currentSong == null) return;
+		var midiFile = MidiFile.Read(currentSong.Path.FullName);
+		playback = midiFile.GetPlayback();
 	}
 	public void Reset()
 	{
@@ -188,6 +192,14 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 	public double SetPositionMs(double pos)
 	{
 		if (playback == null) return 0;
+
+		// Send All Notes Off event to all channels (0-15)
+		for (int channel = 0; channel < 16; channel++)
+		{
+			var allNotesOffEvent = new ControlChangeEvent((SevenBitNumber)123, (SevenBitNumber)0) { Channel = (FourBitNumber)channel };
+			EventReceived?.Invoke(this, new MidiEventReceivedEventArgs(allNotesOffEvent));
+		}
+
 		playback.MoveToTime(new MetricTimeSpan((long)pos));
 		return (double)playback.GetCurrentTime<MetricTimeSpan>().TotalMilliseconds;
 	}

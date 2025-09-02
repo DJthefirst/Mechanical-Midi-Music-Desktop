@@ -18,12 +18,15 @@
     <Grid
         Name="HomeBaseGrid"
         Background="{DynamicResource PrimaryBackground}"
-        ColumnDefinitions="Auto,*">
+        ColumnDefinitions="auto,*">
         <ScrollViewer
             Grid.Column="0"
             IsVisible="{Binding !IsMinWidth}"
             VerticalScrollBarVisibility="Auto">
-            <Grid MinWidth="500" RowDefinitions="*, Auto, Auto">
+            <Grid
+                MinWidth="600"
+                MaxWidth="600"
+                RowDefinitions="Auto, Auto, Auto">
                 <!--  MIDI Player  -->
                 <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
                 <!--  Device Manager  -->

@@ -18,10 +18,11 @@ public interface IMidiPlaylist
 	List<IMidiSong> Songs { get; }
 	IMidiSong? GetCurSong();
 	IMidiSong? GetSongByName(string name);
-	void SertCurSong(string name);
+	void SetCurSong(string name);
 	void AddSong(FileInfo file);
 	void AddSong(IMidiSong song);
 	void AddDirectory(DirectoryInfo path);
+	void RemoveSong(IMidiSong song);
 	public IMidiSong? Next();
 	public IMidiSong? Prev();
 }

@@ -23,6 +23,7 @@
             <StackPanel
                 Grid.Column="0"
                 MinWidth="500"
+                MaxWidth="500"
                 VerticalAlignment="Top">
                 <!--  MIDI Player  -->
                 <ContentControl Content="{Binding MidiPlayerPage}" />

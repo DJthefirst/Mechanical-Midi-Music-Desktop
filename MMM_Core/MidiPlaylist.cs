@@ -49,7 +49,7 @@ public class MidiPlaylist : IMidiPlaylist
 		return Songs.Find(song => song.Name == name);
 	}
 	
-	public void SertCurSong(string name)
+	public void SetCurSong(string name)
 	{
 		if (Songs is null) return;
 		var index = Songs.FindIndex(song => song.Name == name);
@@ -89,6 +89,7 @@ public class MidiPlaylist : IMidiPlaylist
 	public IMidiSong? Next()
 	{
 		if (Songs is null) return null;
+		if (Songs.Count == 0) return null;
 		int newIndex = (curSongIndex + 1) % Songs.Count;
 		if (newIndex != curSongIndex)
 		{
@@ -101,6 +102,7 @@ public class MidiPlaylist : IMidiPlaylist
 	public IMidiSong? Prev()
 	{
 		if (Songs is null) return null;
+		if (Songs.Count == 0) return null;
 		int newIndex = (Songs.Count + curSongIndex - 1) % Songs.Count;
 		if (newIndex != curSongIndex)
 		{
@@ -108,6 +110,13 @@ public class MidiPlaylist : IMidiPlaylist
 			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
 		}
 		return Songs[curSongIndex];
+	}
+
+	public void RemoveSong(IMidiSong song)
+	{
+		Songs?.Remove(song);
+		if(Songs.Count > 0)
+		curSongIndex = Math.Clamp(curSongIndex, 0, Songs.Count - 1);
 	}
 }
 

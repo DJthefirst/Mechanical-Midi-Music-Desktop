@@ -46,7 +46,7 @@ public sealed class MMM
 		midiCore.Connect((IInputDevice)midiPortInManager);
 
 		//Connect MIDI Outputs
-		midiCore.Connect((IOutputDevice)midiOutputSystem);
+		//midiCore.Connect((IOutputDevice)midiOutputSystem);
 		midiCore.Connect((IOutputDevice)serialManager);
 		midiCore.Connect((IOutputDevice)midiPortOutManager);
 

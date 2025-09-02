@@ -8,6 +8,7 @@ using MMM_Core;
 using MMM_Server;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 	{
 		MMM.Instance.player.OnPlaybackTimeUpdated += UpdatePlaybackTime;
 	}
+
+	[ObservableProperty]
+	private bool _isPlaying = false;
 
 	[ObservableProperty]
 	private string? _name;
@@ -45,86 +49,137 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 	[ObservableProperty]
 	private List<string> _songNames = MMM.Instance.playlist.Songs.ConvertAll(song => song.Name);
 
-	[RelayCommand]
-	private void Play() => MMM.Instance.player.Play();
+	[ObservableProperty]
+	private List <string> _midiOutputs = MMM.Instance.midiPortOutManager.AvailableConnections();
+
+	[ObservableProperty]
+	private List<string> _midiInputs = MMM.Instance.midiPortInManager.AvailableConnections();
+
+	public ObservableCollection<String> SelectedMidiInputs { get; } = new();
+	public ObservableCollection<String> SelectedMidiOutputs { get; } = new();
 
 	[RelayCommand]
-	private void Stop() => MMM.Instance.player.Stop();
+	private void PlayPause(){
+		if (IsPlaying) MMM.Instance.player.Pause();
+		else MMM.Instance.player.Play();
+		IsPlaying = !IsPlaying;
+	}
 
 	[RelayCommand]
-	private void Prev() => MMM.Instance.player.Prev();
+	private void Stop(){
+		MMM.Instance.player.Stop();
+		IsPlaying = false;
+		SongDuration = MMM.Instance.player.GetMaxPositionMs();
+		SongPosition = 0;
+	}
 
 	[RelayCommand]
-	private void Next() => MMM.Instance.player.Next();
-
-	//[RelayCommand]
-	//private void Skip() => MMM.Instance.player.Skip();
+	private void Prev() { 
+		MMM.Instance.player.Prev();
+		StopCommand.Execute(null);
+	}
 
 	[RelayCommand]
+	private void Next(){
+		MMM.Instance.player.Next();
+		StopCommand.Execute(null);
+	}
+
+		//[RelayCommand]
+		//private void Skip() => MMM.Instance.player.Skip();
+
+		[RelayCommand]
 	private void Repeat() => MMM.Instance.player.Repeat(1);
 
-    [RelayCommand]
+	[RelayCommand]
 	private async Task AddSongAsync()
 	{
 		var window = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
-
-		if (window?.StorageProvider == null)
-			return;
+		if (window?.StorageProvider == null) return;
 
 		var options = new Avalonia.Platform.Storage.FilePickerOpenOptions
 		{
-			Title = "Select MIDI files or folders",
+			Title = "Select MIDI files",
 			AllowMultiple = true,
 			FileTypeFilter = new List<Avalonia.Platform.Storage.FilePickerFileType>
 						{
-							new("MIDI files") { Patterns = new[] { "*.mid", "*.midi" } },
-							new("All files") { Patterns = new[] { "*" } }
+							new("MIDI files") { Patterns = new[] { "*.mid", "*.midi" } }
 						},
 		};
 
 		var files = await window.StorageProvider.OpenFilePickerAsync(options);
-		if (files == null || files.Count == 0)
-			return;
+		if (files == null || files.Count == 0) return;
 
-		foreach (var file in files)
+		foreach (var file in files.OfType<Avalonia.Platform.Storage.IStorageFile>())
 		{
-			if (file is Avalonia.Platform.Storage.IStorageFolder folder)
-			{
-				var path = folder.Path.LocalPath;
-				if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
-				{
-					AddDirectoryRecursive(new DirectoryInfo(path));
-				}
-				continue;
-			}
-
-			if (file is not Avalonia.Platform.Storage.IStorageFile localFile)
-				continue;
-
-			var pathFile = localFile.Path.LocalPath;
-			if (string.IsNullOrEmpty(pathFile))
-				continue;
-
-			if (Directory.Exists(pathFile))
-			{
-				AddDirectoryRecursive(new DirectoryInfo(pathFile));
-			}
-			else if (File.Exists(pathFile) && IsMidiFile(pathFile))
+			var pathFile = file.Path.LocalPath;
+			if (!string.IsNullOrEmpty(pathFile) && IsMidiFile(pathFile))
 			{
 				MMM.Instance.playlist.AddSong(new FileInfo(pathFile));
 			}
 		}
-		SongNames = MMM.Instance.playlist.Songs.ConvertAll(song => song.Name);
+		UpdateSongNames();
 	}
 
-	private void AddDirectoryRecursive(DirectoryInfo dir)
+	[RelayCommand]
+	private async Task AddDirectoryRecursiveAsync()
 	{
-		foreach (var file in dir.GetFiles("*.*", SearchOption.AllDirectories))
+		var window = (Avalonia.Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+		if (window?.StorageProvider == null) return;
+
+		var options = new Avalonia.Platform.Storage.FolderPickerOpenOptions
+		{
+			Title = "Select Folder(s)",
+			AllowMultiple = false
+		};
+
+		var folders = await window.StorageProvider.OpenFolderPickerAsync(options);
+		if (folders == null || folders.Count == 0) return;
+
+		foreach (var folder in folders.OfType<Avalonia.Platform.Storage.IStorageFolder>())
+		{
+			var dirInfo = new DirectoryInfo(folder.Path.LocalPath);
+			if (dirInfo.Exists)
+			{
+				AddMidiFilesRecursive(dirInfo);
+			}
+		}
+		UpdateSongNames();
+	}
+
+	[RelayCommand]
+	private void RemoveSelectedSong(string songName)
+	{
+		var songToRemove = MMM.Instance.playlist.GetCurSong();
+		if (songToRemove != null)
+		{
+			MMM.Instance.playlist.RemoveSong(songToRemove);
+			UpdateSongNames();
+		}
+		StopCommand.Execute(null);
+	}
+
+	[RelayCommand]
+	private void ClearPlaylist()
+	{
+		MMM.Instance.playlist.Songs.Clear();
+		UpdateSongNames();
+		StopCommand.Execute(null);
+	}
+
+	private void AddMidiFilesRecursive(DirectoryInfo directory)
+	{
+		foreach (var file in directory.GetFiles())
 		{
 			if (IsMidiFile(file.FullName))
 			{
 				MMM.Instance.playlist.AddSong(file);
 			}
+		}
+
+		foreach (var subDir in directory.GetDirectories())
+		{
+			AddMidiFilesRecursive(subDir);
 		}
 	}
 
@@ -132,6 +187,11 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 	{
 		var ext = Path.GetExtension(path).ToLowerInvariant();
 		return ext == ".mid" || ext == ".midi";
+	}
+
+	private void UpdateSongNames()
+	{
+		SongNames = MMM.Instance.playlist.Songs.ConvertAll(song => song.Name);
 	}
 
 
@@ -148,7 +208,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 	private void UpdatePlaybackTime(object? sender, PlaybackUpdateEventArgs e)
 	{
 		SongDuration = e.MaxDuration;
-		SongPosition = (int)e.CurPlaybackTime;
+		SongPosition = e.CurPlaybackTime;
 	}
 
 	public void NavigateTo(int position) => MMM.Instance.player.SetPositionMs(position);

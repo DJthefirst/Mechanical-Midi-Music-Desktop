@@ -41,7 +41,7 @@
                         Padding="0,5,0,5"
                         HorizontalAlignment="Stretch"
                         Background="{DynamicResource SecondaryBackground}"
-                        Command="{Binding AddSongCommand}">
+                        Command="{Binding AddDirectoryRecursiveCommand}">
                         <Label
                             HorizontalAlignment="Center"
                             Classes="icon"
@@ -61,11 +61,12 @@
                             FontFamily="{DynamicResource PhosphorFill}" />
                     </Button>
                     <Button
+                        Name="RemoveSongBtn"
                         Grid.Column="2"
                         Padding="0,5,0,5"
                         HorizontalAlignment="Stretch"
                         Background="{DynamicResource SecondaryBackground}"
-                        Command="{Binding AddSongCommand}">
+                        Command="{Binding RemoveSelectedSongCommand}">
                         <Label
                             HorizontalAlignment="Center"
                             Classes="icon"
@@ -77,7 +78,7 @@
                         Padding="0,5,0,5"
                         HorizontalAlignment="Stretch"
                         Background="{DynamicResource SecondaryBackground}"
-                        Command="{Binding AddSongCommand}">
+                        Command="{Binding ClearPlaylistCommand}">
                         <Label
                             HorizontalAlignment="Center"
                             Classes="icon"
@@ -100,7 +101,8 @@
                                 Margin="0,15,0,0"
                                 VerticalAlignment="Stretch"
                                 ItemsSource="{Binding SongNames}"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                SelectionMode="AlwaysSelected" />
                         </StackPanel>
 
                         <NavBarSlider
@@ -125,7 +127,10 @@
                                 Grid.Column="2"
                                 Content="{Binding TimeDuration}"
                                 Foreground="white" />
-                            <Grid Grid.Column="1" ColumnDefinitions="*,*,*,*,*,*">
+                            <Grid
+                                Grid.Column="1"
+                                MaxWidth="300"
+                                ColumnDefinitions="*,*,*,*,*,*">
                                 <Button
                                     Grid.Column="0"
                                     Padding="0"
@@ -156,12 +161,27 @@
                                     Padding="0"
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
-                                    Command="{Binding PlayCommand}">
+                                    Command="{Binding PlayPauseCommand}"
+                                    IsVisible="{Binding !IsPlaying}">
                                     <Label
                                         Margin="0"
                                         HorizontalAlignment="Center"
                                         Classes="icon"
                                         Content="&#xE3D0;"
+                                        FontFamily="{DynamicResource PhosphorFill}" />
+                                </Button>
+                                <Button
+                                    Grid.Column="2"
+                                    Padding="0"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Command="{Binding PlayPauseCommand}"
+                                    IsVisible="{Binding IsPlaying}">
+                                    <Label
+                                        Margin="0"
+                                        HorizontalAlignment="Center"
+                                        Classes="icon"
+                                        Content="&#xE39E;"
                                         FontFamily="{DynamicResource PhosphorFill}" />
                                 </Button>
                                 <Button
@@ -226,8 +246,9 @@
                                 MaxHeight="80"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
-                                ItemsSource="{Binding SongNames}"
-                                ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                                ItemsSource="{Binding MidiInputs}"
+                                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                SelectionMode="Multiple,Toggle" />
                         </StackPanel>
                     </Border>
                     <Border
@@ -242,9 +263,9 @@
                                 MaxHeight="80"
                                 HorizontalAlignment="Stretch"
                                 VerticalAlignment="Stretch"
-                                ItemsSource="{Binding SongNames}"
+                                ItemsSource="{Binding MidiOutputs}"
                                 ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                SelectionMode="Multiple" />
+                                SelectionMode="Multiple,Toggle" />
                         </StackPanel>
                     </Border>
                 </Grid>
