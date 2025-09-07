@@ -7,45 +7,79 @@ namespace MMM_Core.MidiManagers;
 
 public class MidiSerialManager : IInputManager, IOutputManager
 {
-
+	private List<string> serialPortsAvailable = new List<string>();
 	private List<SerialPort> serialPorts = new List<SerialPort>();
 	private Dictionary<SerialPort, Queue<byte>> buffers = new Dictionary<SerialPort, Queue<byte>>();
 
 	public event EventHandler<MidiEventReceivedEventArgs> EventReceived = delegate { };
 	public event EventHandler<MidiEventSentEventArgs> EventSent = delegate { };
+	public event EventHandler<List<string>> OnPortsUpdated = delegate { };
 
 	public bool IsListeningForEvents { get; private set; }
 
 	public MidiSerialManager()
 	{
 		IsListeningForEvents = true;
+		_ = MonitorPort(); // Fire-and-forget, suppress CS4014 warning
 	}
 
-	public bool AddConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
+	//TODO: Add Native Event Listening for Serial Port Disconnects
+	async Task MonitorPort()
+	{
+		while (IsListeningForEvents)
+		{
+			try
+			{
+				var availableConnections = SerialPort.GetPortNames().ToList();
+				foreach (var connection in serialPorts.ToList())
+				{
+					if (!availableConnections.Contains(connection.PortName))
+					{
+						Console.WriteLine($"Serial Port {connection} disconnected.");
+						RemoveConnection(connection);
+					}
+				}
+				if (!new HashSet<string>(serialPortsAvailable).SetEquals(availableConnections) ||
+					(serialPortsAvailable.Count != availableConnections.Count))
+				{
+					Console.WriteLine("Serial Ports Updated");
+					serialPortsAvailable = availableConnections;
+					OnPortsUpdated.Invoke(this, availableConnections);
+				}
+			}
+			catch(Exception e) { Console.WriteLine("Serial Listenr Error: " + e);}
+			await Task.Delay(2000); // Poll every 2 seconds
+		}
+	}
+
+	public async Task AddConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
 	{
 		SerialPort serialPort;
 		serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
 		serialPort.DataReceived += SerialPortDataReceived;
 
+
 		try
 		{
+			serialPort.Open();
+			serialPort.Close();
 			serialPort.Open();
 			serialPorts.Add(serialPort);
 			buffers.Add(serialPort, new Queue<byte>());
 
+			await Task.Delay(100);
 			byte[] readyMsg = SysExParser.GenerateSysEx(0x0000, SysEx.DeviceReady, []);
 			serialPort.Write(readyMsg, 0, readyMsg.Count());
-			return true;
 		}
 		catch (UnauthorizedAccessException ex)
 		{
 			Console.WriteLine($"Error: Serial Port {portName} is already in use. Details: {ex.Message}");
-			return false;
+			return;
 		}
 		catch (IOException ex)
 		{
 			Console.WriteLine($"Error: Unable to open Serial Port {portName}. Details: {ex.Message}");
-			return false;
+			return;
 		}
 	}
 
@@ -54,13 +88,29 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		var serialPort = serialPorts.FirstOrDefault(sp => sp.PortName == portName);
 		if (serialPort != null)
 		{
-			byte[] MidiReset = { 0xFF };
-			serialPort.Write(MidiReset, 0, 1); // reset
-			serialPort.DataReceived -= SerialPortDataReceived;
-			serialPort.Close();
-			serialPorts.Remove(serialPort);
-			buffers.Remove(serialPort);
-			return true;
+			return RemoveConnection(serialPort);
+		}
+		return true;
+	}
+
+	public bool RemoveConnection(SerialPort serialPort)
+	{
+		serialPorts.Remove(serialPort);
+		buffers.Remove(serialPort);
+		DeviceManager.Instance.CloseConnection(serialPort);
+		if (serialPort != null && serialPort.IsOpen)
+		{
+			try
+			{
+				byte[] MidiReset = { 0xFF };
+				serialPort.Write(MidiReset, 0, 1); // reset
+				serialPort.DataReceived -= SerialPortDataReceived;
+				serialPort.Close();
+				return true;
+			}
+			catch(Exception e){
+				Console.WriteLine("PortErr: " + e);
+			}
 		}
 		return false;
 	}
@@ -69,7 +119,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 	{
 		foreach (var serialPort in serialPorts)
 		{
-			RemoveConnection(serialPort.PortName);
+			RemoveConnection(serialPort);
 		}
 	}
 

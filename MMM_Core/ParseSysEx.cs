@@ -134,7 +134,7 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
 				break;
 			case SysEx.GetDeviceConstruct:
                 Device device = new Device(msg.Payload());
-                device.ConnectionString = GetConnectionString(sender);
+                device.ConnectionString = Device.GetConnectionString(sender);
 				DeviceManager.Instance.AddDevice(device);
 				SendMessage(msg.Source(), SysEx.GetNumOfDistributors);
 				//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
@@ -286,20 +286,5 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
         }
     }
 	void IDisposable.Dispose() { }
-
-    internal string GetConnectionString(object? sender)
-    {
-        // Determine connection string type
-        string connectionString = string.Empty;
-        if (sender is SerialPort serialPort)
-            connectionString = $"Serial:{serialPort.PortName}";
-        else if (sender is string s && System.Net.IPAddress.TryParse(s, out var ip))
-            connectionString = $"IPV4:{ip}";
-        else if (sender is System.Net.IPEndPoint endPoint)
-            connectionString = $"IPV4:{endPoint.Address}";
-        else
-            connectionString = sender?.ToString() ?? "Unknown";
-        return connectionString;
-	}
 }
 

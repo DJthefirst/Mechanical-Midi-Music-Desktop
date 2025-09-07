@@ -35,6 +35,20 @@ namespace MMM_Core
 			OnListUpdated?.Invoke(this, Devices);
 		}
 
+		internal void CloseConnection(object connection)
+		{
+			string connstr = Device.GetConnectionString(connection);
+			var devicesToRemove = Devices.Values.Where(d => d.ConnectionString == connstr).ToList();
+			foreach (var device in devicesToRemove)
+			{
+				Devices.Remove(device.SYSEX_DEV_ID);
+			}
+			if (devicesToRemove.Count > 0)
+			{
+				OnListUpdated?.Invoke(this, Devices);
+			}
+		}
+
 		public static DeviceManager Instance => instance;
 	}
 }

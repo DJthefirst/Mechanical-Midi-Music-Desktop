@@ -8,6 +8,7 @@ using MMM_Server;
 using System.Collections.ObjectModel;
 using System.Collections.Generic;
 using Avalonia.Threading;
+using System;
 
 namespace AvaloniaGUI.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class DeviceListViewModel : ComponentViewModel
 	public DeviceListViewModel() : base(PageComponentNames.DeviceList)
 	{
 		RefreshSerialPorts();
+		MMM.Instance.serialManager.OnPortsUpdated += (s, e) => RefreshSerialPorts();
 
 		DeviceManager.Instance.OnListUpdated += (s, e) =>
 		{
@@ -24,41 +26,11 @@ public partial class DeviceListViewModel : ComponentViewModel
 				DevicesList.Clear();
 				foreach (var device in DeviceManager.Instance.Devices.Values)
 				{
+					Console.WriteLine($"Device Added: {device.Name} on {device.ConnectionString}");
 					DevicesList.Add(device);
 				}
 			});
 		};
-
-		Device device1 = new Device()
-		{
-			Name = "Test Device",
-			ConnectionString = "COM3",
-			SYSEX_DEV_ID = 1,
-			MAX_NUM_INSTRUMENTS = 2,
-			NUM_SUBINSTRUMENTS = 1,
-			INSTRUMENT_TYPE = InstrumentType.ShiftRegister,
-			PLATFORM_TYPE = PlatformType.ESP32,
-			MIN_MIDI_NOTE = 0,
-			MAX_MIDI_NOTE = 127,
-			FIRMWARE_VERSION = 0x0001
-		};
-
-		Device device2 = new Device()
-		{
-			Name = "Test Device 2",
-			ConnectionString = "COM5",
-			SYSEX_DEV_ID = 2,
-			MAX_NUM_INSTRUMENTS = 2,
-			NUM_SUBINSTRUMENTS = 1,
-			INSTRUMENT_TYPE = InstrumentType.FloppyDrive,
-			PLATFORM_TYPE = PlatformType.ArduinoDue,
-			MIN_MIDI_NOTE = 0,
-			MAX_MIDI_NOTE = 127,
-			FIRMWARE_VERSION = 0x0001
-		};
-		///DevicesList.Add(device1);
-		//DevicesList.Add(device2);
-
 	}
 
 	public ObservableCollection<int> BaudRates { get; } = new(){

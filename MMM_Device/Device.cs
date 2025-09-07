@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO.Ports;
 
 namespace MMM_Device;
 public enum InstrumentType
@@ -85,18 +86,33 @@ public class Device
         //Name = BitConverter.ToString(deviceObj[10..20]);
     }
 
-    //public void SetAllDistributors(byte[] data)
-    //{
-    //    int numDistributors = (data.Length / Distributor.NUM_CFG_BYTES);
-    //    Distributors.Clear();
-    //    for (int i = 0; i < numDistributors; ++i)
-    //    {
-    //        int idx = i * Distributor.NUM_CFG_BYTES;
-    //        Distributors.Add(new Distributor(data[(idx)..(idx+Distributor.NUM_CFG_BYTES)]));
-    //    }
-    //}
+	//public void SetAllDistributors(byte[] data)
+	//{
+	//    int numDistributors = (data.Length / Distributor.NUM_CFG_BYTES);
+	//    Distributors.Clear();
+	//    for (int i = 0; i < numDistributors; ++i)
+	//    {
+	//        int idx = i * Distributor.NUM_CFG_BYTES;
+	//        Distributors.Add(new Distributor(data[(idx)..(idx+Distributor.NUM_CFG_BYTES)]));
+	//    }
+	//}
 
-    private byte GetDeviceBoolean()
+	public static string GetConnectionString(object? sender)
+	{
+		// Determine connection string type
+		string connectionString = string.Empty;
+		if (sender is SerialPort serialPort)
+			connectionString = $"Serial:{serialPort.PortName}";
+		else if (sender is string s && System.Net.IPAddress.TryParse(s, out var ip))
+			connectionString = $"IPV4:{ip}";
+		else if (sender is System.Net.IPEndPoint endPoint)
+			connectionString = $"IPV4:{endPoint.Address}";
+		else
+			connectionString = sender?.ToString() ?? "Unknown";
+		return connectionString;
+	}
+
+	private byte GetDeviceBoolean()
     {
         byte deviceBoolByte = 0;
         if (OmniMode) deviceBoolByte |= (1 << 0);
