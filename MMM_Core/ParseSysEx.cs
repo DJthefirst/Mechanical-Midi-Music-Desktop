@@ -78,16 +78,47 @@ public class SysExMsg
 
 }
 
-internal class ParseSysEx : IInputDevice, IOutputDevice, IDisposable
+internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
 {
 
     public event EventHandler<MidiEventReceivedEventArgs> EventReceived = delegate { };
     public event EventHandler<MidiEventSentEventArgs> EventSent = delegate { };
     public bool IsListeningForEvents { get; private set; }
 
-    private void ProcessMessage(SysExMsg msg)
+    public bool OnEventReceived(object? sender, MidiEvent midiEvent)
     {
+		// Check if event is SysEx
+		if (!(midiEvent is NormalSysExEvent sysExEvent)) return false;
+		
+        // Extract the 14-bit address by shifting only the MSB to the right by 1 bit  
+        UInt16 rawAddress = BitConverter.ToUInt16(sysExEvent.Data, 3);
+        UInt16 dest = (UInt16)(((rawAddress & 0x7F00) >> 1) | (rawAddress & 0x007F));
 
+        // If msg destination is to Server process msg and block outbound msg. 
+        if (!(sysExEvent.Data.Length >= 5 && dest == SysEx.AddrController)) {
+			Console.WriteLine($"SysEx Outbound: {BitConverter.ToString(sysExEvent.Data)}");
+			return false;// Adjusted for 14-bit address
+        }
+            
+        var m2bConverter = new MidiEventToBytesConverter();
+        m2bConverter.BytesFormat = BytesFormat.Device;
+        byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
+
+        try{
+            SysExMsg sysExMsg = new SysExMsg(midiEventBytes);
+            Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
+            ProcessMessage(sender, sysExMsg);
+		}
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error sending message: {ex.Message}");
+        }
+
+        return true; //Block outbound msg
+	}
+
+	private void ProcessMessage(object? sender, SysExMsg msg)
+    {
         //Check if Desitination Device ID is correct
         if (msg.Destination() != SysEx.AddrController) return;
 
@@ -248,7 +279,7 @@ internal class ParseSysEx : IInputDevice, IOutputDevice, IDisposable
         try
         {
             SysExMsg sysExMsg = new SysExMsg(midiEventBytes);
-            ProcessMessage(sysExMsg);
+            ProcessMessage(null, sysExMsg);
         }
         catch {
 			Console.WriteLine(BitConverter.ToString(midiEventBytes).Replace("-", " "));

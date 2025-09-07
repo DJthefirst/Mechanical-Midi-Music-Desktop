@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
-using Melanchall.DryWetMidi.Core;
+using System;
+using System.Dynamic;
 using System.Numerics;
 using System.Reflection;
 using System.Xml.Linq;
@@ -11,13 +13,16 @@ public class MidiSong : IMidiSong
 {
 	public string Name { get; private set; }
 	public FileInfo Path { get; private set; }
+	public double Duration { get; set; }
 
+	public string DurationTimestamp => TimeSpan.FromMilliseconds(Duration).ToString(@"mm\:ss");
 	public int Index { get; set; }
 
 	public MidiSong(FileInfo path)
 	{
 		Name = path.Name;
 		Path = path;
+		Duration = (double)MidiFile.Read(path.FullName).GetDuration<MetricTimeSpan>().TotalMilliseconds;
 		Index = -1;
 	}
 
@@ -67,16 +72,31 @@ public class MidiPlaylist : IMidiPlaylist
 
 	public void AddDirectory(DirectoryInfo path)
 	{
+		bool setIndex = false;
+		if (Songs.Count == 0)
+			setIndex = true;
+
 		foreach (var midiFile in path.GetFiles("*.mid"))
 		{
-			AddSong(new MidiSong(midiFile));
+			var song = new MidiSong(midiFile);
+			if (Songs.Any(s => s.Path.FullName.Equals(song.Path.FullName, StringComparison.OrdinalIgnoreCase)))
+				continue;
+			AddSong(song);
 		}
+
+		if (setIndex && Songs.Count > 0)
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
 	}
 
 	public void AddSong(IMidiSong song)
 	{
+		if (Songs.Any(s => s.Path.FullName.Equals(song.Path.FullName, StringComparison.OrdinalIgnoreCase))) return;
 		Songs?.Add(song);
-
+		if (Songs.Count == 1)
+		{
+			curSongIndex = 0;
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
+		}
 	}
 
 	public IMidiSong? Peek()
@@ -115,8 +135,11 @@ public class MidiPlaylist : IMidiPlaylist
 	public void RemoveSong(IMidiSong song)
 	{
 		Songs?.Remove(song);
-		if(Songs.Count > 0)
-		curSongIndex = Math.Clamp(curSongIndex, 0, Songs.Count - 1);
+		if (Songs.Count > 0)
+		{
+			curSongIndex = Math.Clamp(curSongIndex, 0, Songs.Count - 1);
+			OnSongChanged?.Invoke(this, Songs[curSongIndex]);
+		}
 	}
 }
 

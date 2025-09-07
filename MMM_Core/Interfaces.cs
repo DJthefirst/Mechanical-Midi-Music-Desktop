@@ -10,6 +10,8 @@ public interface IMidiSong
 {
 	string Name { get; }
 	FileInfo Path { get; }
+	double Duration { get; }
+	string DurationTimestamp { get; }
 	int Index { get;}
 }
 public interface IMidiPlaylist
@@ -36,6 +38,7 @@ public interface IMidiPlayer
 	PLAYER_STATUS GetStatus();
 	void Play();
 	public void Play(string songName);
+	public void Play(IMidiSong song);
 	void Pause();
 	void Stop();
 	void Reset();

@@ -45,18 +45,11 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 
 	private string? TimePosition => GenerateTimestamp((int)SongPosition/1000);
 
-
-	[ObservableProperty]
-	private List<string> _songNames = MMM.Instance.playlist.Songs.ConvertAll(song => song.Name);
-
-	[ObservableProperty]
-	private List <string> _midiOutputs = MMM.Instance.midiPortOutManager.AvailableConnections();
-
-	[ObservableProperty]
-	private List<string> _midiInputs = MMM.Instance.midiPortInManager.AvailableConnections();
-
-	public ObservableCollection<String> SelectedMidiInputs { get; } = new();
-	public ObservableCollection<String> SelectedMidiOutputs { get; } = new();
+	public ObservableCollection<string> MidiOutputs { get; } = new ObservableCollection<string>(MMM.Instance.midiPortOutManager.AvailableConnections());
+	public ObservableCollection<string> MidiInputs { get; } = new ObservableCollection<string>(MMM.Instance.midiPortInManager.AvailableConnections());
+	public ObservableCollection<IMidiSong> SongList { get; } = new ObservableCollection<IMidiSong>(MMM.Instance.playlist.Songs);
+	public ObservableCollection<string> SelectedMidiInputs { get; } = new();
+	public ObservableCollection<string> SelectedMidiOutputs { get; } = new();
 
 	[RelayCommand]
 	private void PlayPause(){
@@ -88,7 +81,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 		//[RelayCommand]
 		//private void Skip() => MMM.Instance.player.Skip();
 
-		[RelayCommand]
+	[RelayCommand]
 	private void Repeat() => MMM.Instance.player.Repeat(1);
 
 	[RelayCommand]
@@ -118,7 +111,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 				MMM.Instance.playlist.AddSong(new FileInfo(pathFile));
 			}
 		}
-		UpdateSongNames();
+		UpdateSongList();
 	}
 
 	[RelayCommand]
@@ -144,7 +137,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 				AddMidiFilesRecursive(dirInfo);
 			}
 		}
-		UpdateSongNames();
+		UpdateSongList();
 	}
 
 	[RelayCommand]
@@ -154,7 +147,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 		if (songToRemove != null)
 		{
 			MMM.Instance.playlist.RemoveSong(songToRemove);
-			UpdateSongNames();
+			UpdateSongList();
 		}
 		StopCommand.Execute(null);
 	}
@@ -163,7 +156,7 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 	private void ClearPlaylist()
 	{
 		MMM.Instance.playlist.Songs.Clear();
-		UpdateSongNames();
+		UpdateSongList();
 		StopCommand.Execute(null);
 	}
 
@@ -189,9 +182,12 @@ public partial class MidiPlayerViewModel : ComponentViewModel
 		return ext == ".mid" || ext == ".midi";
 	}
 
-	private void UpdateSongNames()
+	private void UpdateSongList()
 	{
-		SongNames = MMM.Instance.playlist.Songs.ConvertAll(song => song.Name);
+		SongList.Clear();
+		foreach (var song in MMM.Instance.playlist.Songs){
+			SongList.Add(song);
+		}
 	}
 
 

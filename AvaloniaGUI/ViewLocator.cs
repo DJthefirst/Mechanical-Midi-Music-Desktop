@@ -6,6 +6,8 @@ using System;
 
 namespace AvaloniaGUI;
 
+//TODO Add a view locator to map viewmodels to views.
+
 public class ViewLocator : IDataTemplate
 {
     public Control? Build(object? data)

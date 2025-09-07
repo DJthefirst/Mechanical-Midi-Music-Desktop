@@ -8,7 +8,7 @@ namespace MMM_Core;
 public class MidiCore
 {
 
-	private ParseSysEx parserSysEx = new ParseSysEx();
+	private SysExParser parserSysEx = new SysExParser();
 
 	public MidiCore()
 	{
@@ -49,25 +49,12 @@ public class MidiCore
 		var eventCallback = EventCallback;
 
 		var midiEvent = eventCallback == null ? inputMidiEvent : eventCallback(inputMidiEvent);
-		if (midiEvent == null)
-			return;
+		if (midiEvent == null) return;
 
-		if (midiEvent is NormalSysExEvent sysExEvent)
-		{
-			// Extract the 14-bit address by shifting only the MSB to the right by 1 bit  
-			UInt16 rawAddress = BitConverter.ToUInt16(sysExEvent.Data, 3);
-			UInt16 dest = (UInt16)(((rawAddress & 0x7F00) >> 1) | (rawAddress & 0x007F));
+		// Give SysEx Parser first chance in case of Server SysEx event
+		if (parserSysEx.OnEventReceived(sender, midiEvent)) return;
 
-			// If msg destination is to Server process msg and block outbound msg. 
-			if (sysExEvent.Data.Length >= 5 && dest == SysEx.AddrController) // Adjusted for 14-bit address  
-			{
-				Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
-				((IOutputDevice)parserSysEx).SendEvent(midiEvent);
-				return;  
-			}
-			Console.WriteLine($"SysEx Outbound: {BitConverter.ToString(sysExEvent.Data)}");
-		}
-
+		// Forward event to all output devices if not handled by SysEx Parser
 		foreach (var outputDevice in OutputDevices)
 		{
 			outputDevice.SendEvent(e.Event);

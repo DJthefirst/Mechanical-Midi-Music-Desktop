@@ -4,7 +4,9 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using AvaloniaGUI.ViewModels;
 using MMM_Server;
+using MMM_Core;
 using System;
+using System.Linq;
 
 namespace AvaloniaGUI.Views;
 
@@ -23,28 +25,35 @@ public partial class MidiPlayerView : UserControl
 		PlayerNavBar.PointerExited += (s, e) =>
 		{
 			(DataContext as MidiPlayerViewModel)?.SetIsNavBarSelected(false);
-			(DataContext as MidiPlayerViewModel)?.NavigateTo((int)PlayerNavBar.Value*1000);
+			(DataContext as MidiPlayerViewModel)?.NavigateTo((int)PlayerNavBar.Value * 1000);
+		};
+
+		// Set SelectedItem to the current song object (IMidiSong)
+		SongSelector.SelectedItem = MMM.Instance.playlist.GetCurSong();
+
+		MMM.Instance.playlist.OnSongChanged += (s, e) =>
+		{
+			Avalonia.Threading.Dispatcher.UIThread.Post(() => SongSelector.SelectedItem = e);
 		};
 
 		SongSelector.SelectionChanged += (s, e) =>
 		{
+			var selectedSong = SongSelector.SelectedValue as IMidiSong;
+			var currentSong = MMM.Instance.playlist?.GetCurSong();
+
+			if (selectedSong == null || selectedSong == currentSong) return;
 			if ((DataContext as MidiPlayerViewModel) == null) return;
+
 			if ((DataContext as MidiPlayerViewModel).IsPlaying)
 			{
-				MMM.Instance.player.Play(SongSelector.SelectedValue?.ToString());
+				MMM.Instance.player.Play(selectedSong);
 			}
 			else
 			{
-
-				MMM.Instance.playlist.SetCurSong(SongSelector.SelectedValue?.ToString());
+				MMM.Instance.playlist.SetCurSong(selectedSong.Name);
 				(DataContext as MidiPlayerViewModel)?.StopCommand.Execute(null);
 			}
-				Console.WriteLine(SongSelector.SelectedValue);
-		};
-
-		SongSelector.SelectedItem = MMM.Instance.playlist.GetCurSong().Name;
-		MMM.Instance.playlist.OnSongChanged += (s, e) => {
-			Avalonia.Threading.Dispatcher.UIThread.Post(() => SongSelector.SelectedItem = e.Name);
+			Console.WriteLine(selectedSong?.Name);
 		};
 
 		MidiOutSelector.SelectionChanged += (s, e) =>
@@ -56,15 +65,16 @@ public partial class MidiPlayerView : UserControl
 				if (viewModel == null)
 					return;
 
-				// Get current connections from midiPortOutManager
 				var existingConnections = MMM.Instance.midiPortOutManager.ListConnections();
 
 				viewModel.SelectedMidiOutputs.Clear();
-				foreach (var item in MidiOutSelector.SelectedItems) {
+				foreach (var item in MidiOutSelector.SelectedItems)
+				{
 					string itemName = item.ToString();
 					viewModel.SelectedMidiOutputs.Add(itemName);
 
-					if (!existingConnections.Contains(itemName)){
+					if (!existingConnections.Contains(itemName))
+					{
 						MMM.Instance.midiPortOutManager.AddConnection(itemName);
 					}
 				}
@@ -115,5 +125,4 @@ public partial class MidiPlayerView : UserControl
 			};
 		};
 	}
-
 }

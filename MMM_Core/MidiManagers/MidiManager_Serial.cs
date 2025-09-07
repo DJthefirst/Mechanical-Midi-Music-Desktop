@@ -32,7 +32,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 			serialPorts.Add(serialPort);
 			buffers.Add(serialPort, new Queue<byte>());
 
-			byte[] readyMsg = ParseSysEx.GenerateSysEx(0x0000, SysEx.DeviceReady, []);
+			byte[] readyMsg = SysExParser.GenerateSysEx(0x0000, SysEx.DeviceReady, []);
 			serialPort.Write(readyMsg, 0, readyMsg.Count());
 			return true;
 		}
@@ -88,7 +88,6 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		}
 		IEnumerable<MidiEvent> midiEvents;
 
-
 		bool hasStart = false;
 		bool hasEnd = false;
 
@@ -135,7 +134,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		foreach (var midiEvent in midiEvents)
 		{
 			var midiEventArgs = new MidiEventReceivedEventArgs(midiEvent);
-			EventReceived?.Invoke(this, midiEventArgs);
+			EventReceived?.Invoke(sender, midiEventArgs);
 		}
 	}
 

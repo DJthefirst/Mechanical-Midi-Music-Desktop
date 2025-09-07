@@ -18,6 +18,8 @@ public sealed class MMM
 	public MidiPortOutManager midiPortOutManager = new MidiPortOutManager();
 	MidiCore midiCore = new MidiCore();
 
+	public DeviceManager deviceManager = DeviceManager.Instance;
+
 	public static void Reset() { }
 
 	static MMM() { }

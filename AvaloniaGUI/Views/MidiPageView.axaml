@@ -22,11 +22,11 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel
                 Grid.Column="0"
-                MinWidth="500"
-                MaxWidth="500"
+                MinWidth="600"
+                MaxWidth="600"
                 VerticalAlignment="Top">
                 <!--  MIDI Player  -->
-                <ContentControl Content="{Binding MidiPlayerPage}" />
+                <ContentControl MaxHeight="275" Content="{Binding MidiPlayerPage}" />
             </StackPanel>
         </ScrollViewer>
     </Grid>

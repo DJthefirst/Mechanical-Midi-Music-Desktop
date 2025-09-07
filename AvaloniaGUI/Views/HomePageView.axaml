@@ -7,7 +7,7 @@
     xmlns:view="clr-namespace:AvaloniaGUI.Views"
     xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
     MinHeight="100"
-    d:DesignHeight="800"
+    d:DesignHeight="900"
     d:DesignWidth="1400"
     x:DataType="vm:HomePageViewModel"
     mc:Ignorable="d">
@@ -26,7 +26,7 @@
             <Grid
                 MinWidth="600"
                 MaxWidth="600"
-                RowDefinitions="Auto, Auto, Auto">
+                RowDefinitions="275, Auto, Auto">
                 <!--  MIDI Player  -->
                 <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
                 <!--  Device Manager  -->

@@ -77,6 +77,11 @@ public class MidiPlayer : IMidiPlayer, IInputDevice
 	{
 		this.loop = loop;
 	}
+
+	public void Play(IMidiSong song)
+	{
+		Play(song.Name.ToString());
+	}
 	public void Play(string songName)
 	{
 		var song = playlist.GetSongByName(songName);

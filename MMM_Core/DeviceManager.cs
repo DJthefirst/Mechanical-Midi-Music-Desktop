@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MMM_Core
 {
-	internal class DeviceManager
+	public class DeviceManager
 	{
 		//Singleton pattern to ensure only one instance of DeviceManager exists
 		private static readonly DeviceManager instance = new DeviceManager();
