@@ -22,15 +22,16 @@
         Background="{DynamicResource SecondaryBackground}"
         CornerRadius="20">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel>
+            <Grid RowDefinitions="auto,auto,*">
                 <Label
+                    Grid.Row="0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     FontSize="18"
                     Foreground="White">
                     Devices
                 </Label>
-                <Grid ColumnDefinitions="1.5*,1.5*,auto,auto,auto">
+                <Grid Grid.Row="1" ColumnDefinitions="1.5*,1.5*,auto,auto,auto">
                     <ComboBox
                         Name="BaudRateSelect"
                         Grid.Column="0"
@@ -81,120 +82,53 @@
                     </Button>
                 </Grid>
 
-                <ListBox Background="{DynamicResource SecondaryBackground}">
-
-                    <ListBoxItem
-                        Margin="5,5,5,5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="15">
-                        <StackPanel>
-                            <Grid>
-                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                                    <Label>ID:</Label>
-                                    <Label>001</Label>
+                <ListBox
+                    Name="DeviceSelector"
+                    Grid.Row="2"
+                    Margin="0"
+                    VerticalAlignment="Stretch"
+                    Background="{DynamicResource SecondaryBackground}"
+                    CornerRadius="15"
+                    ItemsSource="{Binding DevicesList}"
+                    SelectionMode="Single">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="10">
+                                <StackPanel Margin="0" VerticalAlignment="Stretch">
+                                    <Grid>
+                                        <TextBlock HorizontalAlignment="Left" Text="{Binding SYSEX_DEV_ID, StringFormat='ID: {0}'}" />
+                                        <TextBlock HorizontalAlignment="Center" Text="{Binding Name}" />
+                                        <TextBlock HorizontalAlignment="Right" Text="{Binding ConnectionString}" />
+                                    </Grid>
+                                    <Grid>
+                                        <Label HorizontalAlignment="Right">Version 001.0</Label>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding PLATFORM_TYPE, StringFormat='Platform: {0}'}" />
+                                            <TextBlock Text="{Binding INSTRUMENT_TYPE, StringFormat='Device Type: {0}'}" />
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="Instrument CFG: {0}.{1}">
+                                                        <Binding Path="MAX_NUM_INSTRUMENTS" />
+                                                        <Binding Path="NUM_SUBINSTRUMENTS" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="Notes: {0}-{1}">
+                                                        <Binding Path="MIN_MIDI_NOTE" />
+                                                        <Binding Path="MAX_MIDI_NOTE" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
                                 </StackPanel>
-                                <Label HorizontalAlignment="Center">Devcie 1</Label>
-                                <Label HorizontalAlignment="Right">COM 3</Label>
-                            </Grid>
-                            <Grid>
-                                <Label HorizontalAlignment="Right">Version 001.0</Label>
-                                <StackPanel Grid.Column="0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Platform:</Label>
-                                        <Label>0</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Device Type:</Label>
-                                        <Label>0x0001</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Number of Instruments:</Label>
-                                        <Label>0x0000000F</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Notes:</Label>
-                                        <Label>RoundRobinBalance</Label>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem
-                        Margin="5,5,5,5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="15">
-                        <StackPanel>
-                            <Grid>
-                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                                    <Label>ID:</Label>
-                                    <Label>001</Label>
-                                </StackPanel>
-                                <Label HorizontalAlignment="Center" Content="{Binding Name}" />
-                                <Label HorizontalAlignment="Right">UDP 192.168.1.15</Label>
-                            </Grid>
-                            <Grid>
-                                <Label HorizontalAlignment="Right">Version 001.0</Label>
-                                <StackPanel Grid.Column="0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Platform:</Label>
-                                        <Label>0</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Device Type:</Label>
-                                        <Label>0x0001</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Number of Instruments:</Label>
-                                        <Label>0x0000000F</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Notes:</Label>
-                                        <Label>RoundRobinBalance</Label>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </ListBoxItem>
-
-                    <ListBoxItem
-                        Margin="5,5,5,5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="15">
-                        <StackPanel>
-                            <Grid>
-                                <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
-                                    <Label>ID:</Label>
-                                    <Label>001</Label>
-                                </StackPanel>
-                                <Label HorizontalAlignment="Center">Devcie 3</Label>
-                                <Label HorizontalAlignment="Right">COM 5</Label>
-                            </Grid>
-                            <Grid>
-                                <Label HorizontalAlignment="Right">Version 001.0</Label>
-                                <StackPanel Grid.Column="0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Platform:</Label>
-                                        <Label>0</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Device Type:</Label>
-                                        <Label>0x0001</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Number of Instruments:</Label>
-                                        <Label>0x0000000F</Label>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <Label>Notes:</Label>
-                                        <Label>RoundRobinBalance</Label>
-                                    </StackPanel>
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                    </ListBoxItem>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
-            </StackPanel>
+            </Grid>
         </ScrollViewer>
     </Border>
 </UserControl>

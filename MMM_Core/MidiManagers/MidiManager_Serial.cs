@@ -7,6 +7,7 @@ namespace MMM_Core.MidiManagers;
 
 public class MidiSerialManager : IInputManager, IOutputManager
 {
+
 	private List<SerialPort> serialPorts = new List<SerialPort>();
 	private Dictionary<SerialPort, Queue<byte>> buffers = new Dictionary<SerialPort, Queue<byte>>();
 

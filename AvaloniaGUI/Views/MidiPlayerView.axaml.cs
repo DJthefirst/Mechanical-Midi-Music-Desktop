@@ -12,8 +12,6 @@ namespace AvaloniaGUI.Views;
 
 public partial class MidiPlayerView : UserControl
 {
-	private bool _isSliderSelected = false;
-
 	public MidiPlayerView()
 	{
 		InitializeComponent();

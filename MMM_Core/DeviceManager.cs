@@ -12,23 +12,27 @@ namespace MMM_Core
 		//Singleton pattern to ensure only one instance of DeviceManager exists
 		private static readonly DeviceManager instance = new DeviceManager();
 
-		internal Dictionary<int, Device> devices = new Dictionary<int, Device>();
+		public Dictionary<int, Device> Devices { get; private set; } = new Dictionary<int, Device>();
+
+		public event EventHandler<Dictionary<int, Device>>? OnListUpdated;
 
 		static DeviceManager(){}
 		private DeviceManager(){}
 
 		internal void AddDevice(Device device)
 		{
-			if (devices.ContainsKey(device.SYSEX_DEV_ID))
+			if (Devices.ContainsKey(device.SYSEX_DEV_ID))
 			{
-				devices[device.SYSEX_DEV_ID] = device;
+				Devices[device.SYSEX_DEV_ID] = device;
 			}
-			else devices.Add(device.SYSEX_DEV_ID, device);
+			else Devices.Add(device.SYSEX_DEV_ID, device);
+			OnListUpdated?.Invoke(this, Devices);
 		}
 
 		internal void RemoveDevice(Device device)
 		{
-			devices.Remove(device.SYSEX_DEV_ID);
+			Devices.Remove(device.SYSEX_DEV_ID);
+			OnListUpdated?.Invoke(this, Devices);
 		}
 
 		public static DeviceManager Instance => instance;

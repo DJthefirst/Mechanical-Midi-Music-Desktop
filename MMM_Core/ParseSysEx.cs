@@ -104,44 +104,43 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
         m2bConverter.BytesFormat = BytesFormat.Device;
         byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
 
-        try{
+        //try{
             SysExMsg sysExMsg = new SysExMsg(midiEventBytes);
             Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
             ProcessMessage(sender, sysExMsg);
-		}
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error sending message: {ex.Message}");
-        }
+		//}
+        //catch (Exception ex)
+        //{
+        //    Console.WriteLine($"Error sending message: {ex.Message}");
+        //}
 
         return true; //Block outbound msg
 	}
 
 	private void ProcessMessage(object? sender, SysExMsg msg)
-    {
-        //Check if Desitination Device ID is correct
-        if (msg.Destination() != SysEx.AddrController) return;
-
-        switch (msg.Type())
-        {
-            case SysEx.DeviceReady:
-                SendMessage(msg.Source(), SysEx.GetDeviceConstruct);
-                break;
-            case SysEx.ResetDeviceConfig:
-                SendMessage(msg.Source(), SysEx.ResetDeviceConfig);
-                break;
-            case SysEx.DiscoverDevices:
-                SendMessage(SysEx.AddrBroadcast, SysEx.DiscoverDevices);
-                break;
-            case SysEx.GetDeviceConstructWithDistributors:
-                break;
-            case SysEx.GetDeviceConstruct:
-                DeviceManager.Instance.AddDevice(new Device(msg.Payload()));
+	{
+		switch (msg.Type())
+		{
+			case SysEx.DeviceReady:
+				SendMessage(msg.Source(), SysEx.GetDeviceConstruct);
+				break;
+			case SysEx.ResetDeviceConfig:
+				SendMessage(msg.Source(), SysEx.ResetDeviceConfig);
+				break;
+			case SysEx.DiscoverDevices:
+				SendMessage(SysEx.AddrBroadcast, SysEx.DiscoverDevices);
+				break;
+			case SysEx.GetDeviceConstructWithDistributors:
+				break;
+			case SysEx.GetDeviceConstruct:
+                Device device = new Device(msg.Payload());
+                device.ConnectionString = GetConnectionString(sender);
+				DeviceManager.Instance.AddDevice(device);
 				SendMessage(msg.Source(), SysEx.GetNumOfDistributors);
 				//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
 				break;
             case SysEx.GetDeviceName:
-				DeviceManager.Instance.devices[msg.Source()].Name = BitConverter.ToString(msg.Payload()[0..20]);
+				DeviceManager.Instance.Devices[msg.Source()].Name = BitConverter.ToString(msg.Payload()[0..20]);
                 break;
             case SysEx.GetDeviceBoolean:
                 break;
@@ -161,14 +160,14 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
                 for (byte i = 0; i < msg.Payload()[0]; ++i) SendMessage(msg.Source(), SysEx.GetDistributorConstruct, [i]);
                 break;
             case SysEx.GetAllDistributors:
-				DeviceManager.Instance.devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
+				DeviceManager.Instance.Devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
 				break;
             case SysEx.AddDistributor:
                 break;
             case SysEx.ToggleMuteDistributor:
                 break;
             case SysEx.GetDistributorConstruct:
-				DeviceManager.Instance.devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
+				DeviceManager.Instance.Devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
                 break;
             case SysEx.GetDistributorChannels:
                 break;
@@ -287,5 +286,20 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
         }
     }
 	void IDisposable.Dispose() { }
+
+    internal string GetConnectionString(object? sender)
+    {
+        // Determine connection string type
+        string connectionString = string.Empty;
+        if (sender is SerialPort serialPort)
+            connectionString = $"Serial:{serialPort.PortName}";
+        else if (sender is string s && System.Net.IPAddress.TryParse(s, out var ip))
+            connectionString = $"IPV4:{ip}";
+        else if (sender is System.Net.IPEndPoint endPoint)
+            connectionString = $"IPV4:{endPoint.Address}";
+        else
+            connectionString = sender?.ToString() ?? "Unknown";
+        return connectionString;
+	}
 }
 

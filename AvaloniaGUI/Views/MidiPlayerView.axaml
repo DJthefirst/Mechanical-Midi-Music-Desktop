@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
     MinHeight="100"
-    d:DesignHeight="200"
+    d:DesignHeight="300"
     d:DesignWidth="600  "
     x:DataType="vm:MidiPlayerViewModel"
     mc:Ignorable="d">
@@ -107,7 +107,6 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="*,50">
-
                                         <TextBlock Grid.Column="0" Text="{Binding Name}" />
                                         <TextBlock
                                             Grid.Column="1"

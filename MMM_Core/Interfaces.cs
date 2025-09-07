@@ -70,13 +70,4 @@ public interface IManager : IDisposable
 public interface IInputManager : IManager, IInputDevice{}
 public interface IOutputManager : IManager, IOutputDevice{}
 
-public interface IDevice
-{
-
-}
-
-public interface IDeviceList
-{
-
-}
 
