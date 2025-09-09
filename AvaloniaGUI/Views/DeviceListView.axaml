@@ -90,6 +90,7 @@
                     Background="{DynamicResource SecondaryBackground}"
                     CornerRadius="15"
                     ItemsSource="{Binding DevicesList}"
+                    SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
                     SelectionMode="Single">
                     <ListBox.ItemTemplate>
                         <DataTemplate>

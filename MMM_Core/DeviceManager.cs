@@ -29,7 +29,7 @@ namespace MMM_Core
 			OnListUpdated?.Invoke(this, Devices);
 		}
 
-		internal void RemoveDevice(Device device)
+		public void RemoveDevice(Device device)
 		{
 			Devices.Remove(device.SYSEX_DEV_ID);
 			OnListUpdated?.Invoke(this, Devices);

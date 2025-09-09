@@ -40,7 +40,7 @@ public partial class DeviceListViewModel : ComponentViewModel
 	public ObservableCollection<Device> DevicesList { get; } = new();
 
 	[ObservableProperty]
-	private string? _selectedDevice;
+	private Device? _selectedDevice;
 
 	[ObservableProperty]
 	private string? _selectedPort;
@@ -87,7 +87,8 @@ public partial class DeviceListViewModel : ComponentViewModel
 	{
 		if (SelectedDevice != null)
 		{
-			MMM.Instance.serialManager.RemoveConnection(SelectedDevice);
+			Console.WriteLine($"Removing Device: {SelectedDevice.Name} on {SelectedDevice.ConnectionString}");
+			MMM.Instance.serialManager.FreeConnection(SelectedDevice.ConnectionString);
 			SelectedDevice = null;
 		}
 	}

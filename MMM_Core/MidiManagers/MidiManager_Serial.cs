@@ -2,6 +2,7 @@
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 using System.IO.Ports;
+using MMM_Device;
 
 namespace MMM_Core.MidiManagers;
 
@@ -37,6 +38,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 					{
 						Console.WriteLine($"Serial Port {connection} disconnected.");
 						RemoveConnection(connection);
+						OnPortsUpdated.Invoke(this, availableConnections);
 					}
 				}
 				if (!new HashSet<string>(serialPortsAvailable).SetEquals(availableConnections) ||
@@ -88,7 +90,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		var serialPort = serialPorts.FirstOrDefault(sp => sp.PortName == portName);
 		if (serialPort != null)
 		{
-			return RemoveConnection(serialPort);
+			RemoveConnection(serialPort);
 		}
 		return true;
 	}
@@ -106,6 +108,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 				serialPort.Write(MidiReset, 0, 1); // reset
 				serialPort.DataReceived -= SerialPortDataReceived;
 				serialPort.Close();
+				OnPortsUpdated.Invoke(this, AvailableConnections());
 				return true;
 			}
 			catch(Exception e){
@@ -113,6 +116,18 @@ public class MidiSerialManager : IInputManager, IOutputManager
 			}
 		}
 		return false;
+	}
+
+	public void FreeConnection(string str)
+	{
+		foreach (var serialPort in serialPorts.ToList())
+		{
+			if (Device.GetConnectionString(serialPort) == str)
+			{
+				RemoveConnection(serialPort);
+				break;
+			}
+		}
 	}
 
 	public void ClearConnections()
@@ -127,65 +142,72 @@ public class MidiSerialManager : IInputManager, IOutputManager
 	{
 		if (!IsListeningForEvents) return;
 
-		//Read in Serial Message
-		SerialPort sp = (SerialPort)sender;
-		byte[] dataBytes = new byte[sp.BytesToRead];
+		var sp = (SerialPort)sender;
+		var buffer = buffers[sp];
+
+		// Read all available bytes and enqueue them
+		var dataBytes = new byte[sp.BytesToRead];
 		sp.Read(dataBytes, 0, dataBytes.Length);
+		foreach (var b in dataBytes) buffer.Enqueue(b);
 
-		//Push Bytes to Port specific Queue
-		foreach (var dataByte in dataBytes)
+		var completeMessages = new List<byte[]>();
+
+		// Extract complete SysEx messages (F0 ... F7)
+		while (buffer.Count > 0)
 		{
-			buffers[sp].Enqueue(dataByte);
-		}
-		IEnumerable<MidiEvent> midiEvents;
-
-		bool hasStart = false;
-		bool hasEnd = false;
-
-		// Iterate through the buffer to check for F0 (SysEx Start) and F7 (SysEx End) // TODO: Improve Robustness
-		foreach (var b in buffers[sp].ToArray())
-		{
-			if (b == 0xF0) hasStart = true;
-			if (b == 0xF7 && hasStart)
+			// Discard bytes until start byte (F0) is found
+			if (buffer.Peek() != 0xF0)
 			{
-				hasEnd = true;
-				break;
+				buffer.Dequeue();
+				continue;
 			}
+
+			int endIndex = -1, idx = 0;
+			foreach (var b in buffer)
+			{
+				if (idx > 0 && b == 0xF0)
+				{
+					// Found another F0 before F7, discard up to this F0
+					for (int i = 0; i < idx; i++) buffer.Dequeue();
+					idx = 0;
+					continue;
+				}
+				if (b == 0xF7)
+				{
+					endIndex = idx;
+					break;
+				}
+				idx++;
+			}
+
+			if (endIndex == -1) break; // No end found, wait for more data
+
+			// Extract message
+			var message = new byte[endIndex + 1];
+			for (int i = 0; i <= endIndex; i++) message[i] = buffer.Dequeue();
+			completeMessages.Add(message);
 		}
 
-		// Return true only if both start and end are found  
-		if (!(hasStart == hasEnd)) return;
-
-		//Console.WriteLine($"Bytes: {BitConverter.ToString(buffers[sp].ToArray())}");
-
-		//Convert Bytes into a MIDI Message
-		var b2mConverter = new BytesToMidiEventConverter();
-		b2mConverter.BytesFormat = BytesFormat.Device;
-		try
+		// Convert and send only complete messages
+		foreach (var msg in completeMessages)
 		{
-			midiEvents = b2mConverter.ConvertMultiple(buffers[sp].ToArray());
-			buffers[sp].Clear();
-		}
-		catch (UnexpectedRunningStatusException ex)
-		{
-			Console.WriteLine($"Error: Serial Byte Parser. Details: {ex.Message}");
-			//Console.WriteLine($"Actual bytes: {string.Join(", ", buffers[sp].ToArray())}");
-			buffers[sp].Clear();
-			return;
-		}
-		catch (NotEnoughBytesException ex)
-		{
-			Console.WriteLine($"Error: Not enough bytes to parse MIDI event. Details: {ex.Message}");
-			Console.WriteLine($"Expected byte count: {ex.ExpectedCount}, Actual byte count: {ex.ActualCount}");
-			Console.WriteLine($"Actual bytes: {string.Join(", ", buffers[sp].ToArray())}");
-			return;
-		}
-
-		//Foward Midi Event to Event Received
-		foreach (var midiEvent in midiEvents)
-		{
-			var midiEventArgs = new MidiEventReceivedEventArgs(midiEvent);
-			EventReceived?.Invoke(sender, midiEventArgs);
+			var b2mConverter = new BytesToMidiEventConverter { BytesFormat = BytesFormat.Device };
+			try
+			{
+				foreach (var midiEvent in b2mConverter.ConvertMultiple(msg))
+				{
+					EventReceived?.Invoke(sender, new MidiEventReceivedEventArgs(midiEvent));
+				}
+			}
+			catch (UnexpectedRunningStatusException ex)
+			{
+				Console.WriteLine($"Error: Serial Byte Parser. Details: {ex.Message}");
+			}
+			catch (NotEnoughBytesException ex)
+			{
+				Console.WriteLine($"Error: Not enough bytes to parse MIDI event. Details: {ex.Message}");
+				Console.WriteLine($"Expected byte count: {ex.ExpectedCount}, Actual byte count: {ex.ActualCount}");
+			}
 		}
 	}
 
