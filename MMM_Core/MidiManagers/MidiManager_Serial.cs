@@ -6,11 +6,23 @@ using MMM_Device;
 
 namespace MMM_Core.MidiManagers;
 
+public class SerialConnection : SerialPort, IConnection
+{
+	public string ConnectionString => PortName;
+	public IInputManager InputManager => MidiSerialManager.Instance;
+	public IOutputManager OutputManager => MidiSerialManager.Instance;
+	public SerialConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
+		: base(portName, baudRate, parity, dataBits, stopBits){}
+}
+
 public class MidiSerialManager : IInputManager, IOutputManager
 {
+	private static readonly Lazy<MidiSerialManager> _instance = new(() => new MidiSerialManager());
+	public static MidiSerialManager Instance => _instance.Value;
+
 	private List<string> serialPortsAvailable = new List<string>();
-	private List<SerialPort> serialPorts = new List<SerialPort>();
-	private Dictionary<SerialPort, Queue<byte>> buffers = new Dictionary<SerialPort, Queue<byte>>();
+	private List<SerialConnection> serialPorts = new List<SerialConnection>();
+	private Dictionary<SerialConnection, Queue<byte>> buffers = new Dictionary<SerialConnection, Queue<byte>>();
 
 	public event EventHandler<MidiEventReceivedEventArgs> EventReceived = delegate { };
 	public event EventHandler<MidiEventSentEventArgs> EventSent = delegate { };
@@ -18,7 +30,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 
 	public bool IsListeningForEvents { get; private set; }
 
-	public MidiSerialManager()
+	private MidiSerialManager()
 	{
 		IsListeningForEvents = true;
 		_ = MonitorPort(); // Fire-and-forget, suppress CS4014 warning
@@ -31,7 +43,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		{
 			try
 			{
-				var availableConnections = SerialPort.GetPortNames().ToList();
+				var availableConnections = SerialConnection.GetPortNames().ToList();
 				foreach (var connection in serialPorts.ToList())
 				{
 					if (!availableConnections.Contains(connection.PortName))
@@ -49,17 +61,16 @@ public class MidiSerialManager : IInputManager, IOutputManager
 					OnPortsUpdated.Invoke(this, availableConnections);
 				}
 			}
-			catch(Exception e) { Console.WriteLine("Serial Listenr Error: " + e);}
+			catch (Exception e) { Console.WriteLine("Serial Listenr Error: " + e); }
 			await Task.Delay(2000); // Poll every 2 seconds
 		}
 	}
 
 	public async Task AddConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
 	{
-		SerialPort serialPort;
-		serialPort = new SerialPort(portName, baudRate, parity, dataBits, stopBits);
+		SerialConnection serialPort;
+		serialPort = new SerialConnection(portName, baudRate, parity, dataBits, stopBits);
 		serialPort.DataReceived += SerialPortDataReceived;
-
 
 		try
 		{
@@ -70,8 +81,8 @@ public class MidiSerialManager : IInputManager, IOutputManager
 			buffers.Add(serialPort, new Queue<byte>());
 
 			await Task.Delay(100);
-			byte[] readyMsg = SysExParser.GenerateSysEx(0x0000, SysEx.DeviceReady, []);
-			serialPort.Write(readyMsg, 0, readyMsg.Count());
+			MMM_Msg readyMsg = MMM_Msg.GenerateSysEx(0x0000, SysEx.DeviceReady, []);
+			serialPort.Write(readyMsg.buffer, 0, readyMsg.buffer.Length);
 		}
 		catch (UnauthorizedAccessException ex)
 		{
@@ -95,7 +106,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		return true;
 	}
 
-	public bool RemoveConnection(SerialPort serialPort)
+	public bool RemoveConnection(SerialConnection serialPort)
 	{
 		serialPorts.Remove(serialPort);
 		buffers.Remove(serialPort);
@@ -111,7 +122,8 @@ public class MidiSerialManager : IInputManager, IOutputManager
 				OnPortsUpdated.Invoke(this, AvailableConnections());
 				return true;
 			}
-			catch(Exception e){
+			catch (Exception e)
+			{
 				Console.WriteLine("PortErr: " + e);
 			}
 		}
@@ -142,7 +154,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 	{
 		if (!IsListeningForEvents) return;
 
-		var sp = (SerialPort)sender;
+		var sp = (SerialConnection)sender;
 		var buffer = buffers[sp];
 
 		// Read all available bytes and enqueue them
@@ -242,7 +254,7 @@ public class MidiSerialManager : IInputManager, IOutputManager
 
 	public List<string> AvailableConnections()
 	{
-		return SerialPort.GetPortNames().ToList();
+		return SerialConnection.GetPortNames().ToList();
 	}
 
 	public List<string> ListConnections()

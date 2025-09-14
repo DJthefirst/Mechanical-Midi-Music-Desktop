@@ -70,4 +70,11 @@ public interface IManager : IDisposable
 public interface IInputManager : IManager, IInputDevice{}
 public interface IOutputManager : IManager, IOutputDevice{}
 
+public interface IConnection
+{
+	string ConnectionString { get; }
+	public IInputManager? InputManager { get; }
+	public IOutputManager? OutputManager { get; }
+}
+
 

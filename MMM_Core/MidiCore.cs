@@ -8,14 +8,14 @@ namespace MMM_Core;
 public class MidiCore
 {
 
-	private SysExParser parserSysEx = new SysExParser();
+	private MMM_Parser parser = MMM_Parser.Instance;
 
 	public MidiCore()
 	{
 		//TODO: Check if inputDevices and outputDevices are null or empty
 		InputDevices = new List<IInputDevice>();
 		OutputDevices = new List<IOutputDevice>();
-		Connect((IInputDevice)parserSysEx);
+		parser.EventSent += OnEventSent;
 	}
 
 	public List<IInputDevice> InputDevices { get; }
@@ -51,9 +51,12 @@ public class MidiCore
 		var midiEvent = eventCallback == null ? inputMidiEvent : eventCallback(inputMidiEvent);
 		if (midiEvent == null) return;
 
-		// Give SysEx Parser first chance in case of Server SysEx event
-		if (parserSysEx.OnEventReceived(sender, midiEvent)) return;
+		// Give to SysEx Parser in case of Server SysEx event
+		parser.OnEventReceived(sender, midiEvent);
+	}
 
+	private void OnEventSent(object? sender, MidiEventSentEventArgs e)
+	{
 		// Forward event to all output devices if not handled by SysEx Parser
 		foreach (var outputDevice in OutputDevices)
 		{

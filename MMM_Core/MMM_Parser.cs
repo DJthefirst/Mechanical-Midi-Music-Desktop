@@ -57,18 +57,32 @@ public struct SysEx
     public const byte SetDistributorNumPolyphonicNotes = 0x56;
 }
 
-public class SysExMsg
+public class MMM_Msg
 {
     private int len;
     public byte[] buffer;
-    public SysExMsg(byte[] buffer)
-    {
-        this.len = buffer.Count();
-        bool validSysEx = ((len >= 7) && (buffer[0] == 0xF0) && (buffer[1] == SysEx.ManufacturerID));
-        if (!validSysEx) { throw new ArgumentOutOfRangeException(); }
-        this.buffer = buffer;
-    }
-    public int Source() { return (buffer[2] << 7) | buffer[3]; }
+
+	public MMM_Msg(byte[] msg)
+	{
+		Initialize(msg);
+	}
+
+	public MMM_Msg(MidiEvent msg)
+	{
+		var m2bConverter = new MidiEventToBytesConverter { BytesFormat = BytesFormat.Device };
+		byte[] midiEventBytes = m2bConverter.Convert(msg);
+		Initialize(midiEventBytes);
+	}
+
+	private void Initialize(byte[] data)
+	{
+		len = data.Length;
+		if (len < 7 || data[0] != SysEx.Start || data[1] != SysEx.ManufacturerID)
+			throw new ArgumentOutOfRangeException( "Invalid SysEx message.");
+		buffer = data;
+	}
+
+	public int Source() { return (buffer[2] << 7) | buffer[3]; }
     public int Destination()
     {
         return (buffer[4] << 7) | buffer[5];
@@ -76,59 +90,106 @@ public class SysExMsg
     public byte Type() { return buffer[6]; }
     public byte[] Payload() { return buffer[7..]; }
 
+    public MidiEvent ToMidiEvent()
+    {
+        var b2mConverter = new BytesToMidiEventConverter();
+        b2mConverter.BytesFormat = BytesFormat.Device;
+        return b2mConverter.Convert(buffer);
+	}
+
+	internal static MMM_Msg GenerateSysEx(int destinationID, byte msgType, byte[] payload)
+	{
+		byte[] header = new byte[]
+		{
+		   SysEx.Start,
+		   SysEx.ManufacturerID,
+		   0x7F, //source Destination  
+           0x7F, //source Destination  
+           (byte)(destinationID >> 7),
+		   (byte)(destinationID & 0x7F),
+		   msgType
+		};
+		byte[] tail = new byte[] { 0xF7 };
+		return new MMM_Msg(header.Concat(payload).Concat(tail).ToArray());
+	}
+
 }
 
-internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
+internal class MMM_Parser : IDisposable
 {
+	//Singleton
+	private static readonly Lazy<MMM_Parser> _instance = new(() => new MMM_Parser());
+	public static MMM_Parser Instance => _instance.Value;
+    private MMM_Parser() { }
 
-    public event EventHandler<MidiEventReceivedEventArgs> EventReceived = delegate { };
+	//Midi Event Handling In/Out
     public event EventHandler<MidiEventSentEventArgs> EventSent = delegate { };
     public bool IsListeningForEvents { get; private set; }
 
-    public bool OnEventReceived(object? sender, MidiEvent midiEvent)
-    {
-		// Check if event is SysEx
-		if (!(midiEvent is NormalSysExEvent sysExEvent)) return false;
-		
-        // Extract the 14-bit address by shifting only the MSB to the right by 1 bit  
-        UInt16 rawAddress = BitConverter.ToUInt16(sysExEvent.Data, 3);
-        UInt16 dest = (UInt16)(((rawAddress & 0x7F00) >> 1) | (rawAddress & 0x007F));
+	public void OnEventReceived(object? sender, byte[] bytes)
+	{
 
-        // If msg destination is to Server process msg and block outbound msg. 
-        if (!(sysExEvent.Data.Length >= 5 && dest == SysEx.AddrController)) {
-			Console.WriteLine($"SysEx Outbound: {BitConverter.ToString(sysExEvent.Data)}");
-			return false;// Adjusted for 14-bit address
-        }
-            
-        var m2bConverter = new MidiEventToBytesConverter();
-        m2bConverter.BytesFormat = BytesFormat.Device;
-        byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
-
-        //try{
-            SysExMsg sysExMsg = new SysExMsg(midiEventBytes);
-            Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
-            ProcessMessage(sender, sysExMsg);
-		//}
-        //catch (Exception ex)
-        //{
-        //    Console.WriteLine($"Error sending message: {ex.Message}");
-        //}
-
-        return true; //Block outbound msg
+		// Convert bytes to MidiEvent using DryWetMidi
+		var b2mConverter = new BytesToMidiEventConverter();
+		b2mConverter.BytesFormat = BytesFormat.Device;
+		MidiEvent midiEvent = null;
+		try
+		{
+			midiEvent = b2mConverter.Convert(bytes.ToArray());
+            OnEventReceived(sender, midiEvent);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Error converting bytes to MidiEvent: {ex.Message}");
+			return;
+		}
 	}
 
-	private void ProcessMessage(object? sender, SysExMsg msg)
+	public void OnEventReceived(object? sender, MidiEvent midiEvent)
+    {
+		// Check if event is SysEx
+		if (midiEvent is not NormalSysExEvent sysExEvent || sysExEvent.Data.Length < 5)
+		{
+			EventSent.Invoke(sender, new MidiEventSentEventArgs(midiEvent));
+			return;
+		}
+
+		// Extract the 14-bit address
+		ushort rawAddress = BitConverter.ToUInt16(sysExEvent.Data, 3);
+		ushort dest = (ushort)(((rawAddress & 0x7F00) >> 1) | (rawAddress & 0x007F));
+
+		// If msg destination is not to Server block outbound msg.
+		if (dest != SysEx.AddrController)
+		{
+			Console.WriteLine($"SysEx Outbound: {BitConverter.ToString(sysExEvent.Data)}");
+			EventSent.Invoke(sender, new MidiEventSentEventArgs(midiEvent));
+			return;
+		}
+
+        try
+        {
+            MMM_Msg sysExMsg = new MMM_Msg(midiEvent);
+            Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
+            ProcessMessage(sender, sysExMsg);
+        }
+        catch
+        {
+            Console.WriteLine($"Invalid MMM SysEx Msg: {BitConverter.ToString(sysExEvent.Data)}");
+		}
+	}
+
+	private void ProcessMessage(object? sender, MMM_Msg msg)
 	{
 		switch (msg.Type())
 		{
 			case SysEx.DeviceReady:
-				SendMessage(msg.Source(), SysEx.GetDeviceConstruct);
+				SendMessage(sender, msg.Source(), SysEx.GetDeviceConstruct);
 				break;
 			case SysEx.ResetDeviceConfig:
-				SendMessage(msg.Source(), SysEx.ResetDeviceConfig);
+				SendMessage(sender, msg.Source(), SysEx.ResetDeviceConfig);
 				break;
 			case SysEx.DiscoverDevices:
-				SendMessage(SysEx.AddrBroadcast, SysEx.DiscoverDevices);
+				SendMessage(sender, SysEx.AddrBroadcast, SysEx.DiscoverDevices);
 				break;
 			case SysEx.GetDeviceConstructWithDistributors:
 				break;
@@ -136,7 +197,7 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
                 Device device = new Device(msg.Payload());
                 device.ConnectionString = Device.GetConnectionString(sender);
 				DeviceManager.Instance.AddDevice(device);
-				SendMessage(msg.Source(), SysEx.GetNumOfDistributors);
+				SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
 				//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
 				break;
             case SysEx.GetDeviceName:
@@ -157,7 +218,7 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
             case SysEx.RemoveAllDistributors:
                 break;
             case SysEx.GetNumOfDistributors:
-                for (byte i = 0; i < msg.Payload()[0]; ++i) SendMessage(msg.Source(), SysEx.GetDistributorConstruct, [i]);
+                for (byte i = 0; i < msg.Payload()[0]; ++i) SendMessage(sender, msg.Source(), SysEx.GetDistributorConstruct, [i]);
                 break;
             case SysEx.GetAllDistributors:
 				DeviceManager.Instance.Devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
@@ -213,40 +274,34 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
 	//Send SysEx Messages
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	internal static byte[] GenerateSysEx(int destinationID, byte msgType, List<byte> payload)
-    {
-		byte[] header = new byte[]
-        {
-		   SysEx.Start,
-		   SysEx.ManufacturerID,
-		   0x7F, //source Destination  
-           0x7F, //source Destination  
-           (byte)(destinationID >> 7),
-		   (byte)(destinationID & 0x7F),
-		   msgType
-        };
-		byte[] tail = new byte[] { 0xF7 };
-		return header.Concat(payload).Concat(tail).ToArray();
-	}
 
-	public void SendMessage(int destinationID, byte msgType)
+	public void SendMessage(object? sender, int destinationID, byte msgType)
     {
-        SendMessage(destinationID, msgType, []);
+        SendMessage(sender, destinationID, msgType, []);
     }
-    public void SendMessage(int destinationID, byte msgType, List<byte> payload)
+    public void SendMessage(object? sender, int destinationID, byte msgType, byte[] payload)
     {
 
-        byte[] sysExMsg = GenerateSysEx(destinationID, msgType, payload);
+        MMM_Msg msg = MMM_Msg.GenerateSysEx(destinationID, msgType, payload);
 
         var b2mConverter = new BytesToMidiEventConverter();
         b2mConverter.BytesFormat = BytesFormat.Device;
         try
         {
-            MidiEvent midiEvent = b2mConverter.Convert(sysExMsg.ToArray());
+            MidiEvent midiEvent = b2mConverter.Convert(msg.buffer.ToArray());
             var eventArgs = new MidiEventReceivedEventArgs(midiEvent); // Wrap the MidiEvent in the correct EventArgs type  
-            EventReceived?.Invoke(this, eventArgs);
-        }
-        catch (Exception ex)
+
+			// Fwd message response back to sender
+			if (sender is IConnection connection && connection.OutputManager != null) 
+            {
+				connection.OutputManager.SendEvent(midiEvent);
+            }
+            else
+            {
+                EventSent.Invoke(sender, new MidiEventSentEventArgs(midiEvent));
+			}
+		}
+		catch (Exception ex)
         {
             Console.WriteLine($"Error sending message: {ex.Message}");
         }
@@ -256,35 +311,23 @@ internal class SysExParser : IInputDevice, IOutputDevice, IDisposable
 	//DryWetMidi Input/Output Ports
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void IInputDevice.StartEventsListening()
-	{
-		IsListeningForEvents = true;
-	}
+  //  void OnSendEvent(MidiEvent midiEvent)
+  //  {
+  //      //Convert DryWetMidi SysEx event into a MMM_Msg
+  //      var m2bConverter = new MidiEventToBytesConverter();
+		//m2bConverter.BytesFormat = BytesFormat.Device;
+		//byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
 
-	void IInputDevice.StopEventsListening()
-	{
-		IsListeningForEvents = false;
-	}
-
-	void IOutputDevice.PrepareForEventsSending() { }
-
-    void IOutputDevice.SendEvent(MidiEvent midiEvent)
-    {
-        //Convert DryWetMidi SysEx event into a SysExMsg
-        var m2bConverter = new MidiEventToBytesConverter();
-		m2bConverter.BytesFormat = BytesFormat.Device;
-		byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
-
-        try
-        {
-            SysExMsg sysExMsg = new SysExMsg(midiEventBytes);
-            ProcessMessage(null, sysExMsg);
-        }
-        catch {
-			Console.WriteLine(BitConverter.ToString(midiEventBytes).Replace("-", " "));
-            Console.WriteLine("Invalid MMM SysEx Msg"); 
-        }
-    }
+  //      try
+  //      {
+  //          MMM_Msg sysExMsg = new MMM_Msg(midiEventBytes);
+  //          ProcessMessage(null, sysExMsg);
+  //      }
+  //      catch {
+		//	Console.WriteLine(BitConverter.ToString(midiEventBytes).Replace("-", " "));
+  //          Console.WriteLine("Invalid MMM SysEx Msg"); 
+  //      }
+  //  }
 	void IDisposable.Dispose() { }
 }
 

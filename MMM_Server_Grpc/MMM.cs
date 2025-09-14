@@ -13,7 +13,7 @@ public sealed class MMM
 	public IMidiPlayer player;
 
 	private MidiOutputSystem midiOutputSystem = new MidiOutputSystem();
-	public MidiSerialManager serialManager = new MidiSerialManager();
+	public MidiSerialManager serialManager = MidiSerialManager.Instance;
 	public MidiPortInManager midiPortInManager = new MidiPortInManager();
 	public MidiPortOutManager midiPortOutManager = new MidiPortOutManager();
 	MidiCore midiCore = new MidiCore();
