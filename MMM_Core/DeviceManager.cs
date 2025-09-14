@@ -12,41 +12,47 @@ namespace MMM_Core
 		//Singleton pattern to ensure only one instance of DeviceManager exists
 		private static readonly DeviceManager instance = new DeviceManager();
 
-		public Dictionary<int, Device> Devices { get; private set; } = new Dictionary<int, Device>();
+		public Dictionary<(IConnection, int), Device> Devices { get; private set; } = new Dictionary<(IConnection, int), Device>();
 
-		public event EventHandler<Dictionary<int, Device>>? OnListUpdated;
+		public event EventHandler<Dictionary<(IConnection, int), Device>>? OnListUpdated;
 
-		static DeviceManager(){}
-		private DeviceManager(){}
+		static DeviceManager() { }
+		private DeviceManager() { }
 
-		internal void AddDevice(Device device)
+		internal void AddDevice(IConnection connection, Device device)
 		{
-			if (Devices.ContainsKey(device.SYSEX_DEV_ID))
+			Devices[(connection, device.SYSEX_DEV_ID)] = device;
+			OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
+		}
+
+		public void RemoveDevice(IConnection connection, Device device)
+		{
+			if (Devices.Remove((connection, device.SYSEX_DEV_ID)))
 			{
-				Devices[device.SYSEX_DEV_ID] = device;
+				OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
 			}
-			else Devices.Add(device.SYSEX_DEV_ID, device);
-			OnListUpdated?.Invoke(this, Devices);
 		}
 
-		public void RemoveDevice(Device device)
-		{
-			Devices.Remove(device.SYSEX_DEV_ID);
-			OnListUpdated?.Invoke(this, Devices);
-		}
-
-		internal void CloseConnection(object connection)
+		internal void CloseConnection(IConnection connection)
 		{
 			string connstr = Device.GetConnectionString(connection);
 			var devicesToRemove = Devices.Values.Where(d => d.ConnectionString == connstr).ToList();
 			foreach (var device in devicesToRemove)
 			{
-				Devices.Remove(device.SYSEX_DEV_ID);
+				Devices.Remove((connection,device.SYSEX_DEV_ID));
 			}
 			if (devicesToRemove.Count > 0)
 			{
 				OnListUpdated?.Invoke(this, Devices);
 			}
+		}
+
+
+		private Dictionary<(IConnection, int), Device> GetDevicesForConnection(IConnection connection)
+		{
+			return Devices
+			.Where(kvp => kvp.Key.Item1 == connection)
+			.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 		}
 
 		public static DeviceManager Instance => instance;

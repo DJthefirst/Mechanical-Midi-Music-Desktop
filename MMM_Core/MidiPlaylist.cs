@@ -67,7 +67,14 @@ public class MidiPlaylist : IMidiPlaylist
 
 	public void AddSong(FileInfo file)
 	{
-		AddSong(new MidiSong(file));
+		try
+		{
+			AddSong(new MidiSong(file));
+		}
+		catch
+		{
+			Console.WriteLine($"Invalid File: {file}");
+		}
 	}
 
 	public void AddDirectory(DirectoryInfo path)

@@ -180,6 +180,8 @@ internal class MMM_Parser : IDisposable
 
 	private void ProcessMessage(object? sender, MMM_Msg msg)
 	{
+        IConnection? connection = sender as IConnection;
+		
 		switch (msg.Type())
 		{
 			case SysEx.DeviceReady:
@@ -195,13 +197,23 @@ internal class MMM_Parser : IDisposable
 				break;
 			case SysEx.GetDeviceConstruct:
                 Device device = new Device(msg.Payload());
-                device.ConnectionString = Device.GetConnectionString(sender);
-				DeviceManager.Instance.AddDevice(device);
+				device.ConnectionString = Device.GetConnectionString(sender);
+                if (connection == null) 
+                {
+                    Console.WriteLine("Error: Connection Source is null");
+					return; 
+                }
+				DeviceManager.Instance.AddDevice(connection, device);
 				SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
 				//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
 				break;
             case SysEx.GetDeviceName:
-				DeviceManager.Instance.Devices[msg.Source()].Name = BitConverter.ToString(msg.Payload()[0..20]);
+				if (connection == null)
+				{
+					Console.WriteLine("Error: Connection Source is null");
+					return;
+				}
+				DeviceManager.Instance.Devices[(connection,msg.Source())].Name = BitConverter.ToString(msg.Payload()[0..20]);
                 break;
             case SysEx.GetDeviceBoolean:
                 break;
@@ -221,14 +233,24 @@ internal class MMM_Parser : IDisposable
                 for (byte i = 0; i < msg.Payload()[0]; ++i) SendMessage(sender, msg.Source(), SysEx.GetDistributorConstruct, [i]);
                 break;
             case SysEx.GetAllDistributors:
-				DeviceManager.Instance.Devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
+				if (connection == null)
+				{
+					Console.WriteLine("Error: Connection Source is null");
+					return;
+				}
+				DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
 				break;
             case SysEx.AddDistributor:
                 break;
             case SysEx.ToggleMuteDistributor:
                 break;
             case SysEx.GetDistributorConstruct:
-				DeviceManager.Instance.Devices[msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
+				if (connection == null)
+				{
+					Console.WriteLine("Error: Connection Source is null");
+					return;
+				}
+				DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
                 break;
             case SysEx.GetDistributorChannels:
                 break;
@@ -290,8 +312,6 @@ internal class MMM_Parser : IDisposable
         {
             MidiEvent midiEvent = b2mConverter.Convert(msg.buffer.ToArray());
             var eventArgs = new MidiEventReceivedEventArgs(midiEvent); // Wrap the MidiEvent in the correct EventArgs type  
-
-            Console.WriteLine($"Sender: {sender}");
 
 			// Fwd message response back to sender
 			if (sender is IConnection connection && connection.OutputManager != null) 
