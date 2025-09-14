@@ -8,11 +8,23 @@ namespace MMM_Core.MidiManagers;
 
 public class SerialConnection : SerialPort, IConnection
 {
+	public SerialConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
+	: base(portName, baudRate, parity, dataBits, stopBits) { }
 	public string ConnectionString => PortName;
 	public IInputManager InputManager => MidiSerialManager.Instance;
 	public IOutputManager OutputManager => MidiSerialManager.Instance;
-	public SerialConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
-		: base(portName, baudRate, parity, dataBits, stopBits){}
+	public void SendEvent(MidiEvent midiEvent)
+	{
+		var m2bConverter = new MidiEventToBytesConverter();
+		m2bConverter.BytesFormat = BytesFormat.Device;
+		byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
+
+		if (this.IsOpen)
+		{
+			this.Write(midiEventBytes, 0, midiEventBytes.Length);
+		}
+		else Console.WriteLine("Serial Not Available");
+	}
 }
 
 public class MidiSerialManager : IInputManager, IOutputManager
@@ -237,16 +249,9 @@ public class MidiSerialManager : IInputManager, IOutputManager
 
 	void IOutputDevice.SendEvent(MidiEvent midiEvent)
 	{
-		var m2bConverter = new MidiEventToBytesConverter();
-		m2bConverter.BytesFormat = BytesFormat.Device;
-		byte[] midiEventBytes = m2bConverter.Convert(midiEvent);
 		foreach (var serialPort in serialPorts)
 		{
-			if (serialPort.IsOpen)
-			{
-				serialPort.Write(midiEventBytes, 0, midiEventBytes.Length);
-			}
-			else Console.WriteLine("Serial Not Available");
+			serialPort.SendEvent(midiEvent);
 		}
 	}
 

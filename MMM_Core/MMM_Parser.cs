@@ -161,7 +161,7 @@ internal class MMM_Parser : IDisposable
 		// If msg destination is not to Server block outbound msg.
 		if (dest != SysEx.AddrController)
 		{
-			Console.WriteLine($"SysEx Outbound: {BitConverter.ToString(sysExEvent.Data)}");
+			Console.WriteLine($"SysEx Passthrough: {BitConverter.ToString(sysExEvent.Data)}");
 			EventSent.Invoke(sender, new MidiEventSentEventArgs(midiEvent));
 			return;
 		}
@@ -291,10 +291,12 @@ internal class MMM_Parser : IDisposable
             MidiEvent midiEvent = b2mConverter.Convert(msg.buffer.ToArray());
             var eventArgs = new MidiEventReceivedEventArgs(midiEvent); // Wrap the MidiEvent in the correct EventArgs type  
 
+            Console.WriteLine($"Sender: {sender}");
+
 			// Fwd message response back to sender
 			if (sender is IConnection connection && connection.OutputManager != null) 
             {
-				connection.OutputManager.SendEvent(midiEvent);
+				connection.SendEvent(midiEvent);
             }
             else
             {

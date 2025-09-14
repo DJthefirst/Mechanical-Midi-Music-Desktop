@@ -18,9 +18,11 @@ public class MidiPortOutManager : IOutputManager
 		var outputDevice = OutputDevice.GetByName(portName);
 		if (outputDevice != null)
 		{
+			Console.WriteLine($"MIDI Output Port {portName} opened.");
 			midiPorts.Add(outputDevice);
 			return true;
 		}
+		Console.WriteLine($"Error: Unable to open MIDI Output Port {portName}.");
 		return false;
 	}
 

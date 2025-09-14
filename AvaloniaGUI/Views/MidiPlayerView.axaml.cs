@@ -57,70 +57,67 @@ public partial class MidiPlayerView : UserControl
 		MidiOutSelector.SelectionChanged += (s, e) =>
 		{
 			(DataContext as MidiPlayerViewModel)?.SelectedMidiOutputs.Clear();
-			MidiOutSelector.SelectionChanged += (s, e) =>
+
+			var viewModel = DataContext as MidiPlayerViewModel;
+			if (viewModel == null)
+				return;
+			
+			var existingConnections = MMM.Instance.midiPortOutManager.ListConnections();
+
+			viewModel.SelectedMidiOutputs.Clear();
+			foreach (var item in MidiOutSelector.SelectedItems)
 			{
-				var viewModel = DataContext as MidiPlayerViewModel;
-				if (viewModel == null)
-					return;
+				string itemName = item.ToString();
+				viewModel.SelectedMidiOutputs.Add(itemName);
 
-				var existingConnections = MMM.Instance.midiPortOutManager.ListConnections();
-
-				viewModel.SelectedMidiOutputs.Clear();
-				foreach (var item in MidiOutSelector.SelectedItems)
+				if (!existingConnections.Contains(itemName))
 				{
-					string itemName = item.ToString();
-					viewModel.SelectedMidiOutputs.Add(itemName);
-
-					if (!existingConnections.Contains(itemName))
-					{
-						MMM.Instance.midiPortOutManager.AddConnection(itemName);
-					}
+					MMM.Instance.midiPortOutManager.AddConnection(itemName);
 				}
+			}
 
-				// Remove connections that are not selected
-				foreach (var conn in existingConnections)
+			// Remove connections that are not selected
+			foreach (var conn in existingConnections)
+			{
+				if (!viewModel.SelectedMidiOutputs.Contains(conn))
 				{
-					if (!viewModel.SelectedMidiOutputs.Contains(conn))
-					{
-						MMM.Instance.midiPortOutManager.RemoveConnection(conn);
-					}
+					MMM.Instance.midiPortOutManager.RemoveConnection(conn);
 				}
-			};
+			}
 		};
 
 		MidiInSelector.SelectionChanged += (s, e) =>
 		{
 			(DataContext as MidiPlayerViewModel)?.SelectedMidiInputs.Clear();
-			MidiInSelector.SelectionChanged += (s, e) =>
+
+			var viewModel = DataContext as MidiPlayerViewModel;
+			if (viewModel == null)
+				return;
+
+			// Get current connections from midiPortInManager
+			var existingConnections = MMM.Instance.midiPortInManager.ListConnections();
+
+			viewModel.SelectedMidiInputs.Clear();
+			foreach (var item in MidiInSelector.SelectedItems)
 			{
-				var viewModel = DataContext as MidiPlayerViewModel;
-				if (viewModel == null)
-					return;
+				string itemName = item.ToString();
+				viewModel.SelectedMidiInputs.Add(itemName);
 
-				// Get current connections from midiPortInManager
-				var existingConnections = MMM.Instance.midiPortInManager.ListConnections();
-
-				viewModel.SelectedMidiInputs.Clear();
-				foreach (var item in MidiInSelector.SelectedItems)
+				if (!existingConnections.Contains(itemName))
 				{
-					string itemName = item.ToString();
-					viewModel.SelectedMidiInputs.Add(itemName);
-
-					if (!existingConnections.Contains(itemName))
-					{
-						MMM.Instance.midiPortInManager.AddConnection(itemName);
-					}
+					MMM.Instance.midiPortInManager.AddConnection(itemName);
 				}
+			}
 
-				// Remove connections that are not selected
-				foreach (var conn in existingConnections)
+			// Remove connections that are not selected
+			foreach (var conn in existingConnections)
+			{
+				if (!viewModel.SelectedMidiInputs.Contains(conn))
 				{
-					if (!viewModel.SelectedMidiInputs.Contains(conn))
-					{
-						MMM.Instance.midiPortInManager.RemoveConnection(conn);
-					}
+					MMM.Instance.midiPortInManager.RemoveConnection(conn);
 				}
-			};
+			}
 		};
+		
 	}
 }

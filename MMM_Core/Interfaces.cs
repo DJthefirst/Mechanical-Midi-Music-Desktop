@@ -1,4 +1,5 @@
-﻿using Melanchall.DryWetMidi.Multimedia;
+﻿using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Multimedia;
 using MMM_Core.MidiManagers;
 using MMM_Device;
 using System.IO.Ports;
@@ -75,6 +76,7 @@ public interface IConnection
 	string ConnectionString { get; }
 	public IInputManager? InputManager { get; }
 	public IOutputManager? OutputManager { get; }
+	public void SendEvent(MidiEvent midiEvent);
 }
 
 
