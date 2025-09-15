@@ -86,15 +86,17 @@
                     Name="DeviceSelector"
                     Grid.Row="2"
                     Margin="0"
+                    Padding="0"
+                    HorizontalAlignment="Stretch"
                     VerticalAlignment="Stretch"
-                    Background="{DynamicResource SecondaryBackground}"
-                    CornerRadius="15"
+                    Background="Transparent"
+                    CornerRadius="0"
                     ItemsSource="{Binding DevicesList}"
                     SelectedItem="{Binding SelectedDevice, Mode=TwoWay}"
-                    SelectionMode="Single">
+                    SelectionMode="AlwaysSelected">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Border CornerRadius="10">
+                            <DataTemplate.Content>
                                 <StackPanel Margin="0" VerticalAlignment="Stretch">
                                     <Grid>
                                         <TextBlock HorizontalAlignment="Left" Text="{Binding SYSEX_DEV_ID, StringFormat='ID: {0}'}" />
@@ -125,7 +127,7 @@
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
-                            </Border>
+                            </DataTemplate.Content>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

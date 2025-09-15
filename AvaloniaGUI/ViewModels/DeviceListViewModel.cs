@@ -1,8 +1,10 @@
 ﻿using Avalonia.Threading;
 using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
+using AvaloniaGUI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Google.Protobuf.WellKnownTypes;
 using MMM_Core;
 using MMM_Device;
 using MMM_Server;
@@ -10,7 +12,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
-using AvaloniaGUI.Services;
 
 namespace AvaloniaGUI.ViewModels;
 
@@ -32,6 +33,22 @@ public partial class DeviceListViewModel : ComponentViewModel
 					Console.WriteLine($"Device Added: {device.Name} on {device.ConnectionString}");
 					DevicesList.Add(device);
 				}
+				if (Context.SelectedDevice != null && DevicesList.Contains(Context.SelectedDevice))
+					SelectedDevice = Context.SelectedDevice;
+			});
+		};
+
+		DeviceManager.Instance.DeviceUpdated += (s, e) =>
+		{
+			Dispatcher.UIThread.Post(() =>
+			{
+				DevicesList.Clear();
+				foreach (var device in DeviceManager.Instance.Devices.Values)
+				{
+					DevicesList.Add(device);
+				}
+				if (Context.SelectedDevice != null && DevicesList.Contains(Context.SelectedDevice))
+					SelectedDevice = Context.SelectedDevice;
 			});
 		};
 	}
@@ -93,6 +110,7 @@ public partial class DeviceListViewModel : ComponentViewModel
 			Console.WriteLine($"Removing Device: {SelectedDevice.Name} on {SelectedDevice.ConnectionString}");
 			MMM.Instance.serialManager.FreeConnection(SelectedDevice.ConnectionString);
 			SelectedDevice = null;
+			Context.SelectedDevice = null;
 		}
 	}
 
@@ -103,7 +121,10 @@ public partial class DeviceListViewModel : ComponentViewModel
 	}
 	partial void OnSelectedDeviceChanged(Device? value)
 	{
-		Context.SelectedDevice = value;
+		if (SelectedDevice != null)
+		{
+			Context.SelectedDevice = value;
+		}
 	}
 }
 

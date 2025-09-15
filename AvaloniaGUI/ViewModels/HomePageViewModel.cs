@@ -34,7 +34,7 @@ public partial class HomePageViewModel : PageViewModel
 	public void UpdateWidth(double width)
 	{
 		IsFullWidth = (width > 1250);
-		IsMinWidth = (width < 950);
+		IsMinWidth = (width < 850);
 	}
 
 	// Allow nullable PageFactory for now in designer... ideally get it working

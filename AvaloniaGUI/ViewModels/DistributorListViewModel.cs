@@ -1,4 +1,5 @@
-﻿using AvaloniaGUI.Data;
+﻿using Avalonia.Threading;
+using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
 using AvaloniaGUI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -17,6 +18,23 @@ public partial class DistributorListViewModel : ComponentViewModel
 
 	public DistributorListViewModel() : base(PageComponentNames.DeviceList)
 	{
+		// Initialize SelectedDevice and DistributorList if a device is already selected
+		DeviceManager.Instance.DeviceUpdated += (s, e) =>
+		{
+			Dispatcher.UIThread.Post(() =>
+			{
+				if (Context.SelectedDevice != null)
+				SelectedDevice = Context.SelectedDevice;
+				DistributorList.Clear();
+				if (Context.SelectedDevice is null) return;
+
+				var distributors = Context.SelectedDevice.Distributors;
+				foreach (var distributor in distributors)
+				{
+					DistributorList.Add(distributor);
+				}
+			});
+		};
 
 		Context.PropertyChanged += (s, e) =>
 		{

@@ -13,13 +13,7 @@ public class SessionContext : ObservableObject
 	public Device? SelectedDevice
 	{
 		get => _selectedDevice;
-		set
-		{
-			if (SetProperty(ref _selectedDevice, value))
-			{
-				Console.WriteLine("Updated");
-			}
-		}
+		set => SetProperty(ref _selectedDevice, value);
 	}
 
 	private Distributor? _selectedDistributor;

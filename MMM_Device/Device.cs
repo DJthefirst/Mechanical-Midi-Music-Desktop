@@ -32,10 +32,11 @@ public class Device
 	public Device(){}
     public Device(byte[] deviceConstruct) 
     { 
-        this.SetDeviceConstruct(deviceConstruct);       
+        this.SetDeviceConstruct(deviceConstruct); 
     }
 
-    public string ConnectionString { get; set; } = "Unknown";
+	public event EventHandler<Device> DeviceUpdated;
+	public string ConnectionString { get; set; } = "Unknown";
 	public string Name { get; set; } = "New Device";
     public bool OmniMode { get; set; } = false;
 
@@ -63,8 +64,17 @@ public class Device
 	//Firmware Version 14bit
 	public int FIRMWARE_VERSION { get; set; } = 0;
 
-    public List<Distributor> Distributors = new List<Distributor>();
+	private List<Distributor> _distributors = new List<Distributor>();
+	public List<Distributor> Distributors
+	{
+		get => _distributors;
+	}
 
+    public void AddDistributor(Distributor distributor)
+    {
+        _distributors.Add(distributor);
+        DeviceUpdated.Invoke(this, this);
+	}
 
     private void SetDeviceBoolean(byte deviceBoolByte)
     {

@@ -345,12 +345,12 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		var distributors = DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors;
+		var device = DeviceManager.Instance.Devices[(connection, msg.Source())];
 		var distributor = new Distributor(msg.Payload());
 
 		// Check if distributors contains a distributor with matching Index
-		if (!distributors.Any(d => d.Index == distributor.Index))
-			distributors.Add(distributor);
+		if (!device.Distributors.Any(d => d.Index == distributor.Index))
+			device.AddDistributor(distributor);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -24,8 +24,8 @@
             IsVisible="{Binding !IsMinWidth}"
             VerticalScrollBarVisibility="Auto">
             <Grid
-                MinWidth="600"
-                MaxWidth="600"
+                MinWidth="525"
+                MaxWidth="525"
                 RowDefinitions="275, Auto, Auto">
                 <!--  MIDI Player  -->
                 <ContentControl Grid.Row="0" Content="{Binding MidiPlayerComponent}" />
