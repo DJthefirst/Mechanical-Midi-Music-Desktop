@@ -2,6 +2,7 @@
     x:Class="AvaloniaGUI.Views.DistributorListView"
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:cvtr="clr-namespace:AvaloniaGUI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:AvaloniaGUI.ViewModels"
@@ -12,7 +13,7 @@
     mc:Ignorable="d">
 
     <Design.DataContext>
-        <vm:DistributorListViewModel />
+        <vm:DesignDistributorListViewModel />
     </Design.DataContext>
 
     <!--  Distributor List  -->
@@ -30,104 +31,93 @@
                     Foreground="White">
                     Distributors
                 </Label>
-                <ListBox Background="{DynamicResource SecondaryBackground}">
 
-                    <ListBoxItem
-                        Margin="5,5,5,5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="15">
-                        <Grid ColumnDefinitions="*,0.8*">
-                            <StackPanel Grid.Column="0">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Distributor ID:</Label>
-                                    <Label>0</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Channels:</Label>
-                                    <Label>0x0001</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Instrument:</Label>
-                                    <Label>0x0000000F</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical">
-                                    <Label>Distribution Method:</Label>
-                                    <Label>RoundRobinBalance</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Note Min/Max:</Label>
-                                    <Label>1-127</Label>
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Damper:</Label>
-                                    <CheckBox IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Polyphonic:</Label>
-                                    <CheckBox IsChecked="True" IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Note Overwrite:</Label>
-                                    <CheckBox IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>NumPolyphonic Notes:</Label>
-                                    <Label>1</Label>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </ListBoxItem>
 
-                    <ListBoxItem
-                        Margin="5,5,5,5"
-                        Background="{DynamicResource PrimaryBackground}"
-                        CornerRadius="15">
-                        <Grid ColumnDefinitions="*,0.8*">
-                            <StackPanel Grid.Column="0">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Distributor ID:</Label>
-                                    <Label>0</Label>
+                <ListBox
+                    Name="DeviceSelector"
+                    Grid.Row="2"
+                    Margin="0"
+                    VerticalAlignment="Stretch"
+                    Background="{DynamicResource SecondaryBackground}"
+                    CornerRadius="15"
+                    ItemsSource="{Binding DistributorList}"
+                    SelectedItem="{Binding SelectedDistributor, Mode=TwoWay}"
+                    SelectionMode="Single">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="10">
+                                <StackPanel Margin="0" VerticalAlignment="Stretch">
+                                    <Grid ColumnDefinitions="*,0.8*">
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding Index, StringFormat='Distributor ID: {0}'}" />
+                                            <TextBlock Text="{Binding Channels, StringFormat='Channels: 0x{0:X}'}" />
+                                            <TextBlock Text="{Binding Instruments, StringFormat='Instrument: 0x{0:X}'}" />
+                                            <TextBlock Text="{Binding DistributionMethod, StringFormat='Method: {0}'}" />
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="Notes: {0}-{1}">
+                                                        <Binding Path="MinNote" />
+                                                        <Binding Path="MaxNote" />
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <Grid
+                                            Grid.Column="1"
+                                            Height="100"
+                                            RowDefinitions="*,*,*,*">
+
+                                            <Label
+                                                Grid.Row="0"
+                                                Margin="0"
+                                                HorizontalAlignment="Left">
+                                                Damper:
+                                            </Label>
+                                            <CheckBox
+                                                Grid.Row="0"
+                                                Margin="0"
+                                                HorizontalAlignment="Right"
+                                                IsChecked="{Binding DamperPedal}"
+                                                IsEnabled="False" />
+                                            <Label
+                                                Grid.Row="1"
+                                                Margin="0"
+                                                HorizontalAlignment="Left">
+                                                Polyphonic:
+                                            </Label>
+                                            <CheckBox
+                                                Grid.Row="1"
+                                                Margin="0"
+                                                HorizontalAlignment="Right"
+                                                IsChecked="{Binding Polyphonic}"
+                                                IsEnabled="False" />
+                                            <Label Grid.Row="2" HorizontalAlignment="Left">Note Overwrite:</Label>
+                                            <CheckBox
+                                                Grid.Row="2"
+                                                Margin="0"
+                                                HorizontalAlignment="Right"
+                                                IsChecked="{Binding NoteOverwrite}"
+                                                IsEnabled="False" />
+                                            <TextBlock
+                                                Grid.Row="3"
+                                                HorizontalAlignment="Left"
+                                                Text="{Binding NumPolyphonicNotes, StringFormat='NumPolyphonic: {0}'}" />
+                                        </Grid>
+                                    </Grid>
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Channels:</Label>
-                                    <Label>0x0001</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Instrument:</Label>
-                                    <Label>0x0000000F</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Vertical">
-                                    <Label>Distribution Method:</Label>
-                                    <Label>RoundRobinBalance</Label>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Note Min/Max:</Label>
-                                    <Label>1-127</Label>
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel Grid.Column="1">
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Damper:</Label>
-                                    <CheckBox IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Polyphonic:</Label>
-                                    <CheckBox IsChecked="True" IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>Note Overwrite:</Label>
-                                    <CheckBox IsEnabled="False" />
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Label>NumPolyphonic Notes:</Label>
-                                    <Label>1</Label>
-                                </StackPanel>
-                            </StackPanel>
-                        </Grid>
-                    </ListBoxItem>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
+
+
+
+
+
+
+
+
+                <ListBox Background="{DynamicResource SecondaryBackground}" />
             </StackPanel>
         </ScrollViewer>
     </Border>

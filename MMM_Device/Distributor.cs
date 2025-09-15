@@ -25,8 +25,9 @@ public class Distributor
     const int BOOL_POLYPHONIC = 0x04;
     const int BOOL_NOTEOVERWRITE = 0x08;
 
-    //Local Atributes
-    public int CurrentChannel { get; set; } = 0;
+	//Local Atributes
+	public int? Index { get; set; } = null;
+	public int CurrentChannel { get; set; } = 0;
     public int CurrentInstrument { get; set; } = 0;
 
     //Each Bit Represents an Enabled Channel/Instrument (limits max number of instruments to 32)
@@ -87,7 +88,11 @@ public class Distributor
     public void SetDistributor(byte[] data)
     {
         // Decode Distributor Construct
-        int channels =
+
+        int index =
+			  (data[0] << 7)
+			| (data[1] << 0);
+		int channels =
               (data[2] << 14)
             | (data[3] << 7)
             | (data[4] << 0);
@@ -99,7 +104,8 @@ public class Distributor
             | (data[9] << 0);
         DistributionMethod distributionMethod = (DistributionMethod)(data[10]);
 
-        Channels = channels; // 1
+        Index = index;
+		Channels = channels; // 1
         Instruments = instruments; // 1,2
         DistributionMethod = distributionMethod;
         Muted = (data[11] & BOOL_MUTED) != 0;

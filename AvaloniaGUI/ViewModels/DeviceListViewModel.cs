@@ -1,19 +1,22 @@
-﻿using AvaloniaGUI.Data;
+﻿using Avalonia.Threading;
+using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using MMM_Device;
 using MMM_Core;
+using MMM_Device;
 using MMM_Server;
-using System.Collections.ObjectModel;
-using System.Collections.Generic;
-using Avalonia.Threading;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
+using AvaloniaGUI.Services;
 
 namespace AvaloniaGUI.ViewModels;
 
 public partial class DeviceListViewModel : ComponentViewModel
 {
+	public SessionContext Context => SessionContext.Instance;
 	public DeviceListViewModel() : base(PageComponentNames.DeviceList)
 	{
 		RefreshSerialPorts();
@@ -97,6 +100,10 @@ public partial class DeviceListViewModel : ComponentViewModel
 	public void Update(Device device)
 	{
 
+	}
+	partial void OnSelectedDeviceChanged(Device? value)
+	{
+		Context.SelectedDevice = value;
 	}
 }
 

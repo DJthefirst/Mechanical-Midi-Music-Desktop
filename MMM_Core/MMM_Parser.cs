@@ -181,116 +181,177 @@ internal class MMM_Parser : IDisposable
 	private void ProcessMessage(object? sender, MMM_Msg msg)
 	{
         IConnection? connection = sender as IConnection;
-		
+
 		switch (msg.Type())
 		{
 			case SysEx.DeviceReady:
-				SendMessage(sender, msg.Source(), SysEx.GetDeviceConstruct);
+				HandleDeviceReady(sender, msg);
 				break;
 			case SysEx.ResetDeviceConfig:
-				SendMessage(sender, msg.Source(), SysEx.ResetDeviceConfig);
+				HandleResetDeviceConfig(sender, msg);
 				break;
 			case SysEx.DiscoverDevices:
-				SendMessage(sender, SysEx.AddrBroadcast, SysEx.DiscoverDevices);
+				HandleDiscoverDevices(sender, msg);
 				break;
 			case SysEx.GetDeviceConstructWithDistributors:
+				// Not implemented
 				break;
 			case SysEx.GetDeviceConstruct:
-                Device device = new Device(msg.Payload());
-				device.ConnectionString = Device.GetConnectionString(sender);
-                if (connection == null) 
-                {
-                    Console.WriteLine("Error: Connection Source is null");
-					return; 
-                }
-				DeviceManager.Instance.AddDevice(connection, device);
-				SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
-				//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
+				HandleGetDeviceConstruct(sender, msg, connection);
 				break;
-            case SysEx.GetDeviceName:
-				if (connection == null)
-				{
-					Console.WriteLine("Error: Connection Source is null");
-					return;
-				}
-				DeviceManager.Instance.Devices[(connection,msg.Source())].Name = BitConverter.ToString(msg.Payload()[0..20]);
-                break;
-            case SysEx.GetDeviceBoolean:
-                break;
-            case SysEx.SetDeviceConstructWithDistributors:
-                break;
-            case SysEx.SetDeviceConstruct:
-                break;
-            case SysEx.SetDeviceName:
-                break;
-            case SysEx.SetDeviceBoolean:
-                break;
-            case SysEx.RemoveDistributor:
-                break;
-            case SysEx.RemoveAllDistributors:
-                break;
-            case SysEx.GetNumOfDistributors:
-                for (byte i = 0; i < msg.Payload()[0]; ++i) SendMessage(sender, msg.Source(), SysEx.GetDistributorConstruct, [i]);
-                break;
-            case SysEx.GetAllDistributors:
-				if (connection == null)
-				{
-					Console.WriteLine("Error: Connection Source is null");
-					return;
-				}
-				DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
+			case SysEx.GetDeviceName:
+				HandleGetDeviceName(sender, msg, connection);
 				break;
-            case SysEx.AddDistributor:
-                break;
-            case SysEx.ToggleMuteDistributor:
-                break;
-            case SysEx.GetDistributorConstruct:
-				if (connection == null)
-				{
-					Console.WriteLine("Error: Connection Source is null");
-					return;
-				}
-				DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
-                break;
-            case SysEx.GetDistributorChannels:
-                break;
-            case SysEx.GetDistributorInstruments:
-                break;
-            case SysEx.GetDistributorMethod:
-                break;
-            case SysEx.GetDistributorBoolValues:
-                break;
-            case SysEx.GetDistributorMinMaxNotes:
-                break;
-            case SysEx.GetDistributorNumPolyphonicNotes:
-                break;
-            case SysEx.SetDistributorConstruct:
-                break;
-            case SysEx.SetDistributorChannels:
-                break;
-            case SysEx.SetDistributorInstruments:
-                break;
-            case SysEx.SetDistributorMethod:
-                break;
-            case SysEx.SetDistributorBoolValues:
-                break;
-            case SysEx.SetDistributorMinMaxNotes:
-                break;
-            case SysEx.SetDistributorNumPolyphonicNotes:
-                break;
+			case SysEx.GetDeviceBoolean:
+				// Not implemented
+				break;
+			case SysEx.SetDeviceConstructWithDistributors:
+				// Not implemented
+				break;
+			case SysEx.SetDeviceConstruct:
+				// Not implemented
+				break;
+			case SysEx.SetDeviceName:
+				// Not implemented
+				break;
+			case SysEx.SetDeviceBoolean:
+				// Not implemented
+				break;
+			case SysEx.RemoveDistributor:
+				// Not implemented
+				break;
+			case SysEx.RemoveAllDistributors:
+				// Not implemented
+				break;
+			case SysEx.GetNumOfDistributors:
+				HandleGetNumOfDistributors(sender, msg);
+				break;
+			case SysEx.GetAllDistributors:
+				HandleGetAllDistributors(sender, msg, connection);
+				break;
+			case SysEx.AddDistributor:
+				// Not implemented
+				break;
+			case SysEx.ToggleMuteDistributor:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorConstruct:
+				HandleGetDistributorConstruct(sender, msg, connection);
+				break;
+			case SysEx.GetDistributorChannels:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorInstruments:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorMethod:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorBoolValues:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorMinMaxNotes:
+				// Not implemented
+				break;
+			case SysEx.GetDistributorNumPolyphonicNotes:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorConstruct:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorChannels:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorInstruments:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorMethod:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorBoolValues:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorMinMaxNotes:
+				// Not implemented
+				break;
+			case SysEx.SetDistributorNumPolyphonicNotes:
+				// Not implemented
+				break;
+			default:
+				Console.WriteLine("Debug Unkown SysEx");
+				return;
+		}
+	}
 
+	private void HandleDeviceReady(object? sender, MMM_Msg msg)
+	{
+		SendMessage(sender, msg.Source(), SysEx.GetDeviceConstruct);
+	}
 
-            default:
-                Console.WriteLine("Debug Unkown SysEx");
-                return;
-        }
-    }
+	private void HandleResetDeviceConfig(object? sender, MMM_Msg msg)
+	{
+		SendMessage(sender, msg.Source(), SysEx.ResetDeviceConfig);
+	}
 
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	//Send Messages
-	////////////////////////////////////////////////////////////////////////////////////////////////////
+	private void HandleDiscoverDevices(object? sender, MMM_Msg msg)
+	{
+		SendMessage(sender, SysEx.AddrBroadcast, SysEx.DiscoverDevices);
+	}
 
+	private void HandleGetDeviceConstruct(object? sender, MMM_Msg msg, IConnection? connection)
+	{
+		Device device = new Device(msg.Payload());
+		device.ConnectionString = Device.GetConnectionString(sender);
+		if (connection == null)
+		{
+			Console.WriteLine("Error: Connection Source is null");
+			return;
+		}
+		DeviceManager.Instance.AddDevice(connection, device);
+		SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
+		//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
+	}
 
+	private void HandleGetDeviceName(object? sender, MMM_Msg msg, IConnection? connection)
+	{
+		if (connection == null)
+		{
+			Console.WriteLine("Error: Connection Source is null");
+			return;
+		}
+		DeviceManager.Instance.Devices[(connection, msg.Source())].Name = BitConverter.ToString(msg.Payload()[0..20]);
+	}
+
+	private void HandleGetNumOfDistributors(object? sender, MMM_Msg msg)
+	{
+		for (UInt16 i = 0; i < msg.Payload()[0]; ++i)
+			SendMessage(sender, msg.Source(), SysEx.GetDistributorConstruct, [(byte)(i >> 7), (byte)(i & 0x7F)]);
+	}
+
+	private void HandleGetAllDistributors(object? sender, MMM_Msg msg, IConnection? connection)
+	{
+		if (connection == null)
+		{
+			Console.WriteLine("Error: Connection Source is null");
+			return;
+		}
+		DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
+	}
+
+	private void HandleGetDistributorConstruct(object? sender, MMM_Msg msg, IConnection? connection)
+	{
+		if (connection == null)
+		{
+			Console.WriteLine("Error: Connection Source is null");
+			return;
+		}
+		var distributors = DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors;
+		var distributor = new Distributor(msg.Payload());
+
+		// Check if distributors contains a distributor with matching Index
+		if (!distributors.Any(d => d.Index == distributor.Index))
+			distributors.Add(distributor);
+	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Send SysEx Messages

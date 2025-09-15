@@ -83,7 +83,9 @@ public class Device
         MAX_MIDI_NOTE = deviceObj[8];
         FIRMWARE_VERSION = (deviceObj[9] << 7) | (deviceObj[10] << 0);
 
-        //Name = BitConverter.ToString(deviceObj[10..20]);
+		Name = System.Text.Encoding.ASCII
+			.GetString(deviceObj.AsSpan(11, NUM_NAME_BYTES))
+			.TrimEnd('\0');
     }
 
 	//public void SetAllDistributors(byte[] data)
