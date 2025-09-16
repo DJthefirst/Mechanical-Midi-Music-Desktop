@@ -37,7 +37,7 @@
                     <Label VerticalAlignment="Center" Foreground="White">
                         Device ID
                     </Label>
-                    <TextBox Text="1" />
+                    <TextBox Text="{Binding Id, Mode=TwoWay}" />
                 </StackPanel>
                 <StackPanel
                     Grid.Column="1"
@@ -46,14 +46,14 @@
                     <Label VerticalAlignment="Center" Foreground="White">
                         Device Name
                     </Label>
-                    <TextBox Text="{Binding Name}" />
+                    <TextBox Text="{Binding Name, Mode=TwoWay}" />
                 </StackPanel>
             </Grid>
             <StackPanel Margin="5" Orientation="Horizontal">
                 <Label VerticalAlignment="Center" Foreground="White">
                     Omni Mode Enable
                 </Label>
-                <CheckBox />
+                <CheckBox IsChecked="{Binding OmniMode, Mode=TwoWay}" />
             </StackPanel>
             <Grid ColumnDefinitions="*,*,*,*">
                 <Button
@@ -61,7 +61,7 @@
                     Margin="5"
                     HorizontalAlignment="Stretch"
                     HorizontalContentAlignment="Center"
-                    Command="{Binding SaveNameCommand}">
+                    Command="{Binding UpdateCommand}">
                     Update
                 </Button>
                 <Button

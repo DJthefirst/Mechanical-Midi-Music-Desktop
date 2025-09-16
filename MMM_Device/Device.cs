@@ -26,7 +26,7 @@ public class Device
 {
     //Device Construct Constants
     const byte NUM_NAME_BYTES = 20;
-    const byte NUM_CFG_BYTES = 30;
+    const byte NUM_CFG_BYTES = 32;
     const byte BOOL_OMNIMODE = 0x01;
 
 	public Device(){}
@@ -94,7 +94,7 @@ public class Device
         FIRMWARE_VERSION = (deviceObj[9] << 7) | (deviceObj[10] << 0);
 
 		Name = System.Text.Encoding.ASCII
-			.GetString(deviceObj.AsSpan(11, NUM_NAME_BYTES))
+			.GetString(deviceObj.AsSpan(12, NUM_NAME_BYTES))
 			.TrimEnd('\0');
     }
 
@@ -131,9 +131,20 @@ public class Device
         return deviceBoolByte;
     }
 
-    public List<byte> GetDeviceConstruct()
+    public byte[] GetDeviceName()
     {
-        List<byte> deviceObj = new List<byte>();
+        byte[] nameObj = new byte[NUM_NAME_BYTES];
+		for (int i = 0; i < NUM_NAME_BYTES; i++)
+		{
+			if (Name.Length > i) nameObj[i] = (byte)Name.ToCharArray()[i];
+			else nameObj[i] = 0;
+		}
+		return nameObj;
+	}
+
+	public byte[] GetDeviceConstruct()
+    {
+		byte[] deviceObj = new byte[NUM_CFG_BYTES];
 
         deviceObj[0] = (byte)((SYSEX_DEV_ID >> 7) & 0x7F); //Device ID MSB
         deviceObj[1] = (byte)((SYSEX_DEV_ID >> 0) & 0x7F); //Device ID LSB

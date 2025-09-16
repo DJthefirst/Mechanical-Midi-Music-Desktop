@@ -39,6 +39,10 @@ public class MidiPortInManager : IInputManager
 		return true;
 	}
 
+	public void RemoveConnection(IConnection connection)
+	{
+		//TODO: Implement
+	}
 	public bool RemoveConnection(InputDevice inputDevice)
 	{
 		if (inputDevice != null && midiPorts.Contains(inputDevice))

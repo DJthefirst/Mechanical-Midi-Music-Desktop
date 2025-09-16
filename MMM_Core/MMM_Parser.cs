@@ -97,7 +97,7 @@ public class MMM_Msg
         return b2mConverter.Convert(buffer);
 	}
 
-	internal static MMM_Msg GenerateSysEx(int destinationID, byte msgType, byte[] payload)
+	public static MMM_Msg GenerateSysEx(int destinationID, byte msgType, byte[] payload)
 	{
 		byte[] header = new byte[]
 		{

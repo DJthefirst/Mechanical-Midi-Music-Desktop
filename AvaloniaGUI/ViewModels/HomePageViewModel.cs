@@ -62,7 +62,7 @@ public partial class DesignHomePageViewModel : HomePageViewModel
 		: base(
 			new MidiPlayerViewModel(),
 			new DeviceListViewModel(),
-			new DeviceManagerViewModel(new DeviceListViewModel()),
+			new DeviceManagerViewModel(),
 			new DistributorListViewModel(),
 			new DistributorManagerViewModel())
 	{

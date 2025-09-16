@@ -1,37 +1,58 @@
 ﻿using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
+using AvaloniaGUI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using MMM_Core;
 using MMM_Device;
+using MMM_Server.Grpc_Services;
 
 namespace AvaloniaGUI.ViewModels;
 
 public partial class DeviceManagerViewModel : ComponentViewModel
 {
-	private readonly DeviceListViewModel _deviceListViewModel;
+	public SessionContext Context => SessionContext.Instance;
 
-	public DeviceManagerViewModel(DeviceListViewModel deviceListViewModel)
-		: base(PageComponentNames.DeviceManager)
+
+	public DeviceManagerViewModel() : base(PageComponentNames.DeviceManager)
 	{
-		_deviceListViewModel = deviceListViewModel;
+		Context.PropertyChanged += (s, e) =>
+		{
+			if (e.PropertyName == nameof(Context.SelectedDevice))
+			{
+				SelectedDevice = Context.SelectedDevice;
+				Name = SelectedDevice?.Name ?? string.Empty;
+				Id = SelectedDevice?.SYSEX_DEV_ID ?? 0;
+				OmniMode = SelectedDevice?.OmniMode ?? false;
+			}
+		};
 	}
 
 	[ObservableProperty]
-	private string _name = "Device Manager";
+	private Device? _selectedDevice;
+
+	[ObservableProperty]
+	private int _id = 0;
+
+	[ObservableProperty]
+	private string _name = string.Empty;
+
+	[ObservableProperty]
+	private bool _omniMode = false;
 
 	[RelayCommand]
-	public void SaveName()
+	public void Update()
 	{
 		Device device = new Device();
+		device.Name = Name;
+		device.SYSEX_DEV_ID = Id;
+		device.OmniMode = OmniMode;
 
-		device.Name = "New Device";
-		device.OmniMode = false;
-		device.SYSEX_DEV_ID = 1;
-		_deviceListViewModel.Update(device);
+		IConnection? connection = SelectedDevice != null ? DeviceManager.Instance.GetConnection(SelectedDevice) : null;
+		if (connection == null) return;
+
+		MMM_Msg msg = MMM_Msg.GenerateSysEx(Id, SysEx.SetDeviceName, device.GetDeviceName());
+		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
 	}
-
-
-	//---------- Device Configuration ----------
-
 }
 

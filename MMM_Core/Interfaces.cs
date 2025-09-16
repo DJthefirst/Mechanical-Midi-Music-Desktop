@@ -64,6 +64,7 @@ public interface IManager : IDisposable
 {
 	public List<string> AvailableConnections();
 	//public bool AddConnection(string connectionName);
+	public void RemoveConnection(IConnection connection);
 	public bool RemoveConnection(string connectionName);
 	public void ClearConnections();
 
@@ -77,6 +78,12 @@ public interface IConnection
 	public IInputManager? InputManager { get; }
 	public IOutputManager? OutputManager { get; }
 	public void SendEvent(MidiEvent midiEvent);
+
+	public void Close()
+	{
+		InputManager?.RemoveConnection(this);
+		OutputManager?.RemoveConnection(this);
+	}
 }
 
 

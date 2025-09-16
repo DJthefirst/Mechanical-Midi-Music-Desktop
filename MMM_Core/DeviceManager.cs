@@ -23,14 +23,20 @@ namespace MMM_Core
 		public event EventHandler<Device>? DeviceUpdated;
 		internal void AddDevice(IConnection connection, Device device)
 		{
-			device.DeviceUpdated += DeviceUpdated;
+			device.DeviceUpdated += UpdateDevice;
 			Devices[(connection, device.SYSEX_DEV_ID)] = device;
 			OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
 		}
 
-		private void Device_DeviceUpdated(object? sender, Device e)
+		private void UpdateDevice(object? sender, Device e)
 		{
 			throw new NotImplementedException();
+		}
+
+		public void Update(IConnection connection, Melanchall.DryWetMidi.Core.MidiEvent midiEvent)
+		{
+			connection.SendEvent(midiEvent);
+			OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
 		}
 
 		public void RemoveDevice(IConnection connection, Device device)
@@ -61,6 +67,17 @@ namespace MMM_Core
 			return Devices
 			.Where(kvp => kvp.Key.Item1 == connection)
 			.ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+		}
+		public IConnection? GetConnection(Device device)
+		{
+			foreach (var kvp in Devices)
+			{
+				if (kvp.Value == device)
+				{
+					return kvp.Key.Item1;
+				}
+			}
+			return null;
 		}
 	}
 }

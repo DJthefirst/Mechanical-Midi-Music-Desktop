@@ -108,6 +108,11 @@ public class MidiSerialManager : IInputManager, IOutputManager
 		}
 	}
 
+	public void RemoveConnection(IConnection connection)
+	{
+		RemoveConnection((SerialConnection)connection);
+	}
+
 	public bool RemoveConnection(string portName)
 	{
 		var serialPort = serialPorts.FirstOrDefault(sp => sp.PortName == portName);
@@ -140,18 +145,6 @@ public class MidiSerialManager : IInputManager, IOutputManager
 			}
 		}
 		return false;
-	}
-
-	public void FreeConnection(string str)
-	{
-		foreach (var serialPort in serialPorts.ToList())
-		{
-			if (Device.GetConnectionString(serialPort) == str)
-			{
-				RemoveConnection(serialPort);
-				break;
-			}
-		}
 	}
 
 	public void ClearConnections()

@@ -6,12 +6,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Google.Protobuf.WellKnownTypes;
 using MMM_Core;
+using MMM_Core.MidiManagers;
 using MMM_Device;
 using MMM_Server;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AvaloniaGUI.ViewModels;
 
@@ -108,7 +110,11 @@ public partial class DeviceListViewModel : ComponentViewModel
 		if (SelectedDevice != null)
 		{
 			Console.WriteLine($"Removing Device: {SelectedDevice.Name} on {SelectedDevice.ConnectionString}");
-			MMM.Instance.serialManager.FreeConnection(SelectedDevice.ConnectionString);
+			var connection = DeviceManager.Instance.GetConnection(SelectedDevice) as SerialConnection;
+			if (connection != null)
+			{
+				MMM.Instance.serialManager.RemoveConnection(connection);
+			}
 			SelectedDevice = null;
 			Context.SelectedDevice = null;
 		}

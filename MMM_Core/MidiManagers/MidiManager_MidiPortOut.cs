@@ -38,6 +38,10 @@ public class MidiPortOutManager : IOutputManager
 		return false;
 	}
 
+	public void RemoveConnection(IConnection connection)
+	{
+		//TODO: Implement
+	}
 	public bool RemoveConnection(string portName)
 	{
 		// Find the OutputDevice instance in midiPorts by name
