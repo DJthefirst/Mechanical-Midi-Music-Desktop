@@ -57,13 +57,11 @@ public interface IMidiPlayer
 	public double NavigateMs(double increment);
 	public byte[] ToByteArray();
 	public void FromByteArray(byte[] data);
-
 }
 
 public interface IManager : IDisposable
 {
 	public List<string> AvailableConnections();
-	//public bool AddConnection(string connectionName);
 	public void RemoveConnection(IConnection connection);
 	public bool RemoveConnection(string connectionName);
 	public void ClearConnections();
@@ -74,16 +72,12 @@ public interface IOutputManager : IManager, IOutputDevice{}
 
 public interface IConnection
 {
+	public event EventHandler Updated;
+	public void Update();
 	string ConnectionString { get; }
-	public IInputManager? InputManager { get; }
-	public IOutputManager? OutputManager { get; }
+	public IManager? Manager { get; }
+	public void Close() { Manager?.RemoveConnection(this);}
 	public void SendEvent(MidiEvent midiEvent);
-
-	public void Close()
-	{
-		InputManager?.RemoveConnection(this);
-		OutputManager?.RemoveConnection(this);
-	}
 }
 
 

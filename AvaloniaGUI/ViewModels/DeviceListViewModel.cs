@@ -13,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
+using System.Linq;
+using static Grpc.Core.Metadata;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace AvaloniaGUI.ViewModels;
@@ -27,31 +29,13 @@ public partial class DeviceListViewModel : ComponentViewModel
 
 		DeviceManager.Instance.OnListUpdated += (s, e) =>
 		{
-			Dispatcher.UIThread.Post(() =>
-			{
-				DevicesList.Clear();
-				foreach (var device in DeviceManager.Instance.Devices.Values)
-				{
-					Console.WriteLine($"Device Added: {device.Name} on {device.ConnectionString}");
-					DevicesList.Add(device);
-				}
-				if (Context.SelectedDevice != null && DevicesList.Contains(Context.SelectedDevice))
-					SelectedDevice = Context.SelectedDevice;
-			});
+			Dispatcher.UIThread.Post(() => RefreshDeviceList());
+			
 		};
 
 		DeviceManager.Instance.DeviceUpdated += (s, e) =>
 		{
-			Dispatcher.UIThread.Post(() =>
-			{
-				DevicesList.Clear();
-				foreach (var device in DeviceManager.Instance.Devices.Values)
-				{
-					DevicesList.Add(device);
-				}
-				if (Context.SelectedDevice != null && DevicesList.Contains(Context.SelectedDevice))
-					SelectedDevice = Context.SelectedDevice;
-			});
+			Dispatcher.UIThread.Post(() => RefreshDeviceList());
 		};
 	}
 
@@ -59,10 +43,10 @@ public partial class DeviceListViewModel : ComponentViewModel
 		300,1200, 2400, 4800, 9600, 19200, 38400, 57600, 115200
 	};
 	public ObservableCollection<string> SerialPortList { get; } = new();
-	public ObservableCollection<Device> DevicesList { get; } = new();
+	public ObservableCollection<DeviceEntry> DevicesList { get; } = new();
 
 	[ObservableProperty]
-	private Device? _selectedDevice;
+	private DeviceEntry? _selectedDevice;
 
 	[ObservableProperty]
 	private string? _selectedPort;
@@ -89,10 +73,10 @@ public partial class DeviceListViewModel : ComponentViewModel
 	private void RefreshConnectedDevices()
 	{
 		DevicesList.Clear();
-		var connectedDevices = DeviceManager.Instance.Devices.Values;
-		foreach (var device in connectedDevices)
+		var connectedDevices = DeviceManager.Instance.Devices;
+		foreach (var entry in connectedDevices)
 		{
-			DevicesList.Add(device);
+			DevicesList.Add(entry);
 		}
 	}
 
@@ -109,8 +93,8 @@ public partial class DeviceListViewModel : ComponentViewModel
 	{
 		if (SelectedDevice != null)
 		{
-			Console.WriteLine($"Removing Device: {SelectedDevice.Name} on {SelectedDevice.ConnectionString}");
-			var connection = DeviceManager.Instance.GetConnection(SelectedDevice) as SerialConnection;
+			Console.WriteLine($"Removing Device: {SelectedDevice?.Device.Name} on {SelectedDevice?.Device.ConnectionString}");
+			var connection = SelectedDevice?.Connection as SerialConnection;
 			if (connection != null)
 			{
 				MMM.Instance.serialManager.RemoveConnection(connection);
@@ -125,11 +109,58 @@ public partial class DeviceListViewModel : ComponentViewModel
 	{
 
 	}
-	partial void OnSelectedDeviceChanged(Device? value)
+	partial void OnSelectedDeviceChanged(DeviceEntry? value)
 	{
 		if (SelectedDevice != null)
 		{
+			Console.WriteLine($"Context {value?.Connection.ConnectionString}");
 			Context.SelectedDevice = value;
+		}
+	}
+
+	private void RefreshDeviceList()
+	{
+		var tempDevContext = Context.SelectedDevice;
+		var currentDevices = DeviceManager.Instance.Devices.ToList();
+
+		// Remove devices not present anymore
+		for (int i = DevicesList.Count - 1; i >= 0; i--)
+		{
+			if (!currentDevices.Contains(DevicesList[i]))
+			{
+
+				Console.WriteLine($"Removed {DevicesList[i].Connection.ConnectionString}");
+				DevicesList.RemoveAt(i);
+			}
+		}
+
+		// Add or update devices
+		foreach (var entry in currentDevices)
+		{
+			var idx = DevicesList.IndexOf(entry);
+			if (idx == -1)
+			{
+				Console.WriteLine($"Device Added: {entry.Device.Name} on {entry.Device.ConnectionString}");
+				DevicesList.Add(entry);
+				if (tempDevContext?.Connection.ConnectionString == entry.Connection.ConnectionString &&
+					tempDevContext?.Device.SYSEX_DEV_ID == entry.Device.SYSEX_DEV_ID)
+				{
+					Context.SelectedDevice = entry;
+					SelectedDevice = entry;
+				}
+			}
+			else
+			{
+				// Optionally update the entry if needed (if DeviceEntry is mutable)
+				// DevicesList[idx] = entry;
+			}
+		}
+
+		Console.WriteLine($"XDeviceListViewModel Context SelectedDevice: {Context.SelectedDevice?.Device.Name} on {Context.SelectedDevice?.Device.ConnectionString}");
+
+		if (Context.SelectedDevice != null && DevicesList.Contains(Context.SelectedDevice.Value))
+		{
+			SelectedDevice = Context.SelectedDevice;
 		}
 	}
 }

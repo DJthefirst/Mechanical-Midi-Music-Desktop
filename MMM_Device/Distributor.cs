@@ -26,7 +26,7 @@ public class Distributor
     const int BOOL_NOTEOVERWRITE = 0x08;
 
 	//Local Atributes
-	public int? Index { get; set; } = null;
+	public int? Index { get; set; } = 0;
 	public int CurrentChannel { get; set; } = 0;
     public int CurrentInstrument { get; set; } = 0;
 
@@ -44,16 +44,21 @@ public class Distributor
     public int NumPolyphonicNotes { get; set; } = 1;
     public DistributionMethod DistributionMethod { get; set; } = DistributionMethod.RoundRobinBalance;
 
-    public Distributor(byte[] data)
+	public Distributor()
+	{
+		Console.WriteLine("Added a Distributor");
+	}
+
+	public Distributor(byte[] data)
     {
         Console.WriteLine("Added a Distributor");
         this.SetDistributor(data);
     }
 
     //Returns Distributor construct without ID
-    public List<byte> ToSerial()
+    public byte[] ToSerial()
     {
-        List<byte> distributorObj = new List<byte>();
+		byte[] distributorObj = new byte[NUM_CFG_BYTES];
 
         byte distributorBoolByte = 0;
         if (Muted) distributorBoolByte |= BOOL_MUTED;
@@ -64,8 +69,8 @@ public class Distributor
 
         //Cast Distributor Construct to uint8_t Array every MSB = 0 as per the Midi Protocal
         // (https://docs.google.com/spreadsheets/d/1AgS2-iZVLSL0w_MafbeReRx4u_9m_e4OTCsIhKC-QMg/edit?usp=sharing)
-        distributorObj[0] = 0; //Distributor ID MSB Generated in MsgHandler
-        distributorObj[1] = 0; //Distributor ID LSB Generated in MsgHandler
+		distributorObj[0] = (byte)(((Index ?? 0) >> 7) & 0x7F); //Distributor ID MSB Generated in MsgHandler
+		distributorObj[1] = (byte)(((Index ?? 0) >> 0) & 0x7F); //Distributor ID LSB Generated in MsgHandler
         distributorObj[2] = (byte)((Channels >> 14) & 0x03);
         distributorObj[3] = (byte)((Channels >> 7) & 0x7F);
         distributorObj[4] = (byte)((Channels >> 0) & 0x7F);

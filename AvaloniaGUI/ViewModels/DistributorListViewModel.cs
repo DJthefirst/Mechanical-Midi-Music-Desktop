@@ -28,10 +28,13 @@ public partial class DistributorListViewModel : ComponentViewModel
 				DistributorList.Clear();
 				if (Context.SelectedDevice is null) return;
 
-				var distributors = Context.SelectedDevice.Distributors;
-				foreach (var distributor in distributors)
+				var distributors = Context.SelectedDevice?.Device.Distributors;
+				if (distributors != null)
 				{
-					DistributorList.Add(distributor);
+					foreach (var distributor in distributors)
+					{
+						DistributorList.Add(distributor);
+					}
 				}
 			});
 		};
@@ -44,10 +47,13 @@ public partial class DistributorListViewModel : ComponentViewModel
 				DistributorList.Clear();
 				if (Context.SelectedDevice is null) return;
 				
-				var distributors = Context.SelectedDevice.Distributors;
-				foreach (var distributor in distributors)
+				var distributors = Context.SelectedDevice?.Device.Distributors;
+				if (distributors != null)
 				{
-					DistributorList.Add(distributor);
+					foreach (var distributor in distributors)
+					{
+						DistributorList.Add(distributor);
+					}
 				}
 			}
 		};
@@ -56,7 +62,7 @@ public partial class DistributorListViewModel : ComponentViewModel
 	public ObservableCollection<Distributor> DistributorList { get; } = new();
 
 	[ObservableProperty]
-	private Device? _selectedDevice;
+	private DeviceEntry? _selectedDevice;
 
 	[ObservableProperty]
 	private Distributor? _selectedDistributor;
@@ -76,13 +82,13 @@ public partial class DesignDistributorListViewModel : DistributorListViewModel
 		byte[] Distributor0 = [0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0x7F, 0x00, 0x01, 0x00, 0x01, 0x7F, 0x01, 0x00];
 		byte[] Distributor1 = [0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x7F, 0x7F, 0x00, 0x01, 0x00, 0x01, 0x7F, 0x01, 0x00];
 
-		SelectedDevice = new Device();
+		SelectedDevice = new DeviceEntry();
 		for (int i = 0; i < 5; i++)
 		{
 			var distributor0 = new Distributor(Distributor0);
 			var distributor1 = new Distributor(Distributor0);
-			SelectedDevice.Distributors.Add(distributor0);
-			SelectedDevice.Distributors.Add(distributor1);
+			SelectedDevice?.Device.Distributors.Add(distributor0);
+			SelectedDevice?.Device.Distributors.Add(distributor1);
 			DistributorList.Add(distributor0);
 			DistributorList.Add(distributor1);
 		}

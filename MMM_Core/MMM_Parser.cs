@@ -2,6 +2,7 @@
 using System.CodeDom.Compiler;
 using System.IO.Ports;
 using System.Reflection.Metadata;
+using System.Runtime.Serialization;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
 using MMM_Device;
@@ -105,8 +106,8 @@ public class MMM_Msg
 		   SysEx.ManufacturerID,
 		   0x7F, //source Destination  
            0x7F, //source Destination  
-           (byte)(destinationID >> 7),
-		   (byte)(destinationID & 0x7F),
+           (byte)(destinationID >> 7 & 0x7F),
+		   (byte)(destinationID >> 0 & 0x7F),
 		   msgType
 		};
 		byte[] tail = new byte[] { 0xF7 };
@@ -146,7 +147,7 @@ internal class MMM_Parser : IDisposable
 	}
 
 	public void OnEventReceived(object? sender, MidiEvent midiEvent)
-    {
+	{
 		// Check if event is SysEx
 		if (midiEvent is not NormalSysExEvent sysExEvent || sysExEvent.Data.Length < 5)
 		{
@@ -166,15 +167,15 @@ internal class MMM_Parser : IDisposable
 			return;
 		}
 
-        try
-        {
-            MMM_Msg sysExMsg = new MMM_Msg(midiEvent);
-            Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
-            ProcessMessage(sender, sysExMsg);
-        }
-        catch
-        {
-            Console.WriteLine($"Invalid MMM SysEx Msg: {BitConverter.ToString(sysExEvent.Data)}");
+		try
+		{
+			MMM_Msg sysExMsg = new MMM_Msg(midiEvent);
+			Console.WriteLine($"SysEx Inbound:  {BitConverter.ToString(sysExEvent.Data)}");
+			ProcessMessage(sender, sysExMsg);
+		}
+		catch (Exception ex)
+		{
+			Console.Error.WriteLine($"Invalid MMM SysEx Msg: {BitConverter.ToString(sysExEvent.Data)}. Error: {ex}");
 		}
 	}
 
@@ -309,6 +310,7 @@ internal class MMM_Parser : IDisposable
 		}
 		DeviceManager.Instance.AddDevice(connection, device);
 		SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
+		connection.Update();
 		//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
 	}
 
@@ -319,7 +321,8 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		DeviceManager.Instance.Devices[(connection, msg.Source())].Name = BitConverter.ToString(msg.Payload()[0..20]);
+		DeviceManager.Instance.Devices[connection][msg.Source()].Name = BitConverter.ToString(msg.Payload()[0..20]);
+		connection.Update();
 	}
 
 	private void HandleGetNumOfDistributors(object? sender, MMM_Msg msg)
@@ -335,7 +338,8 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		DeviceManager.Instance.Devices[(connection, msg.Source())].Distributors.Add(new Distributor(msg.Payload()));
+		DeviceManager.Instance.Devices[connection][msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
+		connection.Update();
 	}
 
 	private void HandleGetDistributorConstruct(object? sender, MMM_Msg msg, IConnection? connection)
@@ -345,12 +349,15 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		var device = DeviceManager.Instance.Devices[(connection, msg.Source())];
+		var device = DeviceManager.Instance.Devices[connection][msg.Source()];
 		var distributor = new Distributor(msg.Payload());
 
 		// Check if distributors contains a distributor with matching Index
 		if (!device.Distributors.Any(d => d.Index == distributor.Index))
+		{
 			device.AddDistributor(distributor);
+			connection.Update();
+		}
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -375,7 +382,7 @@ internal class MMM_Parser : IDisposable
             var eventArgs = new MidiEventReceivedEventArgs(midiEvent); // Wrap the MidiEvent in the correct EventArgs type  
 
 			// Fwd message response back to sender
-			if (sender is IConnection connection && connection.OutputManager != null) 
+			if (sender is IConnection connection && connection.Manager != null) 
             {
 				connection.SendEvent(midiEvent);
             }

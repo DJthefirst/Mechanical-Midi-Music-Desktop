@@ -21,15 +21,15 @@ public partial class DeviceManagerViewModel : ComponentViewModel
 			if (e.PropertyName == nameof(Context.SelectedDevice))
 			{
 				SelectedDevice = Context.SelectedDevice;
-				Name = SelectedDevice?.Name ?? string.Empty;
-				Id = SelectedDevice?.SYSEX_DEV_ID ?? 0;
-				OmniMode = SelectedDevice?.OmniMode ?? false;
+				Name = SelectedDevice?.Device.Name ?? string.Empty;
+				Id = SelectedDevice?.Id ?? 0;
+				OmniMode = SelectedDevice?.Device.OmniMode ?? false;
 			}
 		};
 	}
 
 	[ObservableProperty]
-	private Device? _selectedDevice;
+	private DeviceEntry? _selectedDevice;
 
 	[ObservableProperty]
 	private int _id = 0;
@@ -48,10 +48,13 @@ public partial class DeviceManagerViewModel : ComponentViewModel
 		device.SYSEX_DEV_ID = Id;
 		device.OmniMode = OmniMode;
 
-		IConnection? connection = SelectedDevice != null ? DeviceManager.Instance.GetConnection(SelectedDevice) : null;
+		IConnection? connection = SelectedDevice?.Connection;
 		if (connection == null) return;
 
 		MMM_Msg msg = MMM_Msg.GenerateSysEx(Id, SysEx.SetDeviceName, device.GetDeviceName());
+		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+
+		msg = MMM_Msg.GenerateSysEx(Id, SysEx.GetDeviceConstruct, []);
 		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
 	}
 }

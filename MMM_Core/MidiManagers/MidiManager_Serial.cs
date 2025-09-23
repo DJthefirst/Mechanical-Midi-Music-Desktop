@@ -10,9 +10,15 @@ public class SerialConnection : SerialPort, IConnection
 {
 	public SerialConnection(string portName, int baudRate = 115200, Parity parity = Parity.None, int dataBits = 8, StopBits stopBits = StopBits.One)
 	: base(portName, baudRate, parity, dataBits, stopBits) { }
+
+	public event EventHandler Updated = delegate { };
+	public void Update()
+	{
+		Console.WriteLine($"Connection {PortName} Updated");
+		Updated.Invoke(this, EventArgs.Empty);
+	}
 	public string ConnectionString => PortName;
-	public IInputManager InputManager => MidiSerialManager.Instance;
-	public IOutputManager OutputManager => MidiSerialManager.Instance;
+	public IManager Manager => MidiSerialManager.Instance;
 	public void SendEvent(MidiEvent midiEvent)
 	{
 		var m2bConverter = new MidiEventToBytesConverter();
