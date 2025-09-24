@@ -30,24 +30,36 @@
                 Distruibutor Manager
             </Label>
             <Grid ColumnDefinitions="*,*">
-                <StackPanel
+                <Grid
                     Grid.Column="0"
                     Margin="0"
-                    Orientation="Horizontal">
-                    <Label VerticalAlignment="Center" Foreground="White">
+                    ColumnDefinitions="auto,*">
+                    <Label
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Foreground="White">
                         Channels
                     </Label>
-                    <TextBox Text="{Binding Channels, Mode=TwoWay}" />
-                </StackPanel>
-                <StackPanel
+                    <TextBox
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        Text="{Binding StrChannels, Mode=TwoWay}" />
+                </Grid>
+                <Grid
                     Grid.Column="1"
                     Margin="0"
-                    Orientation="Horizontal">
-                    <Label VerticalAlignment="Center" Foreground="White">
+                    ColumnDefinitions="auto,*">
+                    <Label
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        Foreground="White">
                         Instruments
                     </Label>
-                    <TextBox Text="{Binding Instruments, Mode=TwoWay}" />
-                </StackPanel>
+                    <TextBox
+                        Grid.Column="1"
+                        Margin="0,0,10,0"
+                        Text="{Binding StrInstruments, Mode=TwoWay}" />
+                </Grid>
             </Grid>
             <StackPanel Margin="0" Orientation="Horizontal">
                 <Label VerticalAlignment="Center" Foreground="White">

@@ -7,6 +7,7 @@ using MMM_Core;
 using MMM_Device;
 using System;
 using System.Xml.Linq;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace AvaloniaGUI.ViewModels;
 
@@ -21,8 +22,8 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 			if (e.PropertyName == nameof(Context.SelectedDistributor))
 			{
 				SelectedDistributor = Context.SelectedDistributor;
-				Channels = (SelectedDistributor?.Channels ?? 0);
-				Instruments = (SelectedDistributor?.Instruments ?? 0);
+				StrChannels = NumberToListedItems(SelectedDistributor?.Channels ?? 0);
+				StrInstruments = NumberToListedItems(SelectedDistributor?.Instruments ?? 0);
 				Distribution = SelectedDistributor?.DistributionMethod ?? DistributionMethod.RoundRobin;
 				Damper = SelectedDistributor?.DamperPedal ?? false;
 				Polyphonic = SelectedDistributor?.Polyphonic ?? false;
@@ -41,11 +42,15 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	[ObservableProperty]
 	private Distributor? _selectedDistributor;
 
+	[NotifyPropertyChangedFor(nameof(Channels))]
 	[ObservableProperty]
-	private int _channels = 0;
+	private string _strChannels = "";
+	private int Channels => UpdateChannels();
 
+	[NotifyPropertyChangedFor(nameof(Instruments))]
 	[ObservableProperty]
-	private int _instruments = 0;
+	private string _strInstruments = "";
+	private int Instruments => UpdateInstruments();
 
 	[ObservableProperty]
 	private DistributionMethod _distribution = DistributionMethod.RoundRobin;
@@ -162,6 +167,105 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.GetDeviceConstruct, []);
 		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
 	}
+
+
+	public int UpdateChannels()
+	{
+		int result = Math.Clamp(ListedItemsToNumber(StrChannels), 0, 0xFFFF);
+		StrChannels = NumberToListedItems(result);
+		Console.WriteLine($"Parsed Channels: {StrChannels} -> {result}");
+		return result;
+	}
+	public int UpdateInstruments()
+	{
+		int result = ListedItemsToNumber(StrInstruments); //TODO Fix result size uint32
+		StrInstruments = NumberToListedItems(result);
+		Console.WriteLine($"Parsed Instruments: {StrInstruments} -> {result}");
+		return result;
+	}
+
+	public static int ListedItemsToNumber(object? input)
+	{
+		if (input is int x)
+			return x;
+		if (input is not string s || string.IsNullOrWhiteSpace(s))
+			return 0;
+
+		// Handle hex, binary, or bitwise expressions
+		if (System.Text.RegularExpressions.Regex.IsMatch(s, @"0x|0b|[|&]", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+		{
+			try
+			{
+				if (!System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\d\s|&xob]+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+					return 0;
+				s = System.Text.RegularExpressions.Regex.Replace(s, @"0b([01]+)", m => Convert.ToInt32(m.Groups[1].Value, 2).ToString());
+				var eval = new System.Data.DataTable().Compute(s, "");
+				return Convert.ToInt32(eval);
+			}
+			catch { return 0; }
+		}
+
+		int result = 0;
+		var rangeRegex = new System.Text.RegularExpressions.Regex(@"(\d+)\s*-\s*(\d+)", System.Text.RegularExpressions.RegexOptions.Compiled);
+		var numRegex = new System.Text.RegularExpressions.Regex(@"(?<=^|[^-\s\d]|\d\s)\s*(\d+)\s*(?=[^-\s\d]|\s\d|$)", System.Text.RegularExpressions.RegexOptions.Compiled);
+
+		foreach (System.Text.RegularExpressions.Match m in rangeRegex.Matches(s))
+		{
+			if (int.TryParse(m.Groups[1].Value, out int start) &&
+				int.TryParse(m.Groups[2].Value, out int end) &&
+				start > 0 && end > 0 && start <= end && end <= 32)
+			{
+				for (int i = start; i <= end; i++)
+					result |= 1 << (i - 1);
+			}
+		}
+
+		foreach (System.Text.RegularExpressions.Match m in numRegex.Matches(s))
+		{
+			if (int.TryParse(m.Groups[1].Value, out int n) && n > 0 && n <= 32)
+				result |= 1 << (n - 1);
+		}
+
+		return result;
+	}
+
+	/// <summary>
+	/// Converts a bitmask integer into a human-readable string listing the set bits as ranges or single values.
+	/// For example, 0b1011 (11) becomes "1-2,4".
+	/// </summary>
+	/// <param name="num">The bitmask integer to convert.</param>
+	/// <returns>A string representing the set bits as a comma-separated list and ranges.</returns>
+	public static string NumberToListedItems(int num)
+	{
+		if (num == 0) return string.Empty; // No bits set, return empty string.
+		var result = new System.Text.StringBuilder();
+		int i = 1; // Bit position (1-based)
+		while (num != 0)
+		{
+			// Skip unset bits
+			if ((num & 1) == 0)
+			{
+				num >>= 1;
+				i++;
+				continue;
+			}
+			int start = i; // Start of a run of set bits
+						   // Find the end of the run of consecutive set bits
+			while (((num >> 1) & 1) == 1)
+			{
+				num >>= 1;
+				i++;
+			}
+			int end = i; // End of the run
+			if (result.Length > 0) result.Append(','); // Add comma if not the first range
+													   // Append either a single value or a range
+			result.Append(start == end ? $"{start}" : $"{start}-{end}");
+			num >>= 1;
+			i++;
+		}
+		return result.ToString();
+	}
+
 }
 
 
