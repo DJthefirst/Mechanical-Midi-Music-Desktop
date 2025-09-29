@@ -6,8 +6,6 @@ using CommunityToolkit.Mvvm.Input;
 using MMM_Core;
 using MMM_Device;
 using System;
-using System.Xml.Linq;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace AvaloniaGUI.ViewModels;
 
@@ -24,7 +22,7 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 				SelectedDistributor = Context.SelectedDistributor;
 				StrChannels = NumberToListedItems(SelectedDistributor?.Channels ?? 0);
 				StrInstruments = NumberToListedItems(SelectedDistributor?.Instruments ?? 0);
-				Distribution = SelectedDistributor?.DistributionMethod ?? DistributionMethod.RoundRobin;
+				Distribution = SelectedDistributor?.Method ?? DistributionMethod.RoundRobin;
 				Damper = SelectedDistributor?.DamperPedal ?? false;
 				Polyphonic = SelectedDistributor?.Polyphonic ?? false;
 				NoteOverwrite = SelectedDistributor?.NoteOverwrite ?? false;
@@ -33,7 +31,6 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 				NumPolyphonicNotes = SelectedDistributor?.NumPolyphonicNotes ?? 1;
 			}
 		};
-
 	}
 
 	[ObservableProperty]
@@ -76,15 +73,13 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	[RelayCommand]
 	public void Update()
 	{
-		Device? device = Context.SelectedDevice?.Device;
-		IConnection? connection = device != null ? DeviceManager.Instance.GetConnection(device) : null;
-		if (device == null || connection == null || SelectedDistributor == null) return;
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
 
 		Distributor distributor = new Distributor();
 		distributor.Index = SelectedDistributor.Index;
 		distributor.Channels = Channels;
 		distributor.Instruments = Instruments;
-		distributor.DistributionMethod = Distribution;
+		distributor.Method = Distribution;
 		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
@@ -93,27 +88,25 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.NumPolyphonicNotes = NumPolyphonicNotes;
 
 		MMM_Msg msg = MMM_Msg.GenerateSysEx(
-			device.SYSEX_DEV_ID,
+			deviceEntry.Id,
 			SysEx.SetDistributorConstruct,
 			distributor.ToSerial());
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 
-		msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.GetDeviceConstruct, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.GetNumOfDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 	}
 
 	[RelayCommand]
 	public void Add()
 	{
-		Device? device = Context.SelectedDevice?.Device;
-		IConnection? connection = Context.SelectedDevice?.Connection;
-		if (device == null || connection == null) return;
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
 
 		Distributor distributor = new Distributor();
-		distributor.Index = device.Distributors.Count;
+		distributor.Index = deviceEntry.Device.Distributors.Count;
 		distributor.Channels = Channels;
 		distributor.Instruments = Instruments;
-		distributor.DistributionMethod = Distribution;
+		distributor.Method = Distribution;
 		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
@@ -121,84 +114,91 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.MaxNote = MaxNote;
 		distributor.NumPolyphonicNotes = NumPolyphonicNotes;
 
-		MMM_Msg msg = MMM_Msg.GenerateSysEx(
-			device.SYSEX_DEV_ID,
-			SysEx.AddDistributor,
-			distributor.ToSerial()
-		);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		deviceEntry.Device.NumDistributors += 1;
+		Context.SelectedDistributor = distributor;
 
-		msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.GetDeviceConstruct, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		MMM_Msg msg = MMM_Msg.GenerateSysEx(
+			deviceEntry.Id,
+			SysEx.AddDistributor,
+			distributor.ToSerial());
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
+
+		msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.GetNumOfDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 	}
 
 	[RelayCommand]
 	public void Remove()
 	{
-		Device? device = Context.SelectedDevice?.Device;
-		IConnection? connection = Context.SelectedDevice?.Connection;
-		if (device == null || connection == null || SelectedDistributor == null) return;
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
 
 		// Fix: Convert int? to byte safely, defaulting to 0 if null
 		int index = SelectedDistributor.Index ?? 0;
 
 		MMM_Msg msg = MMM_Msg.GenerateSysEx(
-		device.SYSEX_DEV_ID,
-		SysEx.RemoveDistributor,
-		[(byte)((index >> 7) & 0x7F), (byte)((index >> 0) & 0x7F)]
-		);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+			deviceEntry.Id,
+			SysEx.RemoveDistributor,
+			[(byte)((index >> 7) & 0x7F), (byte)((index >> 0) & 0x7F)]);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 
-		device.Distributors.Clear();
-		msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.GetDeviceConstruct, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.GetNumOfDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 	}
 
 	[RelayCommand]
 	public void Clear()
 	{
-		Device? device = Context.SelectedDevice?.Device;
-		IConnection? connection = Context.SelectedDevice?.Connection;
-		if (device == null || connection == null) return;
-		MMM_Msg msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.RemoveAllDistributors, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
 
-		device.Distributors.Clear();
-		msg = MMM_Msg.GenerateSysEx(device.SYSEX_DEV_ID, SysEx.GetDeviceConstruct, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		MMM_Msg msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.RemoveAllDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
+
+		msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.GetNumOfDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 	}
-
 
 	public int UpdateChannels()
 	{
 		int result = Math.Clamp(ListedItemsToNumber(StrChannels), 0, 0xFFFF);
 		StrChannels = NumberToListedItems(result);
-		Console.WriteLine($"Parsed Channels: {StrChannels} -> {result}");
 		return result;
 	}
 	public int UpdateInstruments()
 	{
 		int result = ListedItemsToNumber(StrInstruments); //TODO Fix result size uint32
 		StrInstruments = NumberToListedItems(result);
-		Console.WriteLine($"Parsed Instruments: {StrInstruments} -> {result}");
 		return result;
 	}
 
+	/// <summary>
+	/// Converts a user input (string or int) representing a set of items (channels/instruments)
+	/// into a bitmask integer. Supports ranges (e.g. "1-3"), individual numbers (e.g. "5"),
+	/// and bitwise/hex/binary expressions (e.g. "0xF", "0b1011", "1|2|4").
+	/// </summary>
+	/// <param name="input">The input to parse (string or int).</param>
+	/// <returns>An integer bitmask representing the selected items.</returns>
 	public static int ListedItemsToNumber(object? input)
 	{
+		// If input is already an int, return as is
 		if (input is int x)
 			return x;
+		// If input is not a string or is empty/whitespace, return 0
 		if (input is not string s || string.IsNullOrWhiteSpace(s))
 			return 0;
 
-		// Handle hex, binary, or bitwise expressions
-		if (System.Text.RegularExpressions.Regex.IsMatch(s, @"0x|0b|[|&]", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+		// Handle hex, binary, or bitwise expressions (e.g. "0xF", "0b1011", "1|2|4")
+		if (System.Text.RegularExpressions.Regex.IsMatch(s, @"0x|0b", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
 		{
 			try
 			{
-				if (!System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\d\s|&xob]+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+				// Only allow valid characters for safety
+				if (!System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\d\s|&xobXa-fA-F]+$", System.Text.RegularExpressions.RegexOptions.IgnoreCase))
 					return 0;
+				// Convert binary literals (e.g. "0b1011") to decimal
 				s = System.Text.RegularExpressions.Regex.Replace(s, @"0b([01]+)", m => Convert.ToInt32(m.Groups[1].Value, 2).ToString());
+				// Convert hex literals (e.g. "0xFF") to decimal
+				s = System.Text.RegularExpressions.Regex.Replace(s, @"0x([0-9A-Fa-f]+)", m => Convert.ToInt32(m.Groups[1].Value, 16).ToString());
+				// Evaluate the expression using DataTable.Compute
 				var eval = new System.Data.DataTable().Compute(s, "");
 				return Convert.ToInt32(eval);
 			}
@@ -206,9 +206,12 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		}
 
 		int result = 0;
+		// Regex to match ranges like "1-3"
 		var rangeRegex = new System.Text.RegularExpressions.Regex(@"(\d+)\s*-\s*(\d+)", System.Text.RegularExpressions.RegexOptions.Compiled);
+		// Regex to match individual numbers not part of a range
 		var numRegex = new System.Text.RegularExpressions.Regex(@"(?<=^|[^-\s\d]|\d\s)\s*(\d+)\s*(?=[^-\s\d]|\s\d|$)", System.Text.RegularExpressions.RegexOptions.Compiled);
 
+		// Parse and set bits for all ranges found
 		foreach (System.Text.RegularExpressions.Match m in rangeRegex.Matches(s))
 		{
 			if (int.TryParse(m.Groups[1].Value, out int start) &&
@@ -220,6 +223,7 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 			}
 		}
 
+		// Parse and set bits for all individual numbers found
 		foreach (System.Text.RegularExpressions.Match m in numRegex.Matches(s))
 		{
 			if (int.TryParse(m.Groups[1].Value, out int n) && n > 0 && n <= 32)

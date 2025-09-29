@@ -3,6 +3,7 @@ using AvaloniaGUI.Factories;
 using AvaloniaGUI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System;
 using MMM_Core;
 using MMM_Device;
 using MMM_Server.Grpc_Services;
@@ -44,18 +45,19 @@ public partial class DeviceManagerViewModel : ComponentViewModel
 	public void Update()
 	{
 		Device device = new Device();
-		device.Name = Name;
-		device.SYSEX_DEV_ID = Id;
+		// Pad Name to exactly 20 characters with spaces
+		device.Name = Name.Length >= 20 ? Name.Substring(0, 20) : Name.PadRight(20, ' ');
+		device.Id = Id;
 		device.OmniMode = OmniMode;
 
 		IConnection? connection = SelectedDevice?.Connection;
 		if (connection == null) return;
 
 		MMM_Msg msg = MMM_Msg.GenerateSysEx(Id, SysEx.SetDeviceName, device.GetDeviceName());
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		connection.SendEvent(msg.ToMidiEvent());
 
 		msg = MMM_Msg.GenerateSysEx(Id, SysEx.GetDeviceConstruct, []);
-		DeviceManager.Instance.Update(connection, msg.ToMidiEvent());
+		connection.SendEvent(msg.ToMidiEvent());
 	}
 }
 

@@ -1,4 +1,8 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.IO.Ports;
 
 namespace MMM_Device;
@@ -22,76 +26,104 @@ public enum PlatformType
 };
 
 
-public class Device
+public partial class Device : ObservableObject
 {
-    //Device Construct Constants
-    const byte NUM_NAME_BYTES = 20;
-    const byte NUM_CFG_BYTES = 32;
-    const byte BOOL_OMNIMODE = 0x01;
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Constants
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	const byte NUM_NAME_BYTES = 20;
+	const byte NUM_CFG_BYTES = 32;
+	const byte BOOL_OMNIMODE = 0x01;
 
-	public Device(){}
-    public Device(byte[] deviceConstruct) 
-    { 
-        this.SetDeviceConstruct(deviceConstruct); 
-    }
-
-	public event EventHandler<Device> DeviceUpdated;
-	public string ConnectionString { get; set; } = "Unknown";
-	public string Name { get; set; } = "New Device";
-    public bool OmniMode { get; set; } = false;
-
-    //Interupt frequency. A smaller resolution produces more accurate notes but leads to instability.
-    public int TIMER_RESOLUTION = 8;
-
-    //---------- Device Configuration ----------
-
-    //Instrument type
-    public InstrumentType INSTRUMENT_TYPE { get; set; } = InstrumentType.PWM;
-    //Platform type
-    public PlatformType PLATFORM_TYPE { get; set; } = PlatformType.ESP32;
-    //Absolute max number of Polyphonic notes is 16
-    public byte MAX_POLYPHONIC_NOTES { get; set; } = 1;
-    //Absolute max number of Instruments is 32
-    public byte MAX_NUM_INSTRUMENTS { get; set; } = 1;
-	//Absolute max number of SubInstruments is 127
-	public byte NUM_SUBINSTRUMENTS { get; set; } = 1;
-	//Absolute Lowest Note Min=0
-	public byte MIN_MIDI_NOTE { get; set; } = 0;
-    //Absolute Highest Note Max=127
-    public byte MAX_MIDI_NOTE { get; set; } = 127;
-    //A 14 bit number Representing this Devices ID
-    public int SYSEX_DEV_ID { get; set; } = 0x0001;
-	//Firmware Version 14bit
-	public int FIRMWARE_VERSION { get; set; } = 0;
-
-	private List<Distributor> _distributors = new List<Distributor>();
-	public List<Distributor> Distributors
+	public Device() { }
+	public Device(byte[] deviceConstruct)
 	{
-		get => _distributors;
+		this.SetDeviceConstruct(deviceConstruct);
 	}
 
-    public void AddDistributor(Distributor distributor)
-    {
-        _distributors.Add(distributor);
-        DeviceUpdated.Invoke(this, this);
+
+
+	//Interupt frequency. A smaller resolution produces more accurate notes but leads to instability.
+	public int TIMER_RESOLUTION = 8;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Implied Values
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	[ObservableProperty]
+	private string _connectionString = "Unknown";
+	[ObservableProperty]
+	private int _numDistributors = 0;
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Explicit Values
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	[ObservableProperty]
+	private int _id = 0x0001;
+	[ObservableProperty]
+	private string _name = "New Device";
+	[ObservableProperty]
+	private bool _omniMode = false;
+	[ObservableProperty]
+	private byte _maxPolyphonicNotes = 1;
+	[ObservableProperty]
+	private byte _maxNumInstruments = 1;
+	[ObservableProperty]
+	private byte _numSubInstruments = 1;
+	[ObservableProperty]
+	private byte _minMidiNote = 0;
+	[ObservableProperty]
+	private byte _maxMidiNote = 127;
+
+	[ObservableProperty]
+	private InstrumentType _instrument = InstrumentType.PWM;
+	[ObservableProperty]
+	private PlatformType _platform = PlatformType.ESP32;
+	[ObservableProperty]
+	private int _firmwareVersion = 0;
+
+	public ObservableCollection<Distributor> Distributors { get; } = new();
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	//Methods
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	public void AddDistributor(Distributor distributor)
+	{
+		Distributors.Add(distributor);
 	}
 
-    private void SetDeviceBoolean(byte deviceBoolByte)
-    {
-        OmniMode = ((deviceBoolByte & 0x01) != 0);
-    }
+	public void AddDistributor(byte[] bytes)
+	{
+		Distributor distributor = new(bytes);
+		if(distributor.Index is int idx && idx < Distributors.Count)
+		{
+			Distributors[idx] = distributor;
+		}
+		else {
+			Distributors.Add(distributor);
+		}		
+	}
 
-    public void SetDeviceConstruct(byte[] deviceObj)
-    {
-        SYSEX_DEV_ID = (deviceObj[0] << 7) | (deviceObj[1] << 0);
-        SetDeviceBoolean(deviceObj[2]);
-        MAX_NUM_INSTRUMENTS = deviceObj[3];
-		NUM_SUBINSTRUMENTS = deviceObj[4];
-		INSTRUMENT_TYPE = (InstrumentType)deviceObj[5];
-        PLATFORM_TYPE = (PlatformType)deviceObj[6];
-        MIN_MIDI_NOTE = deviceObj[7];
-        MAX_MIDI_NOTE = deviceObj[8];
-        FIRMWARE_VERSION = (deviceObj[9] << 7) | (deviceObj[10] << 0);
+	private void SetDeviceBoolean(byte deviceBoolByte)
+	{
+		OmniMode = ((deviceBoolByte & 0x01) != 0);
+	}
+
+	public void SetDeviceConstruct(byte[] deviceObj)
+	{
+		Id = (deviceObj[0] << 7) | (deviceObj[1] << 0);
+		SetDeviceBoolean(deviceObj[2]);
+		MaxNumInstruments = deviceObj[3];
+		NumSubInstruments = deviceObj[4];
+		Instrument = (InstrumentType)deviceObj[5];
+		Platform = (PlatformType)deviceObj[6];
+		MinMidiNote = deviceObj[7];
+		MaxMidiNote = deviceObj[8];
+		FirmwareVersion = (deviceObj[9] << 7) | (deviceObj[10] << 0);
 
 		Name = System.Text.Encoding.ASCII
 			.GetString(deviceObj.AsSpan(12, NUM_NAME_BYTES))
@@ -143,28 +175,29 @@ public class Device
 	}
 
 	public byte[] GetDeviceConstruct()
-    {
+	{
 		byte[] deviceObj = new byte[NUM_CFG_BYTES];
 
-        deviceObj[0] = (byte)((SYSEX_DEV_ID >> 7) & 0x7F); //Device ID MSB
-        deviceObj[1] = (byte)((SYSEX_DEV_ID >> 0) & 0x7F); //Device ID LSB
-        deviceObj[2] = (byte)GetDeviceBoolean();
-        deviceObj[3] = (byte)MAX_NUM_INSTRUMENTS;
-		deviceObj[4] = (byte)NUM_SUBINSTRUMENTS;
-		deviceObj[5] = (byte)INSTRUMENT_TYPE;
-        deviceObj[6] = (byte)PLATFORM_TYPE;
-        deviceObj[7] = (byte)MIN_MIDI_NOTE;
-        deviceObj[8] = (byte)MAX_MIDI_NOTE;
-        deviceObj[9] = (byte)((FIRMWARE_VERSION >> 7) & 0x7F);
-        deviceObj[10] = (byte)((FIRMWARE_VERSION >> 0) & 0x7F);
+		// Use backing fields and properties instead of undefined constants
+		deviceObj[0] = (byte)((Id >> 7) & 0x7F); //Device ID MSB
+		deviceObj[1] = (byte)((Id >> 0) & 0x7F); //Device ID LSB
+		deviceObj[2] = (byte)GetDeviceBoolean();
+		deviceObj[3] = MaxNumInstruments;
+		deviceObj[4] = NumSubInstruments;
+		deviceObj[5] = (byte)Instrument;
+		deviceObj[6] = (byte)Platform;
+		deviceObj[7] = MinMidiNote;
+		deviceObj[8] = MaxMidiNote;
+		deviceObj[9] = (byte)((FirmwareVersion >> 7) & 0x7F);
+		deviceObj[10] = (byte)((FirmwareVersion >> 0) & 0x7F);
 
-        for (int i = 0; i < 20; i++)
-        {
-            if (Name.Length > i) deviceObj[12 + i] = (byte)Name.ToCharArray()[i];
-            else deviceObj[12 + i] = 0;
-        }
+		for (int i = 0; i < NUM_NAME_BYTES; i++)
+		{
+			if (Name.Length > i) deviceObj[12 + i] = (byte)Name[i];
+			else deviceObj[12 + i] = 0x20; //Hex for space
+		}
 
-        return deviceObj;
-    }
+		return deviceObj;
+	}
 }
 

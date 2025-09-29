@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using static MMM_Core.DeviceEntry;
@@ -87,72 +88,51 @@ public class DeviceManager
 
 	public DeviceCollection Devices { get; private set; } = new();
 
-	public event EventHandler<DeviceCollection>? OnListUpdated;
-	public event EventHandler<DeviceEntry>? DeviceUpdated;
+	public event EventHandler<DeviceCollection>? OnDeviceListChanged;
+	public event EventHandler<DeviceEntry>? OnDeviceChanged;
 
+	internal void HandleDeviceConstruct(IConnection connection, byte[] construct)
+	{
+		Device temp = new Device(construct);
+		temp.ConnectionString = Device.GetConnectionString(connection);
+
+		// Check that the connection exists and the device does not exist yet
+		if (!Devices.ContainsKey(connection) || !Devices[connection].ContainsKey(temp.Id))
+		{
+			AddDevice(connection, temp);
+			return;
+		}
+		Devices[connection][temp.Id].SetDeviceConstruct(construct);
+	}
 	internal void AddDevice(IConnection connection, Device device)
 	{
 		if (!Devices.ContainsKey(connection))
 			Devices[connection] = new Dictionary<int, Device>();
 
-		device.DeviceUpdated += UpdateDevice;
-		connection.Updated += (sender, args) =>
+		Devices[connection].Add(device.Id, device);
+
+		device.PropertyChanged += (sender, args) =>
 		{
-			DeviceUpdated?.Invoke(connection, new DeviceEntry(connection, device.SYSEX_DEV_ID, device));
+			OnDeviceChanged?.Invoke(this, new DeviceEntry(connection, device.Id, device));
 		};
-		Devices[connection][device.SYSEX_DEV_ID] = device;
-		OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
-	}
-
-	private void UpdateDevice(object? sender, Device e)
-	{
-		if (sender is not Device device)
-			return;
-
-		// Find the connection and device id for the updated device
-		if (Devices.Any(entry => entry.Device == device))
-		{
-			OnListUpdated?.Invoke(this, Devices);
-		}
-	}
-
-	public void Update(IConnection connection, Melanchall.DryWetMidi.Core.MidiEvent midiEvent)
-	{
-		connection.SendEvent(midiEvent);
-		OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
+		
 	}
 
 	public void RemoveDevice(IConnection connection, Device device)
 	{
-		if (Devices.TryGetValue(connection, out var devDict) && devDict.Remove(device.SYSEX_DEV_ID))
+		if (Devices.TryGetValue(connection, out var devDict) && devDict.Remove(device.Id))
 		{
 			if (devDict.Count == 0)
 				Devices.Remove(connection);
-			OnListUpdated?.Invoke(this, GetDevicesForConnection(connection));
+			OnDeviceListChanged?.Invoke(this, Devices);
 		}
 	}
-
 	internal void CloseConnection(IConnection connection)
 	{
 		if (Devices.Remove(connection))
 		{
-			OnListUpdated?.Invoke(this, Devices);
+			OnDeviceListChanged?.Invoke(this, Devices);
 		}
-	}
-
-	private DeviceCollection GetDevicesForConnection(IConnection connection)
-	{
-		var result = new Dictionary<IConnection, Dictionary<int, Device>>();
-		if (Devices.TryGetValue(connection, out var devDict))
-		{
-			result[connection] = new Dictionary<int, Device>(devDict);
-		}
-		return new DeviceCollection(result);
-	}
-
-	public IConnection? GetConnection(Device device)
-	{
-		return Devices.FirstOrDefault(entry => entry.Device == device).Connection;
 	}
 }
 

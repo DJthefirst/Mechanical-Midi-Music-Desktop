@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia.Metadata;
+using Avalonia.Threading;
 using AvaloniaGUI.Data;
 using AvaloniaGUI.Factories;
 using AvaloniaGUI.Services;
@@ -16,26 +17,17 @@ public partial class DistributorListViewModel : ComponentViewModel
 {
 	public SessionContext Context => SessionContext.Instance;
 
+	private DeviceEntry? _lastSelectedDeviceEntry;
+	private event EventHandler? _distributorsChangedHandler;
+
 	public DistributorListViewModel() : base(PageComponentNames.DeviceList)
 	{
 		// Initialize SelectedDevice and DistributorList if a device is already selected
-		DeviceManager.Instance.DeviceUpdated += (s, e) =>
+		DeviceManager.Instance.OnDeviceChanged += (s, e) =>
 		{
 			Dispatcher.UIThread.Post(() =>
 			{
-				if (Context.SelectedDevice != null)
-				SelectedDevice = Context.SelectedDevice;
-				DistributorList.Clear();
-				if (Context.SelectedDevice is null) return;
-
-				var distributors = Context.SelectedDevice?.Device.Distributors;
-				if (distributors != null)
-				{
-					foreach (var distributor in distributors)
-					{
-						DistributorList.Add(distributor);
-					}
-				}
+				updateDistributors();
 			});
 		};
 
@@ -43,20 +35,65 @@ public partial class DistributorListViewModel : ComponentViewModel
 		{
 			if (e.PropertyName == nameof(Context.SelectedDevice))
 			{
-				SelectedDevice = Context.SelectedDevice;
-				DistributorList.Clear();
-				if (Context.SelectedDevice is null) return;
-				
-				var distributors = Context.SelectedDevice?.Device.Distributors;
-				if (distributors != null)
+				updateDistributors();
+
+				Console.WriteLine("Log1");
+
+				// Unsubscribe from previous device's distributors changed event
+				if (_lastSelectedDeviceEntry?.Device.Distributors is { } oldDistributors)
 				{
-					foreach (var distributor in distributors)
-					{
-						DistributorList.Add(distributor);
-					}
+					oldDistributors.CollectionChanged -= OnDistributorsChangedHandler;
+					Console.WriteLine("Log2");
+				}
+
+				// Subscribe to new device's distributors changed event
+				_lastSelectedDeviceEntry = Context.SelectedDevice;
+				if (_lastSelectedDeviceEntry?.Device.Distributors is { } newDistributors)
+				{
+					newDistributors.CollectionChanged += OnDistributorsChangedHandler;
+					Console.WriteLine("Log3");
 				}
 			}
 		};
+	}
+
+
+	private void OnDistributorsChangedHandler(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+	{
+		updateDistributors();
+		Console.WriteLine("Log4");
+	}
+	private void updateDistributors()
+	{
+		SelectedDevice = Context.SelectedDevice;
+
+		DistributorList.Clear();
+		if (Context.SelectedDevice is null) return;
+
+		var distributors = Context.SelectedDevice?.Device.Distributors;
+		if (distributors != null)
+		{
+			foreach (var distributor in distributors)
+			{
+				DistributorList.Add(distributor);
+			}
+		}
+
+		if (Context.SelectedDevice?.Device.NumDistributors != DistributorList.Count) return;
+		if (Context.SelectedDistributor?.Index is int idx && idx >= 0 && idx < DistributorList.Count)
+		{
+			SelectedDistributor = DistributorList[idx];
+			Context.SelectedDistributor = SelectedDistributor;
+		}
+		else if (DistributorList.Count > 0)
+		{
+			SelectedDistributor = DistributorList[DistributorList.Count - 1];
+			Context.SelectedDistributor = SelectedDistributor;
+		}
+		else
+		{
+			//SelectedDistributor = null;
+		}
 	}
 
 	public ObservableCollection<Distributor> DistributorList { get; } = new();
@@ -69,7 +106,8 @@ public partial class DistributorListViewModel : ComponentViewModel
 
 	partial void OnSelectedDistributorChanged(Distributor? value)
 	{
-		Context.SelectedDistributor = value;
+		if(value != null)
+			Context.SelectedDistributor = value;
 	}
 }
 
@@ -93,5 +131,6 @@ public partial class DesignDistributorListViewModel : DistributorListViewModel
 			DistributorList.Add(distributor1);
 		}
 		SelectedDistributor = DistributorList[0];
+
 	}
 }

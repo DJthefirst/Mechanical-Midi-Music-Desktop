@@ -99,28 +99,28 @@
                             <DataTemplate.Content>
                                 <StackPanel Margin="0" VerticalAlignment="Stretch">
                                     <Grid>
-                                        <TextBlock HorizontalAlignment="Left" Text="{Binding Device.SYSEX_DEV_ID, StringFormat='ID: {0}'}" />
+                                        <TextBlock HorizontalAlignment="Left" Text="{Binding Device.Id, StringFormat='ID: {0}'}" />
                                         <TextBlock HorizontalAlignment="Center" Text="{Binding Device.Name}" />
                                         <TextBlock HorizontalAlignment="Right" Text="{Binding Device.ConnectionString}" />
                                     </Grid>
                                     <Grid>
                                         <Label HorizontalAlignment="Right">Version 001.0</Label>
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{Binding Device.PLATFORM_TYPE, StringFormat='Platform: {0}'}" />
-                                            <TextBlock Text="{Binding Device.INSTRUMENT_TYPE, StringFormat='Device Type: {0}'}" />
+                                            <TextBlock Text="{Binding Device.Platform, StringFormat='Platform: {0}'}" />
+                                            <TextBlock Text="{Binding Device.Instrument, StringFormat='Device Type: {0}'}" />
                                             <TextBlock>
                                                 <TextBlock.Text>
                                                     <MultiBinding StringFormat="Instrument CFG: {0}.{1}">
-                                                        <Binding Path="Device.MAX_NUM_INSTRUMENTS" />
-                                                        <Binding Path="Device.NUM_SUBINSTRUMENTS" />
+                                                        <Binding Path="Device.MaxNumInstruments" />
+                                                        <Binding Path="Device.NumSubInstruments" />
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>
                                             <TextBlock>
                                                 <TextBlock.Text>
                                                     <MultiBinding StringFormat="Notes: {0}-{1}">
-                                                        <Binding Path="Device.MIN_MIDI_NOTE" />
-                                                        <Binding Path="Device.MAX_MIDI_NOTE" />
+                                                        <Binding Path="Device.MinMidiNote" />
+                                                        <Binding Path="Device.MaxMidiNote" />
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>

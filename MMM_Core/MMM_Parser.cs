@@ -225,7 +225,7 @@ internal class MMM_Parser : IDisposable
 				// Not implemented
 				break;
 			case SysEx.GetNumOfDistributors:
-				HandleGetNumOfDistributors(sender, msg);
+				HandleGetNumOfDistributors(sender, msg, connection);
 				break;
 			case SysEx.GetAllDistributors:
 				HandleGetAllDistributors(sender, msg, connection);
@@ -301,16 +301,13 @@ internal class MMM_Parser : IDisposable
 
 	private void HandleGetDeviceConstruct(object? sender, MMM_Msg msg, IConnection? connection)
 	{
-		Device device = new Device(msg.Payload());
-		device.ConnectionString = Device.GetConnectionString(sender);
 		if (connection == null)
 		{
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		DeviceManager.Instance.AddDevice(connection, device);
+		DeviceManager.Instance.HandleDeviceConstruct(connection, msg.Payload());
 		SendMessage(sender, msg.Source(), SysEx.GetNumOfDistributors);
-		connection.Update();
 		//SendMessage(msg.Source(), SysEx.GetAllDistributors); //TODO: Client Device returns multiple messages
 	}
 
@@ -325,8 +322,10 @@ internal class MMM_Parser : IDisposable
 		connection.Update();
 	}
 
-	private void HandleGetNumOfDistributors(object? sender, MMM_Msg msg)
+	private void HandleGetNumOfDistributors(object? sender, MMM_Msg msg, IConnection connection)
 	{
+		DeviceManager.Instance.Devices[connection][msg.Source()].NumDistributors = msg.Payload()[0];
+		DeviceManager.Instance.Devices[connection][msg.Source()].Distributors.Clear();
 		for (UInt16 i = 0; i < msg.Payload()[0]; ++i)
 			SendMessage(sender, msg.Source(), SysEx.GetDistributorConstruct, [(byte)(i >> 7), (byte)(i & 0x7F)]);
 	}
@@ -338,8 +337,7 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		DeviceManager.Instance.Devices[connection][msg.Source()].Distributors.Add(new Distributor(msg.Payload()));
-		connection.Update();
+		//TODO
 	}
 
 	private void HandleGetDistributorConstruct(object? sender, MMM_Msg msg, IConnection? connection)
@@ -349,15 +347,7 @@ internal class MMM_Parser : IDisposable
 			Console.WriteLine("Error: Connection Source is null");
 			return;
 		}
-		var device = DeviceManager.Instance.Devices[connection][msg.Source()];
-		var distributor = new Distributor(msg.Payload());
-
-		// Check if distributors contains a distributor with matching Index
-		if (!device.Distributors.Any(d => d.Index == distributor.Index))
-		{
-			device.AddDistributor(distributor);
-			connection.Update();
-		}
+		DeviceManager.Instance.Devices[connection][msg.Source()].AddDistributor(msg.Payload());
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -420,4 +410,3 @@ internal class MMM_Parser : IDisposable
   //  }
 	void IDisposable.Dispose() { }
 }
-
