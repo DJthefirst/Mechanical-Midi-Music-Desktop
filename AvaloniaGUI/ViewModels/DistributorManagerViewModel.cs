@@ -80,6 +80,7 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.Channels = Channels;
 		distributor.Instruments = Instruments;
 		distributor.Method = Distribution;
+		distributor.Muted = SelectedDistributor.Muted;
 		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
@@ -107,6 +108,7 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.Channels = Channels;
 		distributor.Instruments = Instruments;
 		distributor.Method = Distribution;
+		distributor.Muted = SelectedDistributor.Muted;
 		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;

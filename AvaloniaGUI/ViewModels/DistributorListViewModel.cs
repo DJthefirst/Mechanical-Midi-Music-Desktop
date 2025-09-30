@@ -5,6 +5,7 @@ using AvaloniaGUI.Factories;
 using AvaloniaGUI.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Google.Protobuf.WellKnownTypes;
 using MMM_Core;
 using MMM_Device;
 using MMM_Server;
@@ -37,13 +38,14 @@ public partial class DistributorListViewModel : ComponentViewModel
 			{
 				updateDistributors();
 
-				Console.WriteLine("Log1");
-
 				// Unsubscribe from previous device's distributors changed event
 				if (_lastSelectedDeviceEntry?.Device.Distributors is { } oldDistributors)
 				{
 					oldDistributors.CollectionChanged -= OnDistributorsChangedHandler;
-					Console.WriteLine("Log2");
+					foreach (var distributor in oldDistributors)
+					{
+						distributor.PropertyChanged -= OnDistributorChangedHandler;
+					}
 				}
 
 				// Subscribe to new device's distributors changed event
@@ -51,22 +53,33 @@ public partial class DistributorListViewModel : ComponentViewModel
 				if (_lastSelectedDeviceEntry?.Device.Distributors is { } newDistributors)
 				{
 					newDistributors.CollectionChanged += OnDistributorsChangedHandler;
-					Console.WriteLine("Log3");
+					foreach (var distributor in newDistributors)
+					{
+						distributor.PropertyChanged += OnDistributorChangedHandler;
+					}
 				}
 			}
 		};
 	}
 
+	// Handler for individual distributor property changes
+	private void OnDistributorChangedHandler(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+	{
+		if (sender is not Distributor distributor) return;
+		Console.WriteLine($"Distributor Muted: {distributor.Muted}");
+	}
 
 	private void OnDistributorsChangedHandler(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 	{
 		updateDistributors();
-		Console.WriteLine("Log4");
 	}
 	private void updateDistributors()
 	{
 		SelectedDevice = Context.SelectedDevice;
-
+		foreach (var distributor in DistributorList)
+		{
+			distributor.PropertyChanged -= OnDistributorChangedHandler;
+		}
 		DistributorList.Clear();
 		if (Context.SelectedDevice is null) return;
 
@@ -76,6 +89,7 @@ public partial class DistributorListViewModel : ComponentViewModel
 			foreach (var distributor in distributors)
 			{
 				DistributorList.Add(distributor);
+				distributor.PropertyChanged += OnDistributorChangedHandler;
 			}
 		}
 
@@ -90,10 +104,6 @@ public partial class DistributorListViewModel : ComponentViewModel
 			SelectedDistributor = DistributorList[DistributorList.Count - 1];
 			Context.SelectedDistributor = SelectedDistributor;
 		}
-		else
-		{
-			//SelectedDistributor = null;
-		}
 	}
 
 	public ObservableCollection<Distributor> DistributorList { get; } = new();
@@ -106,8 +116,28 @@ public partial class DistributorListViewModel : ComponentViewModel
 
 	partial void OnSelectedDistributorChanged(Distributor? value)
 	{
-		if(value != null)
+		if (value != null)
+		{
 			Context.SelectedDistributor = value;
+		}
+	}
+
+	[RelayCommand]
+	public void ToggleMute(Distributor distributor)
+	{
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
+
+		// Fix: Convert int? to byte safely, defaulting to 0 if null
+		int index = distributor.Index ?? 0;
+
+		MMM_Msg msg = MMM_Msg.GenerateSysEx(
+			deviceEntry.Id,
+			SysEx.ToggleMuteDistributor,
+			[(byte)((index >> 7) & 0x7F), (byte)((index >> 0) & 0x7F)]);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
+
+		msg = MMM_Msg.GenerateSysEx(deviceEntry.Id, SysEx.GetNumOfDistributors, []);
+		deviceEntry.Connection.SendEvent(msg.ToMidiEvent());
 	}
 }
 
@@ -117,16 +147,20 @@ public partial class DesignDistributorListViewModel : DistributorListViewModel
 	public DesignDistributorListViewModel()
 		: base()
 	{
-		byte[] Distributor0 = [0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0x7F, 0x00, 0x01, 0x00, 0x01, 0x7F, 0x01, 0x00];
-		byte[] Distributor1 = [0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x7F, 0x7F, 0x00, 0x01, 0x00, 0x01, 0x7F, 0x01, 0x00];
+		byte[] Distributor0 = [0x00, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x01, 0x7F, 0x00, 0x01, 0x06, 0x01, 0x7F, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
+		byte[] Distributor1 = [0x00, 0x01, 0x00, 0x00, 0x04, 0x00, 0x00, 0x7F, 0x7F, 0x00, 0x01, 0x01, 0x01, 0x7F, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00];
 
-		SelectedDevice = new DeviceEntry();
-		for (int i = 0; i < 5; i++)
+		// Creates a new dummy DeviceEntry with default values
+		var dummyDevice = new Device();
+		var SelectedDevice = new DeviceEntry(null, 0, dummyDevice);
+
+
+		for (int i = 0; i < 2; i++)
 		{
 			var distributor0 = new Distributor(Distributor0);
-			var distributor1 = new Distributor(Distributor0);
-			SelectedDevice?.Device.Distributors.Add(distributor0);
-			SelectedDevice?.Device.Distributors.Add(distributor1);
+			var distributor1 = new Distributor(Distributor1);
+			SelectedDevice.Device.Distributors.Add(distributor0);
+			SelectedDevice.Device.Distributors.Add(distributor1);
 			DistributorList.Add(distributor0);
 			DistributorList.Add(distributor1);
 		}

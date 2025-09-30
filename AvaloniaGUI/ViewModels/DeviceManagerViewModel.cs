@@ -59,5 +59,19 @@ public partial class DeviceManagerViewModel : ComponentViewModel
 		msg = MMM_Msg.GenerateSysEx(Id, SysEx.GetDeviceConstruct, []);
 		connection.SendEvent(msg.ToMidiEvent());
 	}
+
+	[RelayCommand]
+	public void Reset()
+	{
+
+		IConnection? connection = SelectedDevice?.Connection;
+		if (connection == null) return;
+
+		MMM_Msg msg = MMM_Msg.GenerateSysEx(Id, SysEx.ResetDeviceConfig, []);
+		connection.SendEvent(msg.ToMidiEvent());
+
+		msg = MMM_Msg.GenerateSysEx(Id, SysEx.GetDeviceConstruct, []);
+		connection.SendEvent(msg.ToMidiEvent());
+	}
 }
 

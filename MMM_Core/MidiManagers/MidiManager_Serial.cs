@@ -186,7 +186,8 @@ public class MidiSerialManager : IInputManager, IOutputManager
 			}
 
 			int endIndex = -1, idx = 0;
-			foreach (var b in buffer)
+			var bufferArray = buffer.ToArray();
+			foreach (var b in bufferArray)
 			{
 				if (idx > 0 && b == 0xF0)
 				{

@@ -10,5 +10,10 @@ public partial class DistributorListView : UserControl
 	public DistributorListView()
 	{
 		InitializeComponent();
+
+		//MutedSelector.SelectionChanged += (s, e) =>
+		//{
+		//	(DataContext as DistributorListViewModel)?.UpdateMutedDistributors();
+		//};
 	}
 }

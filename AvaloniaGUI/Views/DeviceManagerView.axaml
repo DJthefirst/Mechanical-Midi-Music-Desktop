@@ -68,7 +68,8 @@
                     Grid.Column="1"
                     Margin="5"
                     HorizontalAlignment="Stretch"
-                    HorizontalContentAlignment="Center">
+                    HorizontalContentAlignment="Center"
+                    Command="{Binding ResetCommand}">
                     Reset
                 </Button>
                 <Button

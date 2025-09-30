@@ -33,7 +33,7 @@ public partial class Device : ObservableObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	const byte NUM_NAME_BYTES = 20;
-	const byte NUM_CFG_BYTES = 32;
+	const byte NUM_CFG_BYTES = 40;
 	const byte BOOL_OMNIMODE = 0x01;
 
 	public Device() { }
@@ -126,7 +126,7 @@ public partial class Device : ObservableObject
 		FirmwareVersion = (deviceObj[9] << 7) | (deviceObj[10] << 0);
 
 		Name = System.Text.Encoding.ASCII
-			.GetString(deviceObj.AsSpan(12, NUM_NAME_BYTES))
+			.GetString(deviceObj.AsSpan(20, NUM_NAME_BYTES))
 			.TrimEnd('\0');
     }
 
@@ -193,8 +193,8 @@ public partial class Device : ObservableObject
 
 		for (int i = 0; i < NUM_NAME_BYTES; i++)
 		{
-			if (Name.Length > i) deviceObj[12 + i] = (byte)Name[i];
-			else deviceObj[12 + i] = 0x20; //Hex for space
+			if (Name.Length > i) deviceObj[20 + i] = (byte)Name[i];
+			else deviceObj[20 + i] = 0x20; //Hex for space
 		}
 
 		return deviceObj;

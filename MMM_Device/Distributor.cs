@@ -18,7 +18,7 @@ public enum DistributionMethod
 /* Routes Midi Notes to various instrument groups via configurable algorithms. */
 public partial class Distributor : ObservableObject
 {
-	public const int NUM_CFG_BYTES = 16;
+	public const int NUM_CFG_BYTES = 24;
 
 	const int BOOL_MUTED = 0x01;
 	const int BOOL_DAMPERPEDAL = 0x02;

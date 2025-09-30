@@ -48,12 +48,12 @@
                             <Border CornerRadius="10">
                                 <StackPanel Margin="0" VerticalAlignment="Stretch">
                                     <Grid ColumnDefinitions="*,0.8*">
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{Binding Index, StringFormat='Distributor ID: {0}'}" />
-                                            <TextBlock Text="{Binding Channels, StringFormat='Channels: 0x{0:X}'}" />
-                                            <TextBlock Text="{Binding Instruments, StringFormat='Instrument: 0x{0:X}'}" />
-                                            <TextBlock Text="{Binding DistributionMethod, StringFormat='Method: {0}'}" />
-                                            <TextBlock>
+                                        <Grid Grid.Column="0" RowDefinitions="*,*,*,*,*,*">
+                                            <TextBlock Grid.Row="0" Text="{Binding Index, StringFormat='Distributor ID: {0}'}" />
+                                            <TextBlock Grid.Row="1" Text="{Binding Channels, StringFormat='Channels: 0x{0:X}'}" />
+                                            <TextBlock Grid.Row="2" Text="{Binding Instruments, StringFormat='Instrument: 0x{0:X}'}" />
+                                            <TextBlock Grid.Row="3" Text="{Binding Method, StringFormat='Method: {0}'}" />
+                                            <TextBlock Grid.Row="4">
                                                 <TextBlock.Text>
                                                     <MultiBinding StringFormat="Notes: {0}-{1}">
                                                         <Binding Path="MinNote" />
@@ -61,47 +61,80 @@
                                                     </MultiBinding>
                                                 </TextBlock.Text>
                                             </TextBlock>
-                                        </StackPanel>
+                                            <TextBlock
+                                                Grid.Row="5"
+                                                HorizontalAlignment="Left"
+                                                Text="{Binding NumPolyphonicNotes, StringFormat='NumPolyphonic: {0}'}" />
+                                        </Grid>
                                         <Grid
                                             Grid.Column="1"
                                             Height="100"
                                             RowDefinitions="*,*,*,*">
-
+                                            <Button
+                                                Height="25"
+                                                Margin="0,0,6,0"
+                                                Padding="0,0,0,0"
+                                                HorizontalAlignment="Right"
+                                                Command="{Binding DataContext.ToggleMuteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding !Muted}">
+                                                <Label
+                                                    Margin="0"
+                                                    Padding="1,0,1,0"
+                                                    Background="{DynamicResource SecondaryBackground}"
+                                                    Content="M"
+                                                    CornerRadius="5"
+                                                    FontWeight="Bold"
+                                                    Foreground="{DynamicResource PrimaryForeground}" />
+                                            </Button>
+                                            <Button
+                                                Height="25"
+                                                Margin="0,0,6,0"
+                                                Padding="0,0,0,0"
+                                                HorizontalAlignment="Right"
+                                                Command="{Binding DataContext.ToggleMuteCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                                CommandParameter="{Binding .}"
+                                                IsVisible="{Binding Muted}">
+                                                <Label
+                                                    Margin="0"
+                                                    Padding="1,0,1,0"
+                                                    Background="red"
+                                                    Content="M"
+                                                    CornerRadius="5"
+                                                    FontWeight="Bold"
+                                                    Foreground="Black" />
+                                            </Button>
                                             <Label
-                                                Grid.Row="0"
+                                                Grid.Row="1"
                                                 Margin="0"
                                                 HorizontalAlignment="Left">
                                                 Damper:
                                             </Label>
                                             <CheckBox
-                                                Grid.Row="0"
+                                                Grid.Row="1"
                                                 Margin="0"
                                                 HorizontalAlignment="Right"
                                                 IsChecked="{Binding DamperPedal}"
                                                 IsEnabled="False" />
                                             <Label
-                                                Grid.Row="1"
+                                                Grid.Row="2"
                                                 Margin="0"
                                                 HorizontalAlignment="Left">
                                                 Polyphonic:
                                             </Label>
                                             <CheckBox
-                                                Grid.Row="1"
+                                                Grid.Row="2"
                                                 Margin="0"
                                                 HorizontalAlignment="Right"
                                                 IsChecked="{Binding Polyphonic}"
                                                 IsEnabled="False" />
-                                            <Label Grid.Row="2" HorizontalAlignment="Left">Note Overwrite:</Label>
+                                            <Label Grid.Row="3" HorizontalAlignment="Left">Note Overwrite:</Label>
                                             <CheckBox
-                                                Grid.Row="2"
+                                                Grid.Row="3"
                                                 Margin="0"
                                                 HorizontalAlignment="Right"
                                                 IsChecked="{Binding NoteOverwrite}"
                                                 IsEnabled="False" />
-                                            <TextBlock
-                                                Grid.Row="3"
-                                                HorizontalAlignment="Left"
-                                                Text="{Binding NumPolyphonicNotes, StringFormat='NumPolyphonic: {0}'}" />
                                         </Grid>
                                     </Grid>
                                 </StackPanel>
@@ -109,15 +142,6 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-
-
-
-
-
-
-
-
-                <ListBox Background="{DynamicResource SecondaryBackground}" />
             </StackPanel>
         </ScrollViewer>
     </Border>

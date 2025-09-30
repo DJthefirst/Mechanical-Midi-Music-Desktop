@@ -115,7 +115,8 @@ public class DeviceManager
 		{
 			OnDeviceChanged?.Invoke(this, new DeviceEntry(connection, device.Id, device));
 		};
-		
+
+		OnDeviceChanged?.Invoke(this, new DeviceEntry(connection, device.Id, device));
 	}
 
 	public void RemoveDevice(IConnection connection, Device device)
