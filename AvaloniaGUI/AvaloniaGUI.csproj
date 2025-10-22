@@ -40,9 +40,17 @@
   <ItemGroup>
     <ProjectReference Include="..\MMM_Core\MMM_Core.csproj" />
     <ProjectReference Include="..\MMM_Device\MMM_Device.csproj" />
-    <ProjectReference Include="..\MMM_Server_Grpc\MMM_Server.csproj" />
+	    <ProjectReference Include="..\MMM_Server_Grpc\MMM_Server.csproj">
+		    <!-- Prevent the server project's publish/runtime files from being merged into this desktop app.
+            CopyLocal and ExcludeAssets stop the server's apphost/runtimeconfig from colliding with the desktop publish.
+            PrivateAssets prevents transitive asset flow. -->
+		    <Publish>false</Publish>
+		    <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+		    <CopyLocal>false</CopyLocal>
+		    <ExcludeAssets>runtime;native;contentFiles</ExcludeAssets>
+		    <PrivateAssets>all</PrivateAssets>
+	    </ProjectReference>
   </ItemGroup>
-
   <ItemGroup>
     <Compile Update="Controls\Example\IconButton2.axaml.cs">
       <DependentUpon>IconButton2.axaml</DependentUpon>

@@ -67,10 +67,10 @@
                 Name="HomePageStackedLists"
                 IsVisible="{Binding !IsFullWidth}"
                 RowDefinitions="*,*">
-                <!--  Distributor List  -->
-                <ContentControl Grid.Row="0" Content="{Binding DistributorListComponent}" />
                 <!--  Device List  -->
-                <ContentControl Grid.Row="1" Content="{Binding DeviceListComponent}" />
+                <ContentControl Grid.Row="0" Content="{Binding DeviceListComponent}" />
+                <!--  Distributor List  -->
+                <ContentControl Grid.Row="1" Content="{Binding DistributorListComponent}" />
             </Grid>
         </Grid>
     </Grid>

@@ -7,8 +7,12 @@
     <Nullable>enable</Nullable>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-	 <OutputType>Exe</OutputType> <!--For Console Window -->
+	 <OutputType>Exe</OutputType>
+	 <ApplicationIcon>MMM_Icon_Light_BG.ico</ApplicationIcon> <!--For Console Window -->
   </PropertyGroup>
+  <ItemGroup>
+    <Content Include="MMM_Icon_Light_BG.ico" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Avalonia.Desktop" Version="11.3.2" />

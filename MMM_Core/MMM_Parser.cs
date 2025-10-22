@@ -26,13 +26,15 @@ public struct SysEx
 
     public const byte GetDeviceConstructWithDistributors = 0x10;
     public const byte GetDeviceConstruct = 0x11;
-    public const byte GetDeviceName = 0x12;
-    public const byte GetDeviceBoolean = 0x13;
+	public const byte GetDeviceID = 0x12;
+	public const byte GetDeviceName = 0x13;
+    public const byte GetDeviceBoolean = 0x14;
 
     public const byte SetDeviceConstructWithDistributors = 0x20;
     public const byte SetDeviceConstruct = 0x21;
-    public const byte SetDeviceName = 0x22;
-    public const byte SetDeviceBoolean = 0x23;
+	public const byte SetDeviceID = 0x22;
+	public const byte SetDeviceName = 0x23;
+    public const byte SetDeviceBoolean = 0x24;
 
     public const byte GetNumOfDistributors = 0x30;
     public const byte AddDistributor = 0x31;

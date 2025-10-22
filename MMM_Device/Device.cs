@@ -8,10 +8,14 @@ using System.IO.Ports;
 namespace MMM_Device;
 public enum InstrumentType
 {
-    PWM = 1,
-    ShiftRegister,
-    StepperMotor,
-    FloppyDrive
+	None = 0,
+	SW_PWM = 1,
+	HW_PWM = 2,
+	StepHW_PWM,
+	StepSW_PWM,
+	ShiftRegister,
+	StepperMotor = 0x10,
+	FloppyDrive = 0x11
 };
 
 public enum PlatformType
@@ -78,7 +82,7 @@ public partial class Device : ObservableObject
 	private byte _maxMidiNote = 127;
 
 	[ObservableProperty]
-	private InstrumentType _instrument = InstrumentType.PWM;
+	private InstrumentType _instrument = InstrumentType.None;
 	[ObservableProperty]
 	private PlatformType _platform = PlatformType.ESP32;
 	[ObservableProperty]

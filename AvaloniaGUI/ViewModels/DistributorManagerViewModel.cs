@@ -101,14 +101,14 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	[RelayCommand]
 	public void Add()
 	{
-		if (Context.SelectedDevice is not DeviceEntry deviceEntry || SelectedDistributor == null) return;
+		if (Context.SelectedDevice is not DeviceEntry deviceEntry) return;
 
 		Distributor distributor = new Distributor();
 		distributor.Index = deviceEntry.Device.Distributors.Count;
 		distributor.Channels = Channels;
 		distributor.Instruments = Instruments;
 		distributor.Method = Distribution;
-		distributor.Muted = SelectedDistributor.Muted;
+		distributor.Muted = false;
 		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
@@ -161,13 +161,13 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 
 	public int UpdateChannels()
 	{
-		int result = Math.Clamp(ListedItemsToNumber(StrChannels), 0, 0xFFFF);
+		int result = Math.Clamp(ListedItemsToNumber(StrChannels, 16), 0, 0xFFFF);
 		StrChannels = NumberToListedItems(result);
 		return result;
 	}
 	public int UpdateInstruments()
 	{
-		int result = ListedItemsToNumber(StrInstruments); //TODO Fix result size uint32
+		int result = ListedItemsToNumber(StrInstruments, 32); //TODO Fix result size uint32
 		StrInstruments = NumberToListedItems(result);
 		return result;
 	}
@@ -179,11 +179,15 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	/// </summary>
 	/// <param name="input">The input to parse (string or int).</param>
 	/// <returns>An integer bitmask representing the selected items.</returns>
-	public static int ListedItemsToNumber(object? input)
+	public static int ListedItemsToNumber(object? input, int maxItems)
 	{
-		// If input is already an int, return as is
+		// Build mask for allowed bits
+		uint mask = (maxItems == 32) ? 0xFFFFFFFFu : ((1u << maxItems) - 1u);
+
+		// If input is already an int, apply mask and return
 		if (input is int x)
-			return x;
+			return (int)((uint)x & mask);
+
 		// If input is not a string or is empty/whitespace, return 0
 		if (input is not string s || string.IsNullOrWhiteSpace(s))
 			return 0;
@@ -202,7 +206,8 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 				s = System.Text.RegularExpressions.Regex.Replace(s, @"0x([0-9A-Fa-f]+)", m => Convert.ToInt32(m.Groups[1].Value, 16).ToString());
 				// Evaluate the expression using DataTable.Compute
 				var eval = new System.Data.DataTable().Compute(s, "");
-				return Convert.ToInt32(eval);
+				long val = Convert.ToInt64(eval);
+				return (int)((uint)val & mask);
 			}
 			catch { return 0; }
 		}
@@ -213,24 +218,33 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		// Regex to match individual numbers not part of a range
 		var numRegex = new System.Text.RegularExpressions.Regex(@"(?<=^|[^-\s\d]|\d\s)\s*(\d+)\s*(?=[^-\s\d]|\s\d|$)", System.Text.RegularExpressions.RegexOptions.Compiled);
 
-		// Parse and set bits for all ranges found
+		// Parse and set bits for all ranges found (clamped to allowed range)
 		foreach (System.Text.RegularExpressions.Match m in rangeRegex.Matches(s))
 		{
 			if (int.TryParse(m.Groups[1].Value, out int start) &&
 				int.TryParse(m.Groups[2].Value, out int end) &&
-				start > 0 && end > 0 && start <= end && end <= 32)
+				start > 0 && end > 0 && start <= end)
 			{
-				for (int i = start; i <= end; i++)
-					result |= 1 << (i - 1);
+				// Clamp range to [1, maxItems]
+				int st = Math.Max(1, start);
+				int en = Math.Min(maxItems, end);
+				if (st <= en)
+				{
+					for (int i = st; i <= en; i++)
+						result |= 1 << (i - 1);
+				}
 			}
 		}
 
-		// Parse and set bits for all individual numbers found
+		// Parse and set bits for all individual numbers found (clamped to allowed range)
 		foreach (System.Text.RegularExpressions.Match m in numRegex.Matches(s))
 		{
-			if (int.TryParse(m.Groups[1].Value, out int n) && n > 0 && n <= 32)
+			if (int.TryParse(m.Groups[1].Value, out int n) && n > 0 && n <= maxItems)
 				result |= 1 << (n - 1);
 		}
+
+		// Finally, ensure any stray bits above maxItems are cleared
+		result = (int)((uint)result & mask);
 
 		return result;
 	}
@@ -244,29 +258,34 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	public static string NumberToListedItems(int num)
 	{
 		if (num == 0) return string.Empty; // No bits set, return empty string.
+
+		// Use unsigned arithmetic to avoid sign-extension on the high bit (bit 31 -> instrument 32).
+		// If the signed int has the high bit set, casting to uint produces the correct bit pattern
+		uint unum = unchecked((uint)num);
+
 		var result = new System.Text.StringBuilder();
 		int i = 1; // Bit position (1-based)
-		while (num != 0)
+		while (unum != 0)
 		{
 			// Skip unset bits
-			if ((num & 1) == 0)
+			if ((unum & 1u) == 0u)
 			{
-				num >>= 1;
+				unum >>= 1;
 				i++;
 				continue;
 			}
 			int start = i; // Start of a run of set bits
 						   // Find the end of the run of consecutive set bits
-			while (((num >> 1) & 1) == 1)
+			while (((unum >> 1) & 1u) == 1u)
 			{
-				num >>= 1;
+				unum >>= 1;
 				i++;
 			}
 			int end = i; // End of the run
 			if (result.Length > 0) result.Append(','); // Add comma if not the first range
 													   // Append either a single value or a range
 			result.Append(start == end ? $"{start}" : $"{start}-{end}");
-			num >>= 1;
+			unum >>= 1;
 			i++;
 		}
 		return result.ToString();
