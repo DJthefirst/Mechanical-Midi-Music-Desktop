@@ -20,10 +20,11 @@ public partial class Distributor : ObservableObject
 {
 	public const int NUM_CFG_BYTES = 24;
 
-	const int BOOL_MUTED = 0x01;
-	const int BOOL_DAMPERPEDAL = 0x02;
-	const int BOOL_POLYPHONIC = 0x04;
-	const int BOOL_NOTEOVERWRITE = 0x08;
+	const int BOOL_MUTED = 0x0001;
+	const int BOOL_POLYPHONIC = 0x0002;
+	const int BOOL_NOTEOVERWRITE = 0x0004;
+	const int BOOL_DAMPERPEDAL = 0x0008;
+	const int BOOL_VIBRATO = 0x0010;
 
 	[ObservableProperty]
 	private int? _index = 0;
@@ -38,11 +39,13 @@ public partial class Distributor : ObservableObject
 	[ObservableProperty]
 	private bool _muted = false;
 	[ObservableProperty]
-	private bool _damperPedal = false;
-	[ObservableProperty]
 	private bool _polyphonic = true;
 	[ObservableProperty]
 	private bool _noteOverwrite = false;
+	[ObservableProperty]
+	private bool _damperPedal = false;
+	[ObservableProperty]
+	private bool _vibrato = false;
 	[ObservableProperty]
 	private int _minNote = 0;
 	[ObservableProperty]
@@ -67,11 +70,12 @@ public partial class Distributor : ObservableObject
 	{
 		byte[] distributorObj = new byte[NUM_CFG_BYTES];
 
-		byte distributorBoolByte = 0;
-		if (Muted) distributorBoolByte |= BOOL_MUTED;
-		if (DamperPedal) distributorBoolByte |= BOOL_DAMPERPEDAL;
-		if (Polyphonic) distributorBoolByte |= BOOL_POLYPHONIC;
-		if (NoteOverwrite) distributorBoolByte |= BOOL_NOTEOVERWRITE;
+		int distributorBoolValue = 0;
+		if (Muted) distributorBoolValue |= BOOL_MUTED;
+		if (Polyphonic) distributorBoolValue |= BOOL_POLYPHONIC;
+		if (NoteOverwrite) distributorBoolValue |= BOOL_NOTEOVERWRITE;
+		if (DamperPedal) distributorBoolValue |= BOOL_DAMPERPEDAL;
+		if (Vibrato) distributorBoolValue |= BOOL_VIBRATO;
 
 		distributorObj[0] = (byte)(((Index ?? 0) >> 7) & 0x7F);
 		distributorObj[1] = (byte)(((Index ?? 0) >> 0) & 0x7F);
@@ -84,11 +88,17 @@ public partial class Distributor : ObservableObject
 		distributorObj[8] = (byte)((Instruments >> 7) & 0x7F);
 		distributorObj[9] = (byte)((Instruments >> 0) & 0x7F);
 		distributorObj[10] = (byte)(Method);
-		distributorObj[11] = distributorBoolByte;
-		distributorObj[12] = (byte)MinNote;
-		distributorObj[13] = (byte)MaxNote;
-		distributorObj[14] = (byte)NumPolyphonicNotes;
-		distributorObj[15] = 0;
+		distributorObj[11] = (byte)MinNote;
+		distributorObj[12] = (byte)MaxNote;
+		distributorObj[13] = (byte)NumPolyphonicNotes;
+		distributorObj[14] = (byte)((distributorBoolValue >> 7) & 0x7F);
+		distributorObj[15] = (byte)((distributorBoolValue >> 0) & 0x7F);
+		
+		// Bytes 16-23: Reserved
+		for (int i = 16; i < NUM_CFG_BYTES; i++)
+		{
+			distributorObj[i] = 0;
+		}
 
 		return distributorObj;
 	}
@@ -109,17 +119,19 @@ public partial class Distributor : ObservableObject
 			| (data[8] << 7)
 			| (data[9] << 0);
 		DistributionMethod distributionMethod = (DistributionMethod)(data[10]);
+		int boolValue = (data[14] << 7) | (data[15] << 0);
 
 		Index = index;
 		Channels = channels;
 		Instruments = instruments;
 		Method = distributionMethod;
-		Muted = (data[11] & BOOL_MUTED) != 0;
-		DamperPedal = (data[11] & BOOL_DAMPERPEDAL) != 0;
-		Polyphonic = (data[11] & BOOL_POLYPHONIC) != 0;
-		NoteOverwrite = (data[11] & BOOL_NOTEOVERWRITE) != 0;
-		MinNote = data[12];
-		MaxNote = data[13];
-		NumPolyphonicNotes = (data[14]);
+		MinNote = data[11];
+		MaxNote = data[12];
+		NumPolyphonicNotes = data[13];
+		Muted = (boolValue & BOOL_MUTED) != 0;
+		Polyphonic = (boolValue & BOOL_POLYPHONIC) != 0;
+		NoteOverwrite = (boolValue & BOOL_NOTEOVERWRITE) != 0;
+		DamperPedal = (boolValue & BOOL_DAMPERPEDAL) != 0;
+		Vibrato = (boolValue & BOOL_VIBRATO) != 0;
 	}
 }

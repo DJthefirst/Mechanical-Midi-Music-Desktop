@@ -23,9 +23,10 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 				StrChannels = NumberToListedItems(SelectedDistributor?.Channels ?? 0);
 				StrInstruments = NumberToListedItems(SelectedDistributor?.Instruments ?? 0);
 				Distribution = SelectedDistributor?.Method ?? DistributionMethod.RoundRobin;
-				Damper = SelectedDistributor?.DamperPedal ?? false;
 				Polyphonic = SelectedDistributor?.Polyphonic ?? false;
 				NoteOverwrite = SelectedDistributor?.NoteOverwrite ?? false;
+				Damper = SelectedDistributor?.DamperPedal ?? false;
+				Vibrato = SelectedDistributor?.Vibrato ?? false;
 				MinNote = SelectedDistributor?.MinNote ?? 0;
 				MaxNote = SelectedDistributor?.MaxNote ?? 127;
 				NumPolyphonicNotes = SelectedDistributor?.NumPolyphonicNotes ?? 1;
@@ -52,14 +53,18 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 	[ObservableProperty]
 	private DistributionMethod _distribution = DistributionMethod.RoundRobin;
 
-	[ObservableProperty]
-	private bool _damper = false;
 
 	[ObservableProperty]
 	private bool _polyphonic = false;
 
 	[ObservableProperty]
 	private bool _noteOverwrite = false;
+
+	[ObservableProperty]
+	private bool _damper = false;
+
+	[ObservableProperty]
+	private bool _vibrato = false;
 
 	[ObservableProperty]
 	private int _minNote = 0;
@@ -81,9 +86,10 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.Instruments = Instruments;
 		distributor.Method = Distribution;
 		distributor.Muted = SelectedDistributor.Muted;
-		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
+		distributor.DamperPedal = Damper;
+		distributor.Vibrato = Vibrato;
 		distributor.MinNote = MinNote;
 		distributor.MaxNote = MaxNote;
 		distributor.NumPolyphonicNotes = NumPolyphonicNotes;
@@ -109,9 +115,10 @@ public partial class DistributorManagerViewModel : ComponentViewModel
 		distributor.Instruments = Instruments;
 		distributor.Method = Distribution;
 		distributor.Muted = false;
-		distributor.DamperPedal = Damper;
 		distributor.Polyphonic = Polyphonic;
 		distributor.NoteOverwrite = NoteOverwrite;
+		distributor.DamperPedal = Damper;
+		distributor.Vibrato = Vibrato;
 		distributor.MinNote = MinNote;
 		distributor.MaxNote = MaxNote;
 		distributor.NumPolyphonicNotes = NumPolyphonicNotes;

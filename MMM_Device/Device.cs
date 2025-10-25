@@ -38,7 +38,8 @@ public partial class Device : ObservableObject
 	
 	const byte NUM_NAME_BYTES = 20;
 	const byte NUM_CFG_BYTES = 40;
-	const byte BOOL_OMNIMODE = 0x01;
+	const int BOOL_MUTED = 0x0001;
+	const int BOOL_OMNIMODE = 0x0002;
 
 	public Device() { }
 	public Device(byte[] deviceConstruct)
@@ -68,6 +69,8 @@ public partial class Device : ObservableObject
 	private int _id = 0x0001;
 	[ObservableProperty]
 	private string _name = "New Device";
+	[ObservableProperty]
+	private bool _muted = false;
 	[ObservableProperty]
 	private bool _omniMode = false;
 	[ObservableProperty]
@@ -112,38 +115,29 @@ public partial class Device : ObservableObject
 		}		
 	}
 
-	private void SetDeviceBoolean(byte deviceBoolByte)
+	private void SetDeviceBoolean(int deviceBoolValue)
 	{
-		OmniMode = ((deviceBoolByte & 0x01) != 0);
+		Muted = ((deviceBoolValue & BOOL_MUTED) != 0);
+		OmniMode = ((deviceBoolValue & BOOL_OMNIMODE) != 0);
 	}
 
 	public void SetDeviceConstruct(byte[] deviceObj)
 	{
 		Id = (deviceObj[0] << 7) | (deviceObj[1] << 0);
-		SetDeviceBoolean(deviceObj[2]);
-		MaxNumInstruments = deviceObj[3];
-		NumSubInstruments = deviceObj[4];
-		Instrument = (InstrumentType)deviceObj[5];
-		Platform = (PlatformType)deviceObj[6];
-		MinMidiNote = deviceObj[7];
-		MaxMidiNote = deviceObj[8];
-		FirmwareVersion = (deviceObj[9] << 7) | (deviceObj[10] << 0);
+		MaxNumInstruments = deviceObj[2];
+		NumSubInstruments = deviceObj[3];
+		Instrument = (InstrumentType)deviceObj[4];
+		Platform = (PlatformType)deviceObj[5];
+		MinMidiNote = deviceObj[6];
+		MaxMidiNote = deviceObj[7];
+		FirmwareVersion = (deviceObj[8] << 7) | (deviceObj[9] << 0);
+		int boolValue = (deviceObj[10] << 7) | (deviceObj[11] << 0);
+		SetDeviceBoolean(boolValue);
 
 		Name = System.Text.Encoding.ASCII
 			.GetString(deviceObj.AsSpan(20, NUM_NAME_BYTES))
 			.TrimEnd('\0');
     }
-
-	//public void SetAllDistributors(byte[] data)
-	//{
-	//    int numDistributors = (data.Length / Distributor.NUM_CFG_BYTES);
-	//    Distributors.Clear();
-	//    for (int i = 0; i < numDistributors; ++i)
-	//    {
-	//        int idx = i * Distributor.NUM_CFG_BYTES;
-	//        Distributors.Add(new Distributor(data[(idx)..(idx+Distributor.NUM_CFG_BYTES)]));
-	//    }
-	//}
 
 	public static string GetConnectionString(object? sender)
 	{
@@ -160,11 +154,12 @@ public partial class Device : ObservableObject
 		return connectionString;
 	}
 
-	private byte GetDeviceBoolean()
+	private int GetDeviceBoolean()
     {
-        byte deviceBoolByte = 0;
-        if (OmniMode) deviceBoolByte |= (1 << 0);
-        return deviceBoolByte;
+        int deviceBoolValue = 0;
+        if (Muted) deviceBoolValue |= BOOL_MUTED;
+        if (OmniMode) deviceBoolValue |= BOOL_OMNIMODE;
+        return deviceBoolValue;
     }
 
     public byte[] GetDeviceName()
@@ -182,19 +177,28 @@ public partial class Device : ObservableObject
 	{
 		byte[] deviceObj = new byte[NUM_CFG_BYTES];
 
-		// Use backing fields and properties instead of undefined constants
+		int boolValue = GetDeviceBoolean();
+		
 		deviceObj[0] = (byte)((Id >> 7) & 0x7F); //Device ID MSB
 		deviceObj[1] = (byte)((Id >> 0) & 0x7F); //Device ID LSB
-		deviceObj[2] = (byte)GetDeviceBoolean();
-		deviceObj[3] = MaxNumInstruments;
-		deviceObj[4] = NumSubInstruments;
-		deviceObj[5] = (byte)Instrument;
-		deviceObj[6] = (byte)Platform;
-		deviceObj[7] = MinMidiNote;
-		deviceObj[8] = MaxMidiNote;
-		deviceObj[9] = (byte)((FirmwareVersion >> 7) & 0x7F);
-		deviceObj[10] = (byte)((FirmwareVersion >> 0) & 0x7F);
+		deviceObj[2] = MaxNumInstruments;
+		deviceObj[3] = NumSubInstruments;
+		deviceObj[4] = (byte)Instrument;
+		deviceObj[5] = (byte)Platform;
+		deviceObj[6] = MinMidiNote;
+		deviceObj[7] = MaxMidiNote;
+		deviceObj[8] = (byte)((FirmwareVersion >> 7) & 0x7F);
+		deviceObj[9] = (byte)((FirmwareVersion >> 0) & 0x7F);
+		deviceObj[10] = (byte)((boolValue >> 7) & 0x7F);
+		deviceObj[11] = (byte)((boolValue >> 0) & 0x7F);
+		
+		// Bytes 12-19: Reserved
+		for (int i = 12; i < 20; i++)
+		{
+			deviceObj[i] = 0;
+		}
 
+		// Bytes 20-39: Device Name
 		for (int i = 0; i < NUM_NAME_BYTES; i++)
 		{
 			if (Name.Length > i) deviceObj[20 + i] = (byte)Name[i];

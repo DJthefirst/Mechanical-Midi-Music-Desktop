@@ -69,17 +69,21 @@
             </StackPanel>
             <StackPanel Margin="5" Orientation="Horizontal">
                 <Label VerticalAlignment="Center" Foreground="White">
-                    Damper Enable
+                    Damper
                 </Label>
                 <CheckBox IsChecked="{Binding Damper, Mode=TwoWay}" />
                 <Label VerticalAlignment="Center" Foreground="White">
-                    Polyphonic Enable
+                    Polyphonic
                 </Label>
                 <CheckBox IsChecked="{Binding Polyphonic, Mode=TwoWay}" />
                 <Label VerticalAlignment="Center" Foreground="White">
                     Note Overwrite
                 </Label>
                 <CheckBox IsChecked="{Binding NoteOverwrite, Mode=TwoWay}" />
+                <Label VerticalAlignment="Center" Foreground="White">
+                    Vibrato
+                </Label>
+                <CheckBox IsChecked="{Binding Vibrato, Mode=TwoWay}" />
             </StackPanel>
             <StackPanel Margin="5" Orientation="Horizontal">
                 <Label VerticalAlignment="Center" Foreground="White">
